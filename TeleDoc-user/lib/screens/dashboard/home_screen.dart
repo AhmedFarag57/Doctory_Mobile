@@ -21,6 +21,7 @@ import 'package:teledoc/utils/custom_style.dart';
 import 'package:teledoc/screens/auth/sign_in_screen.dart';
 import 'package:teledoc/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teledoc/models/Doctor.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -31,6 +32,30 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  var doctors = <Doctor>[];
+  var user;
+
+  @override
+  void initState() {
+    _getUserData();
+    _getAllDoctors();
+
+    super.initState();
+  }
+
+  _getUserData() async {
+    // Get the user data from phone storage
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = localStorage.get('user');
+    print(user);
+  }
+
+  _getAllDoctors() {
+    CallApi().getDataWithToken('/doctors').then((response) {
+      Iterable list = json.decode(response.body);
+      doctors = list.map((model) => Doctor.fromJson(model)).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/images/profile.png',
         ),
         title: Text(
+          //user['name'],
           Strings.demoName,
           style: TextStyle(
               color: Colors.white,
@@ -122,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
+          //user['phone_number'],
           Strings.demoPhoneNumber,
           style: TextStyle(
             color: Colors.white,
@@ -141,20 +168,19 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       onTap: () async {
         var response = await CallApi().getDataWithToken('/logout');
-        
+
         var body = json.decode(response.body);
 
         if (body['success']) {
-          SharedPreferences localStorage = await SharedPreferences.getInstance();
+          SharedPreferences localStorage =
+              await SharedPreferences.getInstance();
           localStorage.remove('user');
           localStorage.remove('token');
 
           Navigator.of(context).pop();
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => goTo));
-
         }
-        
       },
     );
   }
@@ -445,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: TopDoctorList.list().length,
+              itemCount: doctors.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 TopDoctor topDoctor = TopDoctorList.list()[index];
@@ -595,7 +621,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  nearby.name,
+                                  doctors.name,
+                                  //nearby.name,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
