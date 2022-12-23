@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:doctor/utils/colors.dart';
@@ -7,7 +9,9 @@ import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:doctor/screens/dashboard_screen.dart';
 import 'package:doctor/screens/auth/sign_up_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../network_utils/api.dart';
 import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -16,7 +20,6 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextEditingController emailController = TextEditingController();
@@ -24,6 +27,28 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
+
+  void _signin() async {
+    var data = {
+      'email': emailController.text,
+      'password': passwordController.text
+    };
+
+    var response = await CallApi().postData(data, '/login');
+
+    var body = json.decode(response.body);
+
+    if (body['success']) {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      localStorage.setString('token', json.encode(body['data']['token']));
+      localStorage.setString('user', json.encode(body['data']['user']));
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
+    } else {
+      // ....
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +60,9 @@ class _SignInScreenState extends State<SignInScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.signInAccount,),
+              BackWidget(
+                name: Strings.signInAccount,
+              ),
               bodyWidget(context)
             ],
           ),
@@ -57,9 +84,8 @@ class _SignInScreenState extends State<SignInScreen> {
           height: height * 0.7,
           width: width,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(Dimensions.radius * 2)
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(Dimensions.radius * 2)),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -83,16 +109,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   headingWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-          top: Dimensions.heightSize * 2
-      ),
+      padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
       child: Text(
         Strings.welcomeBack,
         style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: Dimensions.extraLargeTextSize
-        ),
+            fontSize: Dimensions.extraLargeTextSize),
       ),
     );
   }
@@ -104,8 +127,7 @@ class _SignInScreenState extends State<SignInScreen> {
           padding: const EdgeInsets.only(
               top: Dimensions.heightSize * 2,
               left: Dimensions.marginSize,
-              right: Dimensions.marginSize
-          ),
+              right: Dimensions.marginSize),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,24 +140,25 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: CustomStyle.textStyle,
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
-                      hintText: Strings.demoEmail,
-                      contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                      labelStyle: CustomStyle.textStyle,
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintStyle: CustomStyle.textStyle,
-                      focusedBorder: CustomStyle.focusBorder,
-                      enabledBorder: CustomStyle.focusErrorBorder,
-                      focusedErrorBorder: CustomStyle.focusErrorBorder,
-                      errorBorder: CustomStyle.focusErrorBorder,
+                    hintText: Strings.demoEmail,
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    labelStyle: CustomStyle.textStyle,
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintStyle: CustomStyle.textStyle,
+                    focusedBorder: CustomStyle.focusBorder,
+                    enabledBorder: CustomStyle.focusErrorBorder,
+                    focusedErrorBorder: CustomStyle.focusErrorBorder,
+                    errorBorder: CustomStyle.focusErrorBorder,
                   ),
                 ),
               ),
@@ -147,16 +170,17 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: passwordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
                     hintText: Strings.typePassword,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                     labelStyle: CustomStyle.textStyle,
                     focusedBorder: CustomStyle.focusBorder,
                     enabledBorder: CustomStyle.focusErrorBorder,
@@ -173,13 +197,13 @@ class _SignInScreenState extends State<SignInScreen> {
                       },
                       icon: _toggleVisibility
                           ? Icon(
-                        Icons.visibility_off,
-                        color: CustomColor.greyColor,
-                      )
+                              Icons.visibility_off,
+                              color: CustomColor.greyColor,
+                            )
                           : Icon(
-                        Icons.visibility,
-                        color: CustomColor.greyColor,
-                      ),
+                              Icons.visibility,
+                              color: CustomColor.greyColor,
+                            ),
                     ),
                   ),
                   obscureText: _toggleVisibility,
@@ -188,8 +212,7 @@ class _SignInScreenState extends State<SignInScreen> {
               SizedBox(height: Dimensions.heightSize),
             ],
           ),
-        )
-    );
+        ));
   }
 
   rememberForgotWidget(BuildContext context) {
@@ -207,8 +230,8 @@ class _SignInScreenState extends State<SignInScreen> {
               style: CustomStyle.textStyle,
             ),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordScreen
-                ()));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ForgotPasswordScreen()));
             },
           ),
         ],
@@ -219,35 +242,36 @@ class _SignInScreenState extends State<SignInScreen> {
           checkedValue = newValue;
         });
       },
-      controlAffinity: ListTileControlAffinity.leading,  //  <-- leading Checkbox
+      controlAffinity: ListTileControlAffinity.leading, //  <-- leading Checkbox
     );
   }
 
   signInButtonWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: Dimensions.marginSize, right: Dimensions.marginSize),
+      padding: const EdgeInsets.only(
+          left: Dimensions.marginSize, right: Dimensions.marginSize),
       child: GestureDetector(
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius))
-          ),
+              borderRadius:
+                  BorderRadius.all(Radius.circular(Dimensions.radius))),
           child: Center(
             child: Text(
               Strings.signIn.toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-              DashboardScreen()));
+          if (formKey.currentState.validate()) {
+            _signin();
+          }
         },
       ),
     );
@@ -267,12 +291,11 @@ class _SignInScreenState extends State<SignInScreen> {
             style: TextStyle(
                 color: CustomColor.primaryColor,
                 fontWeight: FontWeight.bold,
-              decoration: TextDecoration.underline
-            ),
+                decoration: TextDecoration.underline),
           ),
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                SignUpScreen()));
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => SignUpScreen()));
           },
         )
       ],
@@ -287,11 +310,8 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
       child: Text(
         title,
-        style: TextStyle(
-            color: Colors.black
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     );
   }
-
 }

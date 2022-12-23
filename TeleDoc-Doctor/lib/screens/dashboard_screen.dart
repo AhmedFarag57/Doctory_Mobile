@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Home"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -65,7 +65,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Calendar"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -85,7 +85,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Star"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -105,7 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Profile"
               ),
             ]),
       ),
