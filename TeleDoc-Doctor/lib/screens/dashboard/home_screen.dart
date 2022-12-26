@@ -1,21 +1,50 @@
+import 'dart:convert';
+
 import 'package:doctor/data/recent.dart';
+import 'package:doctor/dialog/model/session.dart';
+import 'package:doctor/network_utils/api.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  var patients;
+  var user;
+
+  @override
+  void initState() {
+    _getUserData();
+    _getAllPatients();
+
+    super.initState();
+  }
+
+  _getUserData() async {
+    // Get the user data from phone storage
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.get('user'));
+  }
+
+  _getAllPatients() async {
+    var response = await CallApi().getDataWithToken('/id/sessions');
+    var body = jsonDecode(response.body);
+
+    if (body['success']) {
+      patients = body['data'];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: MediaQuery.of(context).size.height * 0.3,
               decoration: BoxDecoration(
-                  gradient: LinearGradient (
-                      begin: FractionalOffset.topCenter,
-                      end: FractionalOffset.bottomCenter,
-                      colors: [
-                        Color(0xFF4C6BFF).withOpacity(0.8),
-                        Color(0xFF4C6BFF).withOpacity(0.8),
-                      ]
-                  ),
+                gradient: LinearGradient(
+                    begin: FractionalOffset.topCenter,
+                    end: FractionalOffset.bottomCenter,
+                    colors: [
+                      Color(0xFF4C6BFF).withOpacity(0.8),
+                      Color(0xFF4C6BFF).withOpacity(0.8),
+                    ]),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(Dimensions.radius * 4),
                   bottomRight: Radius.circular(Dimensions.radius * 4),
@@ -64,9 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   headerWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-          top: Dimensions.heightSize
-      ),
+      padding: const EdgeInsets.only(top: Dimensions.heightSize),
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -94,13 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 40.0,
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0)
-                              ),
+                                  borderRadius: BorderRadius.circular(20.0)),
                               child: Icon(
                                 Icons.notifications_outlined,
                                 color: CustomColor.primaryColor,
-                              )
-                          ),
+                              )),
                           Positioned(
                             right: -5,
                             top: -5,
@@ -109,15 +133,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               width: 20.0,
                               decoration: BoxDecoration(
                                   color: CustomColor.primaryColor,
-                                  borderRadius: BorderRadius.circular(10.0)
-                              ),
+                                  borderRadius: BorderRadius.circular(10.0)),
                               child: Center(
                                 child: Text(
                                   '02',
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: Dimensions.smallTextSize
-                                  ),
+                                      fontSize: Dimensions.smallTextSize),
                                 ),
                               ),
                             ),
@@ -126,8 +148,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      NotificationScreen()));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => NotificationScreen()));
                     },
                   ),
                 ],
@@ -146,8 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize * 1.6,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.start,
                   ),
                 ),
@@ -162,9 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bodyWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: Dimensions.heightSize * 2
-      ),
+      padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -190,8 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 100,
               decoration: BoxDecoration(
                   color: CustomColor.primaryColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radius)
-              ),
+                  borderRadius: BorderRadius.circular(Dimensions.radius)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -200,31 +218,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: Dimensions.heightSize,),
+                  SizedBox(
+                    height: Dimensions.heightSize,
+                  ),
                   Text(
-                    '12,265',
+                    '65',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(width: Dimensions.widthSize,),
+          SizedBox(
+            width: Dimensions.widthSize,
+          ),
           Expanded(
             flex: 1,
             child: Container(
               height: 100,
               decoration: BoxDecoration(
                   color: CustomColor.accentColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radius)
-              ),
+                  borderRadius: BorderRadius.circular(Dimensions.radius)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -233,17 +252,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: Dimensions.heightSize,),
+                  SizedBox(
+                    height: Dimensions.heightSize,
+                  ),
                   Text(
                     '25',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -264,20 +283,19 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-                left: Dimensions.marginSize
-            ),
+            padding: const EdgeInsets.only(left: Dimensions.marginSize),
             child: Text(
               Strings.recentlyAppointed,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
@@ -293,8 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       left: Dimensions.widthSize * 2,
                       right: Dimensions.widthSize,
                       top: 10,
-                      bottom: 10
-                  ),
+                      bottom: 10),
                   child: GestureDetector(
                     child: Container(
                       width: 150,
@@ -316,98 +333,105 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Image.asset(
-                                recent.image
+                            Image.asset(recent.image),
+                            SizedBox(
+                              width: Dimensions.widthSize,
                             ),
-                            SizedBox(width: Dimensions.widthSize,),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  recent.name,
+                                  patients['fake_name'],
+                                  //recent.name,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                   textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: Dimensions.heightSize * 0.5,),
+                                SizedBox(
+                                  height: Dimensions.heightSize * 0.5,
+                                ),
                                 Text(
                                   recent.problem,
                                   style: TextStyle(
                                       color: Colors.blueAccent,
-                                      fontSize: Dimensions.smallTextSize
-                                  ),
+                                      fontSize: Dimensions.smallTextSize),
                                   textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: Dimensions.heightSize * 0.5,),
+                                SizedBox(
+                                  height: Dimensions.heightSize * 0.5,
+                                ),
                                 Row(
                                   children: [
                                     Text(
-                                      recent.time,
+                                      patients['date_time'],
+                                      //recent.time,
                                       style: TextStyle(
                                           color: Colors.black.withOpacity(0.6),
-                                          fontSize: Dimensions.smallTextSize
-                                      ),
+                                          fontSize: Dimensions.smallTextSize),
                                       textAlign: TextAlign.center,
                                     ),
-                                    SizedBox(width: Dimensions.widthSize * 0.5,),
+                                    SizedBox(
+                                      width: Dimensions.widthSize * 0.5,
+                                    ),
                                     Text(
                                       recent.date,
                                       style: TextStyle(
                                           color: Colors.black.withOpacity(0.6),
-                                          fontSize: Dimensions.smallTextSize
-                                      ),
+                                          fontSize: Dimensions.smallTextSize),
                                       textAlign: TextAlign.center,
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: Dimensions.heightSize * 0.5,),
+                                SizedBox(
+                                  height: Dimensions.heightSize * 0.5,
+                                ),
                                 Row(
                                   children: [
                                     Container(
                                       height: 30,
                                       width: 30,
                                       decoration: BoxDecoration(
-                                        color: CustomColor.primaryColor,
-                                        borderRadius: BorderRadius.circular(15)
-                                      ),
+                                          color: CustomColor.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Image.asset(
-                                          'assets/images/message.png'
-                                        ),
+                                            'assets/images/message.png'),
                                       ),
                                     ),
-                                    SizedBox(width: Dimensions.widthSize * 0.5,),
+                                    SizedBox(
+                                      width: Dimensions.widthSize * 0.5,
+                                    ),
                                     Container(
                                       height: 30,
                                       width: 30,
                                       decoration: BoxDecoration(
                                           color: CustomColor.primaryColor,
-                                          borderRadius: BorderRadius.circular(15)
-                                      ),
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Image.asset(
-                                            'assets/images/call.png'
-                                        ),
+                                            'assets/images/call.png'),
                                       ),
                                     ),
-                                    SizedBox(width: Dimensions.widthSize * 0.5,),
+                                    SizedBox(
+                                      width: Dimensions.widthSize * 0.5,
+                                    ),
                                     Container(
                                       height: 30,
                                       width: 30,
                                       decoration: BoxDecoration(
                                           color: CustomColor.primaryColor,
-                                          borderRadius: BorderRadius.circular(15)
-                                      ),
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Image.asset(
-                                            'assets/images/video.png'
-                                        ),
+                                            'assets/images/video.png'),
                                       ),
                                     ),
                                   ],
@@ -418,9 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    onTap: () {
-
-                    },
+                    onTap: () {},
                   ),
                 );
               },
@@ -430,5 +452,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
 }

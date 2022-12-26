@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doctor/data/recent.dart';
 import 'package:doctor/screens/messaging_screen.dart';
 import 'package:doctor/utils/colors.dart';
@@ -6,27 +8,39 @@ import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:flutter/material.dart';
 
+import '../../network_utils/api.dart';
+
 class TodayAppointmentWidget extends StatelessWidget {
+  var patients;
+
+  _getAllPatients() async {
+    var response = await CallApi().getDataWithToken('/id/sessions');
+    var body = jsonDecode(response.body);
+
+    if (body['success']) {
+      patients = body['data'];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(
-              left: Dimensions.marginSize
-          ),
+          padding: const EdgeInsets.only(left: Dimensions.marginSize),
           child: Text(
             Strings.todayAppointment,
             style: TextStyle(
                 color: Colors.black,
                 fontSize: Dimensions.largeTextSize,
-                fontWeight: FontWeight.bold
-            ),
+                fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: Dimensions.heightSize,),
+        SizedBox(
+          height: Dimensions.heightSize,
+        ),
         Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
@@ -42,8 +56,7 @@ class TodayAppointmentWidget extends StatelessWidget {
                     left: Dimensions.widthSize * 2,
                     right: Dimensions.widthSize,
                     top: 10,
-                    bottom: 10
-                ),
+                    bottom: 10),
                 child: GestureDetector(
                   child: Container(
                     width: 150,
@@ -65,41 +78,46 @@ class TodayAppointmentWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Image.asset(
-                              recent.image
+                          Image.asset(recent.image),
+                          SizedBox(
+                            width: Dimensions.widthSize,
                           ),
-                          SizedBox(width: Dimensions.widthSize,),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                recent.name,
+                                patients['fake_name'],
+                                //recent.name,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: Dimensions.defaultTextSize,
-                                    fontWeight: FontWeight.bold
-                                ),
+                                    fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: Dimensions.heightSize * 0.5,),
+                              SizedBox(
+                                height: Dimensions.heightSize * 0.5,
+                              ),
                               Text(
                                 recent.problem,
                                 style: TextStyle(
                                     color: Colors.blueAccent,
-                                    fontSize: Dimensions.smallTextSize
-                                ),
+                                    fontSize: Dimensions.smallTextSize),
                                 textAlign: TextAlign.start,
                               ),
-                              SizedBox(height: Dimensions.heightSize * 0.5,),
+                              SizedBox(
+                                height: Dimensions.heightSize * 0.5,
+                              ),
                               Text(
-                                '${recent.time} ${recent.date}',
+                                patients['date_time'],
+                                //'${recent.time} ${recent.date}',
                                 style: TextStyle(
                                     color: Colors.black.withOpacity(0.6),
-                                    fontSize: Dimensions.smallTextSize
-                                ),
+                                    fontSize: Dimensions.smallTextSize),
                                 textAlign: TextAlign.start,
                               ),
-                              SizedBox(height: Dimensions.heightSize * 0.5,),
+                              SizedBox(
+                                height: Dimensions.heightSize * 0.5,
+                              ),
                               Row(
                                 children: [
                                   GestureDetector(
@@ -108,48 +126,51 @@ class TodayAppointmentWidget extends StatelessWidget {
                                       width: 30,
                                       decoration: BoxDecoration(
                                           color: CustomColor.primaryColor,
-                                          borderRadius: BorderRadius.circular(15)
-                                      ),
+                                          borderRadius:
+                                              BorderRadius.circular(15)),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Image.asset(
-                                            'assets/images/message.png'
-                                        ),
+                                            'assets/images/message.png'),
                                       ),
                                     ),
                                     onTap: () {
-                                      Navigator.of(context).push(MaterialPageRoute(builder:
-                                      (context) => MessagingScreen()));
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MessagingScreen()));
                                     },
                                   ),
-                                  SizedBox(width: Dimensions.widthSize * 0.5,),
+                                  SizedBox(
+                                    width: Dimensions.widthSize * 0.5,
+                                  ),
                                   Container(
                                     height: 30,
                                     width: 30,
                                     decoration: BoxDecoration(
                                         color: CustomColor.primaryColor,
-                                        borderRadius: BorderRadius.circular(15)
-                                    ),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Image.asset(
-                                          'assets/images/call.png'
-                                      ),
+                                      child:
+                                          Image.asset('assets/images/call.png'),
                                     ),
                                   ),
-                                  SizedBox(width: Dimensions.widthSize * 0.5,),
+                                  SizedBox(
+                                    width: Dimensions.widthSize * 0.5,
+                                  ),
                                   Container(
                                     height: 30,
                                     width: 30,
                                     decoration: BoxDecoration(
                                         color: CustomColor.primaryColor,
-                                        borderRadius: BorderRadius.circular(15)
-                                    ),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Image.asset(
-                                          'assets/images/video.png'
-                                      ),
+                                          'assets/images/video.png'),
                                     ),
                                   ),
                                 ],
@@ -164,9 +185,11 @@ class TodayAppointmentWidget extends StatelessWidget {
                     openPatientDetailsDialog(
                       context,
                       recent.image,
-                      recent.name,
+                      patients['fake_name'],
+                      //recent.name,
                       recent.problem,
-                      recent.time,
+                      patients['date_time'],
+                      //recent.time,
                       recent.date,
                     );
                   },
@@ -179,10 +202,11 @@ class TodayAppointmentWidget extends StatelessWidget {
     );
   }
 
-  openPatientDetailsDialog(BuildContext context, image, name, problem, time, date){
+  openPatientDetailsDialog(
+      BuildContext context, image, name, problem, time, date) {
     showGeneralDialog(
         barrierLabel:
-        MaterialLocalizations.of(context).modalBarrierDismissLabel,
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
         barrierDismissible: true,
         barrierColor: Colors.black.withOpacity(0.6),
         transitionDuration: Duration(milliseconds: 700),
@@ -219,13 +243,16 @@ class TodayAppointmentWidget extends StatelessWidget {
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(Dimensions.radius),
+                              borderRadius:
+                                  BorderRadius.circular(Dimensions.radius),
                               boxShadow: [
                                 BoxShadow(
-                                  color: CustomColor.primaryColor.withOpacity(0.1),
+                                  color:
+                                      CustomColor.primaryColor.withOpacity(0.1),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset: Offset(0, 3), // changes position of shadow
+                                  offset: Offset(
+                                      0, 3), // changes position of shadow
                                 ),
                               ],
                             ),
@@ -235,41 +262,47 @@ class TodayAppointmentWidget extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Image.asset(
-                                      image
+                                  Image.asset(image),
+                                  SizedBox(
+                                    width: Dimensions.widthSize,
                                   ),
-                                  SizedBox(width: Dimensions.widthSize,),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         name,
                                         style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: Dimensions.defaultTextSize,
-                                            fontWeight: FontWeight.bold
-                                        ),
+                                            fontSize:
+                                                Dimensions.defaultTextSize,
+                                            fontWeight: FontWeight.bold),
                                         textAlign: TextAlign.center,
                                       ),
-                                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                                      SizedBox(
+                                        height: Dimensions.heightSize * 0.5,
+                                      ),
                                       Text(
                                         problem,
                                         style: TextStyle(
                                             color: Colors.blueAccent,
-                                            fontSize: Dimensions.smallTextSize
-                                        ),
+                                            fontSize: Dimensions.smallTextSize),
                                         textAlign: TextAlign.start,
                                       ),
-                                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                                      SizedBox(
+                                        height: Dimensions.heightSize * 0.5,
+                                      ),
                                       Text(
                                         '$time $date',
                                         style: TextStyle(
-                                            color: Colors.black.withOpacity(0.6),
-                                            fontSize: Dimensions.smallTextSize
-                                        ),
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            fontSize: Dimensions.smallTextSize),
                                         textAlign: TextAlign.start,
                                       ),
-                                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                                      SizedBox(
+                                        height: Dimensions.heightSize * 0.5,
+                                      ),
                                       Row(
                                         children: [
                                           Container(
@@ -277,43 +310,47 @@ class TodayAppointmentWidget extends StatelessWidget {
                                             width: 30,
                                             decoration: BoxDecoration(
                                                 color: CustomColor.primaryColor,
-                                                borderRadius: BorderRadius.circular(15)
-                                            ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15)),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Image.asset(
-                                                  'assets/images/message.png'
-                                              ),
+                                                  'assets/images/message.png'),
                                             ),
                                           ),
-                                          SizedBox(width: Dimensions.widthSize * 0.5,),
+                                          SizedBox(
+                                            width: Dimensions.widthSize * 0.5,
+                                          ),
                                           Container(
                                             height: 30,
                                             width: 30,
                                             decoration: BoxDecoration(
                                                 color: CustomColor.primaryColor,
-                                                borderRadius: BorderRadius.circular(15)
-                                            ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15)),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Image.asset(
-                                                  'assets/images/call.png'
-                                              ),
+                                                  'assets/images/call.png'),
                                             ),
                                           ),
-                                          SizedBox(width: Dimensions.widthSize * 0.5,),
+                                          SizedBox(
+                                            width: Dimensions.widthSize * 0.5,
+                                          ),
                                           Container(
                                             height: 30,
                                             width: 30,
                                             decoration: BoxDecoration(
                                                 color: CustomColor.primaryColor,
-                                                borderRadius: BorderRadius.circular(15)
-                                            ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15)),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Image.asset(
-                                                  'assets/images/video.png'
-                                              ),
+                                                  'assets/images/video.png'),
                                             ),
                                           ),
                                         ],
@@ -326,10 +363,13 @@ class TodayAppointmentWidget extends StatelessWidget {
                           ),
                           SizedBox(height: Dimensions.heightSize),
                           _titleData(Strings.name, Strings.age, name, '69'),
-                          _titleData(Strings.patientSex, Strings.patientId, 'Male', '7865KD'),
+                          _titleData(Strings.patientSex, Strings.patientId,
+                              'Male', '7865KD'),
                           _titleData(Strings.date, Strings.time, date, time),
-                          _titleData(Strings.chamber, Strings.roomNo, 'Modern Hospital', '250'),
-                          _titleData(Strings.fee, 'Status', '\$250', 'Appointment'),
+                          _titleData(Strings.chamber, Strings.roomNo,
+                              'Modern Hospital', '250'),
+                          _titleData(
+                              Strings.fee, 'Status', '\$250', 'Appointment'),
                         ],
                       ),
                     ),
@@ -342,13 +382,13 @@ class TodayAppointmentWidget extends StatelessWidget {
         transitionBuilder: (_, anim, __, child) {
           return SlideTransition(
             position:
-            Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+                Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
             child: child,
           );
         });
   }
 
-  _titleData(String title1, String title2, String value1, String value2){
+  _titleData(String title1, String title2, String value1, String value2) {
     return Padding(
       padding: const EdgeInsets.only(
         top: Dimensions.heightSize,
@@ -360,34 +400,22 @@ class TodayAppointmentWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                  title1,
-                  style: CustomStyle.textStyle
-              ),
-              Text(
-                  title2,
-                  style: CustomStyle.textStyle
-              ),
+              Text(title1, style: CustomStyle.textStyle),
+              Text(title2, style: CustomStyle.textStyle),
             ],
           ),
           SizedBox(height: Dimensions.heightSize * 0.5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                  value1,
+              Text(value1,
                   style: TextStyle(
                       color: Colors.black,
-                      fontSize: Dimensions.defaultTextSize
-                  )
-              ),
-              Text(
-                  value2,
+                      fontSize: Dimensions.defaultTextSize)),
+              Text(value2,
                   style: TextStyle(
                       color: Colors.black,
-                      fontSize: Dimensions.defaultTextSize
-                  )
-              ),
+                      fontSize: Dimensions.defaultTextSize)),
             ],
           ),
         ],
