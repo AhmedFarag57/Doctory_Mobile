@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teledoc/screens/input_patient_details_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -8,18 +11,48 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/filter_chip_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
+import '../network_utils/api.dart';
+
 class SetAppointmentScreen extends StatefulWidget {
+  /*
   final String image, name, specialist, available;
 
-  const SetAppointmentScreen({Key key, this.image, this.name, this.specialist, this.available}) : super(key: key);
+  const SetAppointmentScreen(
+      {Key key, this.image, this.name, this.specialist, this.available})
+      : super(key: key);
+      */
   @override
   _SetAppointmentScreenState createState() => _SetAppointmentScreenState();
 }
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
-
   DateTime selectedDate = DateTime.now();
   String date = 'Select date';
+  var user;
+  var doctors;
+
+  @override
+  void initState() {
+    _getUserData();
+    _getAllDoctors();
+
+    super.initState();
+  }
+
+  _getUserData() async {
+    // Get the user data from phone storage
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.get('user'));
+  }
+
+  _getAllDoctors() async {
+    var response = await CallApi().getDataWithToken('/doctors');
+    var body = jsonDecode(response.body);
+
+    if (body['success']) {
+      doctors = body['data'];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +64,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.setAppointment,),
+              BackWidget(
+                name: Strings.setAppointment,
+              ),
               bodyWidget(context),
               nextButtonWidget(context)
             ],
@@ -44,7 +79,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
         left: Dimensions.marginSize,
         right: Dimensions.marginSize,
       ),
@@ -52,19 +87,22 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             profileWidget(context),
-            SizedBox(height: Dimensions.heightSize * 3,),
+            SizedBox(
+              height: Dimensions.heightSize * 3,
+            ),
             selectDateWidget(context),
-            SizedBox(height: Dimensions.heightSize * 3,),
+            SizedBox(
+              height: Dimensions.heightSize * 3,
+            ),
             selectTimeWidget(context)
           ],
         ),
@@ -99,55 +137,68 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              /*
               Image.asset(
                 widget.image,
                 height: 60,
                 width: 60,
               ),
-              SizedBox(width: Dimensions.widthSize,),
+              */
+              SizedBox(
+                width: Dimensions.widthSize,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.name,
+                    doctors['name'],
+                    //widget.name,
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
-                    widget.specialist,
+                    doctors['session_price'].toString(),
+                    //widget.specialist,
                     style: TextStyle(
                         color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize
-                    ),
+                        fontSize: Dimensions.smallTextSize),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
-                    widget.available,
+                    doctors['phone_number'],
+                    //widget.available,
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.6),
-                        fontSize: Dimensions.smallTextSize
-                    ),
+                        fontSize: Dimensions.smallTextSize),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
-                    'Fee \$200',
+                    doctors['clinic_address'],
                     style: TextStyle(
                         color: Colors.blueAccent,
                         fontSize: Dimensions.smallTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
+                  MyRating(
+                    rating: '5',
+                  )
                 ],
               )
             ],
@@ -169,20 +220,20 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           Text(
             Strings.selectDate,
             style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: Dimensions.largeTextSize
-            ),
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: Dimensions.largeTextSize),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           GestureDetector(
             child: Container(
               height: Dimensions.buttonHeight,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withOpacity(0.1)),
-                borderRadius: BorderRadius.circular(Dimensions.radius)
-              ),
+                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(Dimensions.radius)),
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: Dimensions.marginSize,
@@ -193,13 +244,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   children: [
                     Text(
                       date,
-                      style: TextStyle(
-                        color: Colors.black.withOpacity(0.7)
-                      ),
+                      style: TextStyle(color: Colors.black.withOpacity(0.7)),
                     ),
-                    Image.asset(
-                      'assets/images/calender.png'
-                    )
+                    Image.asset('assets/images/calender.png')
                   ],
                 ),
               ),
@@ -227,14 +274,14 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
             style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: Dimensions.largeTextSize
-            ),
+                fontSize: Dimensions.largeTextSize),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           Padding(
-            padding: const EdgeInsets.only(left:8.0),
-            child: Align
-              (
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Align(
               alignment: Alignment.centerLeft,
               child: Container(
                 child: Wrap(
@@ -273,7 +320,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       setState(() {
         selectedDate = picked;
         date = "${selectedDate.toLocal()}".split(' ')[0];
-        print('date: '+date);
+        print('date: ' + date);
       });
   }
 
@@ -288,25 +335,22 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius * 0.5)
-          ),
+              borderRadius: BorderRadius.circular(Dimensions.radius * 0.5)),
           child: Center(
             child: Text(
               Strings.next.toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-              InputPatientDetailsScreen()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => InputPatientDetailsScreen()));
         },
       ),
     );
   }
-
 }

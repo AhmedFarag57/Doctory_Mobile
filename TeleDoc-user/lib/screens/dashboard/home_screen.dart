@@ -37,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    
     _getUserData();
     _getAllDoctors();
 
