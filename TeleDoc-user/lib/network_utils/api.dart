@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CallApi {
-  //final String _url = 'https://doctory-test.000webhostapp.com/api';
+  // final String _url = 'https://doctory-test.000webhostapp.com/api';
   final String _url = 'http://10.0.2.2:8080/Projects/Graduation_Project/Doctory/public/api';
   
   

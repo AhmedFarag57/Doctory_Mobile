@@ -32,11 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  var doctors = <Doctor>[];
   var user;
+  var doctors;
 
   @override
   void initState() {
+    
     _getUserData();
     _getAllDoctors();
 
@@ -46,15 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
   _getUserData() async {
     // Get the user data from phone storage
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = localStorage.get('user');
-    print(user);
+    user = jsonDecode(localStorage.get('user'));
   }
 
-  _getAllDoctors() {
-    CallApi().getDataWithToken('/doctors').then((response) {
-      Iterable list = json.decode(response.body);
-      doctors = list.map((model) => Doctor.fromJson(model)).toList();
-    });
+  _getAllDoctors() async {
+    var response = await CallApi().getDataWithToken('/doctors');
+    var body = jsonDecode(response.body);
+
+    if (body['success']) {
+      doctors = body['data'];
+    }
   }
 
   @override
@@ -140,16 +142,16 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/images/profile.png',
         ),
         title: Text(
-          //user['name'],
-          Strings.demoName,
+          user['name'],
+          //Strings.demoName,
           style: TextStyle(
               color: Colors.white,
               fontSize: Dimensions.largeTextSize,
               fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          //user['phone_number'],
-          Strings.demoPhoneNumber,
+          user['phone_number'],
+          //Strings.demoPhoneNumber,
           style: TextStyle(
             color: Colors.white,
             fontSize: Dimensions.defaultTextSize,
@@ -230,50 +232,50 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                   ),
-                  GestureDetector(
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                              height: 40,
-                              width: 40.0,
-                              decoration: BoxDecoration(
-                                  color: CustomColor.primaryColor,
-                                  borderRadius: BorderRadius.circular(20.0)),
-                              child: Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                              )),
-                          Positioned(
-                            right: -5,
-                            top: -5,
-                            child: Container(
-                              height: 20.0,
-                              width: 20.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              child: Center(
-                                child: Text(
-                                  '02',
-                                  style: TextStyle(
-                                      color: CustomColor.primaryColor,
-                                      fontSize: Dimensions.smallTextSize),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => NotificationScreen()));
-                    },
-                  ),
+                  // GestureDetector(
+                  //   child: Container(
+                  //     height: 40,
+                  //     width: 40,
+                  //     child: Stack(
+                  //       clipBehavior: Clip.none,
+                  //       children: [
+                  //         Container(
+                  //             height: 40,
+                  //             width: 40.0,
+                  //             decoration: BoxDecoration(
+                  //                 color: CustomColor.primaryColor,
+                  //                 borderRadius: BorderRadius.circular(20.0)),
+                  //             child: Icon(
+                  //               Icons.notifications_outlined,
+                  //               color: Colors.white,
+                  //             )),
+                  //         Positioned(
+                  //           right: -5,
+                  //           top: -5,
+                  //           child: Container(
+                  //             height: 20.0,
+                  //             width: 20.0,
+                  //             decoration: BoxDecoration(
+                  //                 color: Colors.white,
+                  //                 borderRadius: BorderRadius.circular(10.0)),
+                  //             child: Center(
+                  //               child: Text(
+                  //                 '02',
+                  //                 style: TextStyle(
+                  //                     color: CustomColor.primaryColor,
+                  //                     fontSize: Dimensions.smallTextSize),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         )
+                  //       ],
+                  //     ),
+                  //   ),
+                  //   onTap: () {
+                  //     Navigator.of(context).push(MaterialPageRoute(
+                  //         builder: (context) => NotificationScreen()));
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -369,11 +371,11 @@ class _HomeScreenState extends State<HomeScreen> {
               topRight: Radius.circular(Dimensions.radius * 2),
             )),
         child: ListView(
-          //physics: NeverScrollableScrollPhysics(),
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           children: [
-            categoryWidget(context),
-            topDoctorWidget(context),
+            //categoryWidget(context),
+            //topDoctorWidget(context),
             nearbyDoctorWidget(context)
           ],
         ),
@@ -471,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: doctors.length,
+              itemCount: TopDoctorList.list().length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 TopDoctor topDoctor = TopDoctorList.list()[index];
@@ -580,12 +582,14 @@ class _HomeScreenState extends State<HomeScreen> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: NearbyList.list().length,
+              itemCount: doctors.length,
+              //itemCount: NearbyList.list().length,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                Nearby nearby = NearbyList.list()[index];
+                //Nearby nearby = NearbyList.list()[index];
+                // Doctor doctor = doctors[index];
                 return Padding(
                   padding: const EdgeInsets.only(
                       left: Dimensions.widthSize * 2,
@@ -613,7 +617,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Image.asset(nearby.image),
+                            //Image.asset(nearby.image),
                             SizedBox(
                               width: Dimensions.widthSize,
                             ),
@@ -621,7 +625,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  doctors.name,
+                                  doctors[index]['name'],
                                   //nearby.name,
                                   style: TextStyle(
                                       color: Colors.black,
@@ -633,7 +637,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  nearby.specialist,
+                                  doctors[index]['session_price'].toString(),
+                                  //nearby.specialist,
                                   style: TextStyle(
                                       color: Colors.blueAccent,
                                       fontSize: Dimensions.smallTextSize),
@@ -643,7 +648,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  nearby.available,
+                                  doctors[index]['phone_number'],
+                                  //nearby.available,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
@@ -653,7 +659,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  nearby.address,
+                                  doctors[index]['clinic_address'],
+                                  //nearby.address,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
@@ -666,13 +673,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => DoctorDetailsScreen(
-                                image: nearby.image,
-                                name: nearby.name,
-                                specialist: nearby.specialist,
-                                available: nearby.available,
-                              )));
+                      /*
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => DoctorDetailsScreen(
+                              image: nearby.image,
+                              name: nearby.name,
+                              specialist: nearby.specialist,
+                              available: nearby.available,
+                            )));
+                  */
                     },
                   ),
                 );
