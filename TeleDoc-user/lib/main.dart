@@ -19,4 +19,5 @@ class MyApp extends StatelessWidget {
       home: SplashScreen(),
     );
   }
+  // Just new Line
 }
