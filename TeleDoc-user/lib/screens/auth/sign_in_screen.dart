@@ -46,7 +46,7 @@ class _SignInScreenState extends State<SignInScreen> {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
     } else {
-      // ....
+      //....
     }
   }
 
@@ -269,6 +269,8 @@ class _SignInScreenState extends State<SignInScreen> {
         onTap: () {
           if (formKey.currentState.validate()) {
             _signin();
+            //Navigator.of(context)
+            //   .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
           }
         },
       ),
