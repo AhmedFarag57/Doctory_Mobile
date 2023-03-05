@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:teledoc/screens/dashboard/emergency_screen.dart';
 import 'package:teledoc/screens/dashboard/home_screen.dart';
 import 'package:teledoc/screens/dashboard/nearby_screen.dart';
+import 'package:teledoc/screens/notification_screen.dart';
 import 'package:teledoc/screens/search_result_screen.dart';
 import 'package:teledoc/utils/colors.dart';
 
@@ -12,7 +13,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-
   int currentIndex = 0;
 
   @override
@@ -29,91 +29,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),*/
         //borderRadius: BorderRadius.circular(20),
         child: new BottomNavigationBar(
-          //backgroundColor: Colors.white,
+            //backgroundColor: Colors.white,
             elevation: 25,
             type: BottomNavigationBarType.fixed,
-            currentIndex: currentIndex ,
+            currentIndex: currentIndex,
             onTap: _onTapIndex,
             items: [
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: currentIndex == 0 ? CustomColor.primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/home.svg',
-                        color: currentIndex == 0 ? Colors.white : Colors.grey,
-                      ),
+                icon: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      color: currentIndex == 0
+                          ? CustomColor.primaryColor
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      'assets/svg/home.svg',
+                      color: currentIndex == 0 ? Colors.white : Colors.grey,
                     ),
                   ),
-                  // ignore: deprecated_member_use
-                  label: Container().toString()
+                ),
+                // ignore: deprecated_member_use
+                label: "Home",
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 1 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/location.svg',
-                        color: currentIndex == 1 ? Colors.white : Colors.grey,
-                      ),
+                icon: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      color: currentIndex == 1
+                          ? CustomColor.primaryColor
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      'assets/svg/location.svg',
+                      color: currentIndex == 1 ? Colors.white : Colors.grey,
                     ),
                   ),
-                  // ignore: deprecated_member_use
-                  label: Container().toString()
+                ),
+                // ignore: deprecated_member_use
+                label: "Nearby",
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 2 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/search.svg',
-                        color: currentIndex == 2 ? Colors.white : Colors.grey,
-                      ),
+                icon: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      color: currentIndex == 2
+                          ? CustomColor.primaryColor
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      'assets/svg/search.svg',
+                      color: currentIndex == 2 ? Colors.white : Colors.grey,
                     ),
                   ),
-                  // ignore: deprecated_member_use
-                  label: Container().toString()
+                ),
+                // ignore: deprecated_member_use
+                label: "Search",
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 3 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/siren.svg',
-                        color: currentIndex == 3 ? Colors.white : Colors.grey,
-                      ),
+                icon: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      color: currentIndex == 3
+                          ? CustomColor.primaryColor
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      'assets/svg/siren.svg',
+                      color: currentIndex == 3 ? Colors.white : Colors.grey,
                     ),
                   ),
-                  // ignore: deprecated_member_use
-                  label: Container().toString()
+                ),
+                // ignore: deprecated_member_use
+                label: "Notification",
               ),
             ]),
       ),
@@ -129,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   goToScreen(int currentIndex) {
-    switch(currentIndex){
+    switch (currentIndex) {
       case 0:
         return HomeScreen();
       case 1:
@@ -137,7 +141,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 2:
         return SearchResultScreen();
       case 3:
-        return EmergencyScreen();
+        return NotificationScreen(); //EmergencyScreen();
     }
   }
 }

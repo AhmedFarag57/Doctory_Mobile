@@ -8,18 +8,28 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/filter_chip_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
-class SetAppointmentScreen extends StatefulWidget {
-  final String image, name, specialist, available;
+import 'appointment_summery_screen.dart';
 
-  const SetAppointmentScreen({Key key, this.image, this.name, this.specialist, this.available}) : super(key: key);
+class SetAppointmentScreen extends StatefulWidget {
+  final String image, name, session_price, rating, clinic_address, id;
+  //final int id;
+
+  const SetAppointmentScreen({
+    Key key,
+    this.image,
+    this.name,
+    this.session_price,
+    this.rating,
+    this.clinic_address,
+    this.id,
+  }) : super(key: key);
   @override
   _SetAppointmentScreenState createState() => _SetAppointmentScreenState();
 }
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
-
   DateTime selectedDate = DateTime.now();
-  String date = 'Select date';
+  String date = '2023-01-04';
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +41,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.setAppointment,),
+              BackWidget(
+                name: Strings.setAppointment,
+              ),
               bodyWidget(context),
               nextButtonWidget(context)
             ],
@@ -44,7 +56,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
         left: Dimensions.marginSize,
         right: Dimensions.marginSize,
       ),
@@ -52,19 +64,22 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             profileWidget(context),
-            SizedBox(height: Dimensions.heightSize * 3,),
+            SizedBox(
+              height: Dimensions.heightSize * 3,
+            ),
             selectDateWidget(context),
-            SizedBox(height: Dimensions.heightSize * 3,),
+            SizedBox(
+              height: Dimensions.heightSize * 3,
+            ),
             selectTimeWidget(context)
           ],
         ),
@@ -104,50 +119,57 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                 height: 60,
                 width: 60,
               ),
-              SizedBox(width: Dimensions.widthSize,),
+              SizedBox(
+                width: Dimensions.widthSize,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    widget.name,
+                    "Dr. " + widget.name,
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  Text(
-                    widget.specialist,
-                    style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize
-                    ),
-                    textAlign: TextAlign.center,
+                  // SizedBox(height: Dimensions.heightSize * 0.5,),
+                  // Text(
+                  //   widget.clinic_address,
+                  //   style: TextStyle(
+                  //       color: Colors.blueAccent,
+                  //       fontSize: Dimensions.smallTextSize
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  // ),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
                   Text(
-                    widget.available,
+                    widget.clinic_address,
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.6),
-                        fontSize: Dimensions.smallTextSize
-                    ),
+                        fontSize: Dimensions.smallTextSize),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
-                    'Fee \$200',
+                    'Fee ' + widget.session_price + ' L.E',
                     style: TextStyle(
                         color: Colors.blueAccent,
                         fontSize: Dimensions.smallTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
+                  MyRating(
+                    rating: widget.rating,
+                  )
                 ],
               )
             ],
@@ -169,20 +191,20 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           Text(
             Strings.selectDate,
             style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              fontSize: Dimensions.largeTextSize
-            ),
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: Dimensions.largeTextSize),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           GestureDetector(
             child: Container(
               height: Dimensions.buttonHeight,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withOpacity(0.1)),
-                borderRadius: BorderRadius.circular(Dimensions.radius)
-              ),
+                  border: Border.all(color: Colors.black.withOpacity(0.1)),
+                  borderRadius: BorderRadius.circular(Dimensions.radius)),
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: Dimensions.marginSize,
@@ -192,14 +214,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      date,
-                      style: TextStyle(
-                        color: Colors.black.withOpacity(0.7)
-                      ),
+                      '2023-01-02',//date,
+                      style: TextStyle(color: Colors.black.withOpacity(0.7)),
                     ),
-                    Image.asset(
-                      'assets/images/calender.png'
-                    )
+                    Image.asset('assets/images/calender.png')
                   ],
                 ),
               ),
@@ -227,14 +245,14 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
             style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontSize: Dimensions.largeTextSize
-            ),
+                fontSize: Dimensions.largeTextSize),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           Padding(
-            padding: const EdgeInsets.only(left:8.0),
-            child: Align
-              (
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Align(
               alignment: Alignment.centerLeft,
               child: Container(
                 child: Wrap(
@@ -247,10 +265,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                     FilterChipWidget(chipName: '11:00 am'),
                     FilterChipWidget(chipName: '12:00 pm'),
                     FilterChipWidget(chipName: '1:00 pm'),
-                    FilterChipWidget(chipName: '2:00 am'),
-                    FilterChipWidget(chipName: '3:00 am'),
-                    FilterChipWidget(chipName: '4:00 am'),
-                    FilterChipWidget(chipName: '5:00 am'),
+                    FilterChipWidget(chipName: '2:00 pm'),
+                    FilterChipWidget(chipName: '3:00 pm'),
+                    FilterChipWidget(chipName: '4:00 pm'),
+                    FilterChipWidget(chipName: '5:00 pm'),
                     FilterChipWidget(chipName: '6:00 pm'),
                     FilterChipWidget(chipName: '7:00 pm'),
                   ],
@@ -273,7 +291,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       setState(() {
         selectedDate = picked;
         date = "${selectedDate.toLocal()}".split(' ')[0];
-        print('date: '+date);
+        print('date: ' + date);
       });
   }
 
@@ -288,25 +306,37 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius * 0.5)
-          ),
+              borderRadius: BorderRadius.circular(Dimensions.radius * 0.5)),
           child: Center(
             child: Text(
               Strings.next.toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-              InputPatientDetailsScreen()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => AppointmentSummeryScreen(
+                    docName: widget.name,
+                    id: widget.id,
+                    date: _getDate(),
+                    time: '08:00:00',
+                    session_price: widget.session_price,
+                  )));
+          // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+          //     InputPatientDetailsScreen()));
         },
       ),
     );
   }
 
+  String _getDate() {
+    var formattedDate =
+        "${selectedDate.year}-${selectedDate.month}-${selectedDate.day}";
+
+    return formattedDate;
+  }
 }

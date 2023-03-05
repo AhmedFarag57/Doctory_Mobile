@@ -148,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   }
                 },
                 decoration: InputDecoration(
-                  hintText: 'Ahmed Farag',
+                  hintText: 'Enter your name',
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   labelStyle: CustomStyle.textStyle,

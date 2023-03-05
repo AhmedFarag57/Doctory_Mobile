@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/category.dart';
 import 'package:teledoc/data/nearby.dart';
@@ -78,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 listData('assets/images/icon/appointment.png',
-                    Strings.myAppointment, MyAppointmentScreen()),
+                    Strings.myAppointment, MyAppointmentScreen(id: user['id'])),
                 listData('assets/images/icon/change.png',
                     Strings.changePassword, ChangePasswordScreen()),
                 listData('assets/images/icon/card.png', Strings.myCard,
@@ -541,8 +540,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => DoctorDetailsScreen(
                                 image: topDoctor.image,
                                 name: topDoctor.name,
-                                specialist: topDoctor.specialist,
-                                available: topDoctor.available,
+                                session_price: topDoctor.specialist,
+                                rating: topDoctor.available,
                               )));
                     },
                   ),
@@ -588,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                //Nearby nearby = NearbyList.list()[index];
+                Nearby nearby = NearbyList.list()[index];
                 // Doctor doctor = doctors[index];
                 return Padding(
                   padding: const EdgeInsets.only(
@@ -617,7 +616,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            //Image.asset(nearby.image),
+                            Image.asset(nearby.image),
                             SizedBox(
                               width: Dimensions.widthSize,
                             ),
@@ -625,7 +624,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  doctors[index]['name'],
+                                  "Dr. " + doctors[index]['name'],
                                   //nearby.name,
                                   style: TextStyle(
                                       color: Colors.black,
@@ -637,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  doctors[index]['session_price'].toString(),
+                                  "Session Price: " + doctors[index]['session_price'].toString(),
                                   //nearby.specialist,
                                   style: TextStyle(
                                       color: Colors.blueAccent,
@@ -648,7 +647,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  doctors[index]['phone_number'],
+                                  'Rating: ' + doctors[index]['rating'],
                                   //nearby.available,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
@@ -673,15 +672,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onTap: () {
-                      /*
+                      
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => DoctorDetailsScreen(
+                              id: doctors[index]['id'].toString(),
                               image: nearby.image,
-                              name: nearby.name,
-                              specialist: nearby.specialist,
-                              available: nearby.available,
+                              name: doctors[index]['name'],
+                              session_price: doctors[index]['session_price'],
+                              rating: doctors[index]['rating'],
+                              clinic_address: doctors[index]['clinic_address'],
                             )));
-                  */
                     },
                   ),
                 );
