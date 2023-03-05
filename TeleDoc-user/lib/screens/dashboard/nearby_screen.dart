@@ -271,8 +271,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       DoctorDetailsScreen(
                         image: topDoctor.image,
                         name: topDoctor.name,
-                        specialist: topDoctor.specialist,
-                        available: topDoctor.available,
+                        session_price: topDoctor.specialist,
+                        rating: topDoctor.available,
                       )));
                 },
               ),

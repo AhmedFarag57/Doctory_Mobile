@@ -1,8 +1,13 @@
 import 'dart:convert';
 
 import 'package:doctor/data/recent.dart';
+<<<<<<< HEAD
+import 'package:doctor/network_utils/api.dart';
+import 'package:doctor/screens/loading/loading_screen.dart';
+=======
 import 'package:doctor/dialog/model/session.dart';
 import 'package:doctor/network_utils/api.dart';
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
 import 'package:flutter/material.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
@@ -20,6 +25,59 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+<<<<<<< HEAD
+  bool isLoading = false;
+
+  var totalAppointed;
+  var totalPatients = 0;
+  var recentlyAppointed;
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadData();
+  }
+
+  loadData() async {
+    setState(() => isLoading = true);
+
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var user = jsonDecode(localStorage.getString('user'));
+    var id = user['id'];
+
+    var response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments/count');
+
+    var body = json.decode(response.body);
+
+    totalAppointed = body['data']['count'];
+
+    setState(() => isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            key: scaffoldKey,
+            body: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(Dimensions.radius * 4),
+                    bottomRight: Radius.circular(Dimensions.radius * 4),
+                  ),
+                  child: Image.asset(
+                    'assets/images/home_bg.png',
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    width: MediaQuery.of(context).size.width,
+                    fit: BoxFit.fill,
+                    //colorBlendMode: BlendMode.dst,
+                  ),
+=======
   var patients;
   var user;
 
@@ -80,15 +138,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(Dimensions.radius * 4),
                   bottomRight: Radius.circular(Dimensions.radius * 4),
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                 ),
-              ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: FractionalOffset.topCenter,
+                        end: FractionalOffset.bottomCenter,
+                        colors: [
+                          Color(0xFF4C6BFF).withOpacity(0.8),
+                          Color(0xFF4C6BFF).withOpacity(0.8),
+                        ]),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(Dimensions.radius * 4),
+                      bottomRight: Radius.circular(Dimensions.radius * 4),
+                    ),
+                  ),
+                ),
+                headerWidget(context),
+              ],
             ),
-            headerWidget(context),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+        );
 
   headerWidget(BuildContext context) {
     return Padding(
@@ -224,7 +296,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: Dimensions.heightSize,
                   ),
                   Text(
+<<<<<<< HEAD
+                    isLoading
+                        ? CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : totalPatients.toString(),
+=======
                     '65',
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
@@ -258,7 +338,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: Dimensions.heightSize,
                   ),
                   Text(
-                    '25',
+                    isLoading
+                        ? CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : totalAppointed.toString(),
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
@@ -341,8 +425,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD
+                                  '', //recent.name,
+=======
                                   patients['fake_name'],
                                   //recent.name,
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,

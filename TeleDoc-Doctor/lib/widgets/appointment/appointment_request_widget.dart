@@ -90,8 +90,12 @@ class AppointmentRequestWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD
+                                  '',//recent.name,
+=======
                                   patients['fake_name'],
                                   //recent.name,
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
