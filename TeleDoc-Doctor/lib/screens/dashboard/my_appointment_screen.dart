@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doctor/widgets/appointment/appointment_request_widget.dart';
 import 'package:doctor/widgets/appointment/today_appointment_widget.dart';
 import 'package:doctor/widgets/header_widget.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../network_utils/api.dart';
 
 class MyAppointmentScreen extends StatefulWidget {
   @override
@@ -13,8 +18,22 @@ class MyAppointmentScreen extends StatefulWidget {
 }
 
 class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
-
   int totalPages = 2;
+
+  var user;
+
+  @override
+  void initState() {
+    _getUserData();
+
+    super.initState();
+  }
+
+  _getUserData() async {
+    // Get the user data from phone storage
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.get('user'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +45,9 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              HeaderWidget(name: Strings.myAppointment,),
+              HeaderWidget(
+                name: Strings.myAppointment,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -38,25 +59,22 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
       ),
       child: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: PageView.builder(
             itemCount: totalPages,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(
-                  top: Dimensions.heightSize * 2
-                ),
+                padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -81,13 +99,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                                       style: TextStyle(
                                           color: CustomColor.primaryColor,
                                           fontSize: Dimensions.defaultTextSize,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(height: Dimensions.heightSize,),
+                                    SizedBox(
+                                      height: Dimensions.heightSize,
+                                    ),
                                     Container(
                                       height: 2,
-                                      color: index == 0 ? CustomColor.primaryColor : Colors.black.withOpacity(0.7),
+                                      color: index == 0
+                                          ? CustomColor.primaryColor
+                                          : Colors.black.withOpacity(0.7),
                                     )
                                   ],
                                 ),
@@ -102,14 +123,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                                       style: TextStyle(
                                           color: CustomColor.primaryColor,
                                           fontSize: Dimensions.defaultTextSize,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(height: Dimensions.heightSize,),
+                                    SizedBox(
+                                      height: Dimensions.heightSize,
+                                    ),
                                     Container(
                                       height: 2,
-                                      color: index == 1 ? CustomColor.primaryColor : Colors.black
-                                          .withOpacity(0.7),
+                                      color: index == 1
+                                          ? CustomColor.primaryColor
+                                          : Colors.black.withOpacity(0.7),
                                     )
                                   ],
                                 ),
@@ -126,17 +149,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                   ),
                 ),
               );
-            }
-        ),
+            }),
       ),
     );
   }
 
   pageViewWidget(int i) {
-    switch(i) {
-      case 0 :
+    switch (i) {
+      case 0:
         return AppointmentRequestWidget();
-      case 1 :
+      case 1:
         return TodayAppointmentWidget();
     }
   }

@@ -12,6 +12,7 @@ class DoctorDetailsScreen extends StatefulWidget {
   //final int id;
 
   const DoctorDetailsScreen(
+<<<<<<< HEAD
       {Key key,
       this.image,
       this.name,
@@ -19,6 +20,9 @@ class DoctorDetailsScreen extends StatefulWidget {
       this.rating,
       this.clinic_address,
       this.id})
+=======
+      {Key key, this.image, this.name, this.specialist, this.available})
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
       : super(key: key);
   @override
   _DoctorDetailsScreenState createState() => _DoctorDetailsScreenState();
@@ -122,12 +126,21 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SetAppointmentScreen(
+<<<<<<< HEAD
                     id: widget.id,
                     image: widget.image,
                     name: widget.name,
                     session_price: widget.session_price,
                     rating: widget.rating,
                     clinic_address: widget.clinic_address,
+=======
+                  /*
+            image: widget.image,
+            name: widget.name,
+            specialist: widget.specialist,
+            available: widget.available,
+            */
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                   )));
         },
       ),
@@ -163,7 +176,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             height: Dimensions.heightSize * 0.5,
           ),
           MyRating(
+<<<<<<< HEAD
             rating: widget.rating,
+=======
+            rating: '5',
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
           ),
           SizedBox(
             height: Dimensions.heightSize * 0.5,
