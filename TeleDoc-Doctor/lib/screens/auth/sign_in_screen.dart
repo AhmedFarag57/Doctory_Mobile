@@ -11,6 +11,7 @@ import 'package:doctor/screens/dashboard_screen.dart';
 import 'package:doctor/screens/auth/sign_up_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../dialog/success_dialog.dart';
 import '../../network_utils/api.dart';
 import 'forgot_password_screen.dart';
 import '../loading/loading_screen.dart';
@@ -262,16 +263,21 @@ class _SignInScreenState extends State<SignInScreen> {
             var body = json.decode(response.body);
 
             if (body['success']) {
-              SharedPreferences localStorage = await SharedPreferences.getInstance();
-              localStorage.setString('token', json.encode(body['data']['token']));
+              SharedPreferences localStorage =
+                  await SharedPreferences.getInstance();
+              localStorage.setString(
+                  'token', json.encode(body['data']['token']));
               localStorage.setString('user', json.encode(body['data']['user']));
+
+              print(body['data']['token']);
 
               setState(() => isLoading = false);
 
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => DashboardScreen()));
             } else {
-              // ....
+              setState(() => isLoading = false);
+              showSuccessDialog(context);
             }
           }
         },
@@ -315,5 +321,19 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Colors.black),
       ),
     );
+  }
+
+  Future<bool> showSuccessDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => SuccessDialog(
+            title: "Error",
+            subTitle: "Invalid Email or Password",
+            buttonName: Strings.ok,
+            moved: SignInScreen(),
+          ),
+        )) ??
+        false;
   }
 }

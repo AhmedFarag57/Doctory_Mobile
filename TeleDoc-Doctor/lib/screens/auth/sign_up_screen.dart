@@ -330,7 +330,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             showSuccessDialog(context);
           } else {
             
-            // ...
+            setState(() => isLoading = false);
+
+            //showSuccessDialog(context);
           }
         }
       },
