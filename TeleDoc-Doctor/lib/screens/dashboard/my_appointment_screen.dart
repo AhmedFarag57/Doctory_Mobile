@@ -11,6 +11,7 @@ import 'package:doctor/utils/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../network_utils/api.dart';
+import '../loading/loading_screen.dart';
 
 class MyAppointmentScreen extends StatefulWidget {
   @override
@@ -19,42 +20,60 @@ class MyAppointmentScreen extends StatefulWidget {
 
 class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
   int totalPages = 2;
+  bool isLoading = false;
 
   var user;
+  var appointmentsRequest;
 
   @override
   void initState() {
-    _getUserData();
-
     super.initState();
+
+    loadData();
   }
 
-  _getUserData() async {
-    // Get the user data from phone storage
+  loadData() async {
+    setState(() => isLoading = true);
+
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = jsonDecode(localStorage.get('user'));
+    user = jsonDecode(localStorage.getString('user'));
+    var id = user['id'];
+    var response;
+    var body;
+
+    response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments/request');
+
+    body = jsonDecode(response.body);
+
+    if (body['success']) {
+      appointmentsRequest = body['data'];
+    }
+
+
+    setState(() => isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: CustomColor.secondaryColor,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              HeaderWidget(
-                name: Strings.myAppointment,
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            backgroundColor: CustomColor.secondaryColor,
+            body: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  HeaderWidget(
+                    name: Strings.myAppointment,
+                  ),
+                  bodyWidget(context),
+                ],
               ),
-              bodyWidget(context),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
+        );
 
   bodyWidget(BuildContext context) {
     return Padding(
