@@ -6,20 +6,13 @@ import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../network_utils/api.dart';
 
 class AppointmentRequestWidget extends StatelessWidget {
-  var patients;
-
-  _getAllPatients() async {
-    var response = await CallApi().getDataWithToken('/id/sessions');
-    var body = jsonDecode(response.body);
-
-    if (body['success']) {
-      patients = body['data'];
-    }
-  }
+  
+  
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +83,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  patients['fake_name'],
-                                  //recent.name,
+                                  recent.name,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
@@ -112,8 +104,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  patients['date_time'],
-                                  //'${recent.time} ${recent.date}',
+                                  '${recent.time} ${recent.date}',
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
@@ -222,12 +213,10 @@ class AppointmentRequestWidget extends StatelessWidget {
                     openPatientDetailsDialog(
                       context,
                       recent.image,
-                      patients['fake_name'],
-                      //recent.name,
+                      recent.name,
                       recent.problem,
-                      patients['date_time'],
-                      //recent.time,
-                      recent.date,
+                      recent.time,
+                      recent.date
                     );
                   },
                 ),

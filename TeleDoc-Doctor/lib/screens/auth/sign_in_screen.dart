@@ -11,8 +11,10 @@ import 'package:doctor/screens/dashboard_screen.dart';
 import 'package:doctor/screens/auth/sign_up_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../dialog/success_dialog.dart';
 import '../../network_utils/api.dart';
 import 'forgot_password_screen.dart';
+import '../loading/loading_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -27,49 +29,28 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
-
-  void _signin() async {
-    var data = {
-      'email': emailController.text,
-      'password': passwordController.text
-    };
-
-    var response = await CallApi().postData(data, '/login');
-
-    var body = json.decode(response.body);
-
-    if (body['success']) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['data']['token']));
-      localStorage.setString('user', json.encode(body['data']['user']));
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-    } else {
-      // ....
-    }
-  }
+  bool isLoading = false;
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: CustomColor.secondaryColor,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              BackWidget(
-                name: Strings.signInAccount,
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            backgroundColor: CustomColor.secondaryColor,
+            body: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  BackWidget(
+                    name: Strings.signInAccount,
+                  ),
+                  bodyWidget(context)
+                ],
               ),
-              bodyWidget(context)
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
+        );
 
   bodyWidget(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -268,15 +249,37 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
         ),
-        onTap: () {
-
-          Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-          /*
+        onTap: () async {
           if (formKey.currentState.validate()) {
-            _signin();
+            setState(() => isLoading = true);
+
+            var data = {
+              'email': emailController.text,
+              'password': passwordController.text
+            };
+
+            var response = await CallApi().postData(data, '/login');
+
+            var body = json.decode(response.body);
+
+            if (body['success']) {
+              SharedPreferences localStorage =
+                  await SharedPreferences.getInstance();
+              localStorage.setString(
+                  'token', json.encode(body['data']['token']));
+              localStorage.setString('user', json.encode(body['data']['user']));
+
+              print(body['data']['token']);
+
+              setState(() => isLoading = false);
+
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => DashboardScreen()));
+            } else {
+              setState(() => isLoading = false);
+              showSuccessDialog(context);
+            }
           }
-          */
         },
       ),
     );
@@ -318,5 +321,19 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Colors.black),
       ),
     );
+  }
+
+  Future<bool> showSuccessDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => SuccessDialog(
+            title: "Error",
+            subTitle: "Invalid Email or Password",
+            buttonName: Strings.ok,
+            moved: SignInScreen(),
+          ),
+        )) ??
+        false;
   }
 }

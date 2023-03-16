@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:doctor/data/recent.dart';
+import 'package:doctor/network_utils/api.dart';
+import 'package:doctor/screens/loading/loading_screen.dart';
 import 'package:doctor/dialog/model/session.dart';
 import 'package:doctor/network_utils/api.dart';
 import 'package:flutter/material.dart';
@@ -20,75 +22,96 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  var patients;
-  var user;
+  bool isLoading = false;
+
+  var totalAppointed;
+  var totalPatients = 0;
+  var recentlyAppointed;
 
   @override
   void initState() {
-    _getUserData();
-    _getAllPatients();
-
     super.initState();
+
+    _loadData();
   }
 
-  _getUserData() async {
-    // Get the user data from phone storage
+  _loadData() async {
+    setState(() => isLoading = true);
+
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = jsonDecode(localStorage.get('user'));
-  }
+    var user = jsonDecode(localStorage.getString('user'));
+    var id = user['id'];
+    var response;
+    var body;
 
-  _getAllPatients() async {
-    var response = await CallApi().getDataWithToken('/id/sessions');
-    var body = jsonDecode(response.body);
+    // get total appointed
+    response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments/count');
+
+    body = json.decode(response.body);
 
     if (body['success']) {
-      patients = body['data'];
+      totalAppointed = body['data']['count'];
     }
+
+    // get total patients
+    // ..
+
+    // get recently appointed
+    response = await CallApi().getDataWithToken('/doctors/' + id.toString() + '/appointments');
+
+    body = json.decode(response.body);
+
+    if (body['success']) {
+      recentlyAppointed = body['data'];
+    }
+
+    setState(() => isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        key: scaffoldKey,
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(Dimensions.radius * 4),
-                bottomRight: Radius.circular(Dimensions.radius * 4),
-              ),
-              child: Image.asset(
-                'assets/images/home_bg.png',
-                height: MediaQuery.of(context).size.height * 0.3,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.fill,
-                //colorBlendMode: BlendMode.dst,
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.3,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: FractionalOffset.topCenter,
-                    end: FractionalOffset.bottomCenter,
-                    colors: [
-                      Color(0xFF4C6BFF).withOpacity(0.8),
-                      Color(0xFF4C6BFF).withOpacity(0.8),
-                    ]),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(Dimensions.radius * 4),
-                  bottomRight: Radius.circular(Dimensions.radius * 4),
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            key: scaffoldKey,
+            body: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(Dimensions.radius * 4),
+                    bottomRight: Radius.circular(Dimensions.radius * 4),
+                  ),
+                  child: Image.asset(
+                    'assets/images/home_bg.png',
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    width: MediaQuery.of(context).size.width,
+                    fit: BoxFit.fill,
+                    //colorBlendMode: BlendMode.dst,
+                  ),
                 ),
-              ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: FractionalOffset.topCenter,
+                        end: FractionalOffset.bottomCenter,
+                        colors: [
+                          Color(0xFF4C6BFF).withOpacity(0.8),
+                          Color(0xFF4C6BFF).withOpacity(0.8),
+                        ]),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(Dimensions.radius * 4),
+                      bottomRight: Radius.circular(Dimensions.radius * 4),
+                    ),
+                  ),
+                ),
+                headerWidget(context),
+              ],
             ),
-            headerWidget(context),
-          ],
-        ),
-      ),
-    );
-  }
+          ),
+        );
 
   headerWidget(BuildContext context) {
     return Padding(
@@ -224,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: Dimensions.heightSize,
                   ),
                   Text(
-                    '65',
+                    totalPatients.toString(),
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
@@ -258,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: Dimensions.heightSize,
                   ),
                   Text(
-                    '25',
+                    totalAppointed.toString(),
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize,
@@ -300,12 +323,12 @@ class _HomeScreenState extends State<HomeScreen> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: RecentList.list().length,
+              itemCount: recentlyAppointed.length,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                Recent recent = RecentList.list()[index];
+                //Recent recent = RecentList.list()[index];
                 return Padding(
                   padding: const EdgeInsets.only(
                       left: Dimensions.widthSize * 2,
@@ -333,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Image.asset(recent.image),
+                            //Image.asset(recent.image),
                             SizedBox(
                               width: Dimensions.widthSize,
                             ),
@@ -341,8 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  patients['fake_name'],
-                                  //recent.name,
+                                  recentlyAppointed[index]['status'],
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
@@ -352,21 +374,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
-                                Text(
-                                  recent.problem,
-                                  style: TextStyle(
-                                      color: Colors.blueAccent,
-                                      fontSize: Dimensions.smallTextSize),
-                                  textAlign: TextAlign.center,
-                                ),
+                                // Text(
+                                //   recent.problem,
+                                //   style: TextStyle(
+                                //       color: Colors.blueAccent,
+                                //       fontSize: Dimensions.smallTextSize),
+                                //   textAlign: TextAlign.center,
+                                // ),
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Row(
                                   children: [
                                     Text(
-                                      patients['date_time'],
-                                      //recent.time,
+                                      recentlyAppointed[index]['time'],
                                       style: TextStyle(
                                           color: Colors.black.withOpacity(0.6),
                                           fontSize: Dimensions.smallTextSize),
@@ -376,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: Dimensions.widthSize * 0.5,
                                     ),
                                     Text(
-                                      recent.date,
+                                      recentlyAppointed[index]['date'],
                                       style: TextStyle(
                                           color: Colors.black.withOpacity(0.6),
                                           fontSize: Dimensions.smallTextSize),

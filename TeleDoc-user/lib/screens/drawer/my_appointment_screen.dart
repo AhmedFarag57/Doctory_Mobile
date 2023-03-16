@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/doctor.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/appointment_details_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -8,12 +11,36 @@ import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/widgets/back_widget.dart';
 
 class MyAppointmentScreen extends StatefulWidget {
+  final int id;
+
+  const MyAppointmentScreen({Key key, this.id}) : super(key: key);
 
   @override
   _MyAppointmentScreenState createState() => _MyAppointmentScreenState();
 }
 
 class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
+  var myAppointment = [];
+
+  @override
+  void initState() {
+    _getUserAppointment();
+    super.initState();
+  }
+
+  _getUserAppointment() async {
+    var _url = "/patients/appointments/" + widget.id.toString();
+
+
+    var response = await CallApi().getDataWithToken(_url);
+
+    var body = jsonDecode(response.body);
+
+    if (body['success']) {
+      myAppointment = body['data'];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -24,7 +51,9 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.myAppointment,),
+              BackWidget(
+                name: Strings.myAppointment,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -48,10 +77,10 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimensions.radius * 2),
               topRight: Radius.circular(Dimensions.radius * 2),
-            )
-        ),
+            )),
         child: ListView.builder(
-          itemCount: DoctorList.list().length,
+          itemCount: myAppointment.length,
+          //itemCount: DoctorList.list().length,
           shrinkWrap: true,
           itemBuilder: (context, index) {
             Doctor doctor = DoctorList.list()[index];
@@ -60,8 +89,7 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                   left: Dimensions.widthSize * 2,
                   right: Dimensions.widthSize,
                   top: 10,
-                  bottom: 10
-              ),
+                  bottom: 10),
               child: GestureDetector(
                 child: Container(
                   width: 150,
@@ -85,39 +113,45 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                       children: [
                         Expanded(
                           flex: 1,
-                          child: Image.asset(
-                              doctor.image
-                          ),
+                          child: Image.asset(doctor.image),
                         ),
-                        SizedBox(width: Dimensions.widthSize,),
+                        SizedBox(
+                          width: Dimensions.widthSize,
+                        ),
                         Expanded(
                           flex: 2,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                doctor.name,
+                                "Dr. " + myAppointment[index]['name'],
+                                //doctor.name,
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: Dimensions.defaultTextSize,
-                                    fontWeight: FontWeight.bold
-                                ),
+                                    fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: Dimensions.heightSize * 0.5,),
+                              SizedBox(
+                                height: Dimensions.heightSize * 0.5,
+                              ),
                               Row(
                                 children: [
                                   Icon(
                                     Icons.history,
                                     size: 15,
                                   ),
-                                  SizedBox(width: Dimensions.widthSize * 0.5,),
+                                  SizedBox(
+                                    width: Dimensions.widthSize * 0.5,
+                                  ),
                                   Text(
-                                    doctor.available,
+                                    myAppointment[index]['time'] +
+                                        ' / ' +
+                                        myAppointment[index]['date'],
+                                    //doctor.available,
                                     style: TextStyle(
                                         color: Colors.grey,
-                                        fontSize: Dimensions.smallTextSize
-                                    ),
+                                        fontSize: Dimensions.smallTextSize),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -125,22 +159,23 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(width: Dimensions.widthSize,),
+                        SizedBox(
+                          width: Dimensions.widthSize,
+                        ),
                         Expanded(
                           flex: 1,
                           child: Container(
                             height: 30,
                             decoration: BoxDecoration(
-                              color: CustomColor.secondaryColor,
-                              borderRadius: BorderRadius.circular(15)
-                            ),
+                                color: CustomColor.secondaryColor,
+                                borderRadius: BorderRadius.circular(15)),
                             child: Center(
                               child: Text(
-                                'Accepted',
+                                myAppointment[index]['status'],
+                                //'Accepted',
                                 style: TextStyle(
-                                  color: CustomColor.primaryColor,
-                                  fontSize: Dimensions.smallTextSize
-                                ),
+                                    color: CustomColor.primaryColor,
+                                    fontSize: Dimensions.smallTextSize),
                               ),
                             ),
                           ),
@@ -150,8 +185,8 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      AppointmentDetailsScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => AppointmentDetailsScreen()));
                 },
               ),
             );

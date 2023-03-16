@@ -3,7 +3,7 @@ class Strings {
   static String appName = 'TeleDoc';
 
   //onBoard screen
-  static const String title1 = 'Thousands Of Doctor';
+  static const String title1 = 'Specialist doctors';
   static const String title2 = 'Live Talk With Doctor';
   static const String title3 = 'Chat With Doctor';
   static const String subTitle1 =

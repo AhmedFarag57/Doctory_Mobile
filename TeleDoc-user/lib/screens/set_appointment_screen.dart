@@ -11,6 +11,23 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/filter_chip_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
+<<<<<<< HEAD
+import 'appointment_summery_screen.dart';
+
+class SetAppointmentScreen extends StatefulWidget {
+  final String image, name, session_price, rating, clinic_address, id;
+  //final int id;
+
+  const SetAppointmentScreen({
+    Key key,
+    this.image,
+    this.name,
+    this.session_price,
+    this.rating,
+    this.clinic_address,
+    this.id,
+  }) : super(key: key);
+=======
 import '../network_utils/api.dart';
 
 class SetAppointmentScreen extends StatefulWidget {
@@ -21,12 +38,16 @@ class SetAppointmentScreen extends StatefulWidget {
       {Key key, this.image, this.name, this.specialist, this.available})
       : super(key: key);
       */
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
   @override
   _SetAppointmentScreenState createState() => _SetAppointmentScreenState();
 }
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   DateTime selectedDate = DateTime.now();
+<<<<<<< HEAD
+  String date = '2023-01-04';
+=======
   String date = 'Select date';
   var user;
   var doctors;
@@ -53,6 +74,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       doctors = body['data'];
     }
   }
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +165,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                 height: 60,
                 width: 60,
               ),
+<<<<<<< HEAD
+=======
               */
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
               SizedBox(
                 width: Dimensions.widthSize,
               ),
@@ -152,14 +177,34 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
+<<<<<<< HEAD
+                    "Dr. " + widget.name,
+=======
                     doctors['name'],
                     //widget.name,
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: Dimensions.defaultTextSize,
                         fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
+<<<<<<< HEAD
+                  // SizedBox(height: Dimensions.heightSize * 0.5,),
+                  // Text(
+                  //   widget.clinic_address,
+                  //   style: TextStyle(
+                  //       color: Colors.blueAccent,
+                  //       fontSize: Dimensions.smallTextSize
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  // ),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
+                  Text(
+                    widget.clinic_address,
+=======
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
@@ -177,6 +222,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   Text(
                     doctors['phone_number'],
                     //widget.available,
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.6),
                         fontSize: Dimensions.smallTextSize),
@@ -186,7 +232,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                     height: Dimensions.heightSize * 0.5,
                   ),
                   Text(
+<<<<<<< HEAD
+                    'Fee ' + widget.session_price + ' L.E',
+=======
                     doctors['clinic_address'],
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                     style: TextStyle(
                         color: Colors.blueAccent,
                         fontSize: Dimensions.smallTextSize,
@@ -197,7 +247,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                     height: Dimensions.heightSize * 0.5,
                   ),
                   MyRating(
+<<<<<<< HEAD
+                    rating: widget.rating,
+=======
                     rating: '5',
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                   )
                 ],
               )
@@ -243,7 +297,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
+<<<<<<< HEAD
+                      '2023-01-02',//date,
+=======
                       date,
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
                       style: TextStyle(color: Colors.black.withOpacity(0.7)),
                     ),
                     Image.asset('assets/images/calender.png')
@@ -294,10 +352,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                     FilterChipWidget(chipName: '11:00 am'),
                     FilterChipWidget(chipName: '12:00 pm'),
                     FilterChipWidget(chipName: '1:00 pm'),
-                    FilterChipWidget(chipName: '2:00 am'),
-                    FilterChipWidget(chipName: '3:00 am'),
-                    FilterChipWidget(chipName: '4:00 am'),
-                    FilterChipWidget(chipName: '5:00 am'),
+                    FilterChipWidget(chipName: '2:00 pm'),
+                    FilterChipWidget(chipName: '3:00 pm'),
+                    FilterChipWidget(chipName: '4:00 pm'),
+                    FilterChipWidget(chipName: '5:00 pm'),
                     FilterChipWidget(chipName: '6:00 pm'),
                     FilterChipWidget(chipName: '7:00 pm'),
                   ],
@@ -348,9 +406,31 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
         ),
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
+<<<<<<< HEAD
+              builder: (context) => AppointmentSummeryScreen(
+                    docName: widget.name,
+                    id: widget.id,
+                    date: _getDate(),
+                    time: '08:00:00',
+                    session_price: widget.session_price,
+                  )));
+          // Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
+          //     InputPatientDetailsScreen()));
+=======
               builder: (context) => InputPatientDetailsScreen()));
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
         },
       ),
     );
   }
+<<<<<<< HEAD
+
+  String _getDate() {
+    var formattedDate =
+        "${selectedDate.year}-${selectedDate.month}-${selectedDate.day}";
+
+    return formattedDate;
+  }
+=======
+>>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
 }

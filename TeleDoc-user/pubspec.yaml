@@ -50,6 +50,7 @@ dependencies:
   flutter_svg: ^0.22.0
   weekday_selector: ^1.0.0
   shared_preferences: ^2.0.15
+  age_calculator: ^1.0.0
 
 
 dev_dependencies:

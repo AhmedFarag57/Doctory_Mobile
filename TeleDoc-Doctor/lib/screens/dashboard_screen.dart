@@ -116,13 +116,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   _onTapIndex(index) {
     setState(() {
       currentIndex = index;
-      print('index: $index');
     });
     goToScreen(currentIndex);
   }
 
   goToScreen(int currentIndex) {
-    print('indexx: $currentIndex');
     switch(currentIndex){
       case 0:
         return HomeScreen();
