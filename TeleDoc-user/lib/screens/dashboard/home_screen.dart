@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/category.dart';
 import 'package:teledoc/data/nearby.dart';
@@ -10,6 +11,7 @@ import 'package:teledoc/screens/drawer/help_support_screen.dart';
 import 'package:teledoc/screens/drawer/my_appointment_screen.dart';
 import 'package:teledoc/screens/drawer/my_card_screen.dart';
 import 'package:teledoc/screens/drawer/pill_reminder_screen.dart';
+import 'package:teledoc/screens/loading/loading_screen.dart';
 import 'package:teledoc/screens/notification_screen.dart';
 import 'package:teledoc/screens/search_result_screen.dart';
 import 'package:teledoc/screens/specialist_details_screen.dart';
@@ -21,6 +23,7 @@ import 'package:teledoc/screens/auth/sign_in_screen.dart';
 import 'package:teledoc/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teledoc/models/Doctor.dart';
+import 'package:wave/config.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -31,17 +34,21 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  //List<Doctor> listModel = [];
   var user;
   var doctors;
 
+  bool isloading = false;
+
   @override
   void initState() {
-    _getUserData();
-    _getAllDoctors();
-
+    // _getUserData();
+    // _getAllDoctors();
     super.initState();
+    _loadingdata();
   }
 
+/*
   _getUserData() async {
     // Get the user data from phone storage
     SharedPreferences localStorage = await SharedPreferences.getInstance();
@@ -54,81 +61,106 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (body['success']) {
       doctors = body['data'];
+      // print(doctors);
+      // print(user);
+    }
+  }
+*/
+  _loadingdata() async {
+    setState(() => isloading = true);
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.get('user'));
+    var id = user['id'];
+    var response;
+    var body;
+
+    response = await CallApi().getDataWithToken('/doctors/');
+
+    body = jsonDecode(response.body);
+
+    if (body['success']) {
+      doctors = body['data'];
+/*
+      for (Map i in body) {
+        listModel.add(doctors.fromJson(i));
+      }
+      */
+      setState(() => isloading = false);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        key: scaffoldKey,
-        drawer: Drawer(
-          child: Container(
-            color: CustomColor.primaryColor,
-            child: ListView(
-              //portant: Remove any padding from the ListView.
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  child: profileWidget(context),
+  Widget build(BuildContext context) => isloading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            key: scaffoldKey,
+            drawer: Drawer(
+              child: Container(
+                color: CustomColor.primaryColor,
+                child: ListView(
+                  //portant: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    DrawerHeader(
+                      child: profileWidget(context),
+                      decoration: BoxDecoration(
+                        color: CustomColor.primaryColor,
+                      ),
+                    ),
+                    listData('assets/images/icon/appointment.png',
+                        Strings.myAppointment, MyAppointmentScreen()),
+                    listData('assets/images/icon/change.png',
+                        Strings.changePassword, ChangePasswordScreen()),
+                    listData('assets/images/icon/card.png', Strings.myCard,
+                        MyCardScreen()),
+                    listData('assets/images/icon/reminder.png',
+                        Strings.pillReminder, PillReminderScreen()),
+                    listData('assets/images/icon/settings.png',
+                        Strings.helpSupport, HelpSupportScreen()),
+                    logoutListData('assets/images/icon/signout.png',
+                        Strings.signOut, SignInScreen()),
+                  ],
+                ),
+              ),
+            ),
+            body: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Image.asset(
+                  'assets/images/home_bg.png',
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  width: MediaQuery.of(context).size.width,
+                  fit: BoxFit.fill,
+                  //colorBlendMode: BlendMode.dst,
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4,
                   decoration: BoxDecoration(
-                    color: CustomColor.primaryColor,
+                      gradient: LinearGradient(
+                          begin: FractionalOffset.topCenter,
+                          end: FractionalOffset.bottomCenter,
+                          colors: [
+                        Colors.grey.withOpacity(0.5),
+                        Color(0xFF4C6BFF),
+                      ])),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Image.asset(
+                    'assets/images/bg.png',
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    width: MediaQuery.of(context).size.width,
+                    fit: BoxFit.fill,
                   ),
                 ),
-                listData('assets/images/icon/appointment.png',
-                    Strings.myAppointment, MyAppointmentScreen(id: user['id'])),
-                listData('assets/images/icon/change.png',
-                    Strings.changePassword, ChangePasswordScreen()),
-                listData('assets/images/icon/card.png', Strings.myCard,
-                    MyCardScreen()),
-                listData('assets/images/icon/reminder.png',
-                    Strings.pillReminder, PillReminderScreen()),
-                listData('assets/images/icon/settings.png', Strings.helpSupport,
-                    HelpSupportScreen()),
-                logoutListData('assets/images/icon/signout.png',
-                    Strings.signOut, SignInScreen()),
+                bodyWidget(context)
               ],
             ),
           ),
-        ),
-        body: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Image.asset(
-              'assets/images/home_bg.png',
-              height: MediaQuery.of(context).size.height * 0.4,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.fill,
-              //colorBlendMode: BlendMode.dst,
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.4,
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: FractionalOffset.topCenter,
-                      end: FractionalOffset.bottomCenter,
-                      colors: [
-                    Colors.grey.withOpacity(0.5),
-                    Color(0xFF4C6BFF),
-                  ])),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Image.asset(
-                'assets/images/bg.png',
-                height: MediaQuery.of(context).size.height * 0.5,
-                width: MediaQuery.of(context).size.width,
-                fit: BoxFit.fill,
-              ),
-            ),
-            bodyWidget(context)
-          ],
-        ),
-      ),
-    );
-  }
+        );
 
   profileWidget(BuildContext context) {
     return Padding(
@@ -140,13 +172,15 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/images/profile.png',
         ),
         title: Text(
-          user['name'],
+          user["name"],
+
           //Strings.demoName,
           style: TextStyle(
               color: Colors.white,
               fontSize: Dimensions.largeTextSize,
               fontWeight: FontWeight.bold),
         ),
+        /*
         subtitle: Text(
           user['phone_number'],
           //Strings.demoPhoneNumber,
@@ -155,6 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: Dimensions.defaultTextSize,
           ),
         ),
+        */
       ),
     );
   }
@@ -381,6 +416,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+/*
   categoryWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
@@ -444,7 +480,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+*/
+/*
   topDoctorWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -471,7 +508,8 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: TopDoctorList.list().length,
+              // itemCount: TopDoctorList.list().length,
+              itemCount: doctors.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 TopDoctor topDoctor = TopDoctorList.list()[index];
@@ -504,7 +542,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: Dimensions.heightSize,
                           ),
                           Text(
-                            topDoctor.name,
+                            doctors[index]['name'],
+                            //topDoctor.name,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: Dimensions.defaultTextSize,
@@ -539,8 +578,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => DoctorDetailsScreen(
                                 image: topDoctor.image,
                                 name: topDoctor.name,
-                                session_price: topDoctor.specialist,
-                                rating: topDoctor.available,
+                                //  specialist: topDoctor.specialist,
+                                //available: topDoctor.available,
                               )));
                     },
                   ),
@@ -552,7 +591,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+*/
   nearbyDoctorWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -586,6 +625,8 @@ class _HomeScreenState extends State<HomeScreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
+                //final nDataList = listModel[i];
+                //final doctors = listModel[index];
                 Nearby nearby = NearbyList.list()[index];
                 // Doctor doctor = doctors[index];
                 return Padding(
@@ -623,7 +664,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Dr. " + doctors[index]['name'],
+                                  "DR : " + doctors[index]['name'],
+                                  // nDataList.name,
                                   //nearby.name,
                                   style: TextStyle(
                                       color: Colors.black,
@@ -634,9 +676,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                /*
                                 Text(
-                                  "Session Price: " + doctors[index]['session_price'].toString(),
-                                  //nearby.specialist,
+                                  // doctors[index]['session_price'].toString(),
+                                  nearby.specialist,
                                   style: TextStyle(
                                       color: Colors.blueAccent,
                                       fontSize: Dimensions.smallTextSize),
@@ -645,9 +688,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                */
                                 Text(
-                                  'Rating: ' + doctors[index]['rating'],
-                                  //nearby.available,
+                                  // doctors[index]['phone_number'],
+                                  nearby.available,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
@@ -656,14 +700,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                /*
                                 Text(
-                                  doctors[index]['clinic_address'],
-                                  //nearby.address,
+                                  // doctors[index]['clinic_address'],
+                                  nearby.address,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
                                   textAlign: TextAlign.center,
                                 ),
+                                */
                               ],
                             )
                           ],
@@ -671,16 +717,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onTap: () {
-                      
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DoctorDetailsScreen(
-                              id: doctors[index]['id'].toString(),
-                              image: nearby.image,
-                              name: doctors[index]['name'],
-                              session_price: doctors[index]['session_price'],
-                              rating: doctors[index]['rating'],
-                              clinic_address: doctors[index]['clinic_address'],
-                            )));
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => DoctorDetailsScreen(
+                                name: doctors[index]['name'],
+                                // dName: nDataList.name,
+                                // image: nearby.image,
+                                //name: nearby.name,
+                                // arguments: Doctor,
+                                //specialist: nearby.specialist,
+                                //available: nearby.available,
+                              )));
                     },
                   ),
                 );

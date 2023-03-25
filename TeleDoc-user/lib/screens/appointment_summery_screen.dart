@@ -12,14 +12,14 @@ import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/custom_style.dart';
 
 class AppointmentSummeryScreen extends StatefulWidget {
-  final String docName, session_price, date, time, id;
+  final String docName, date, time;
   //final int id;
 
   const AppointmentSummeryScreen({
     Key key,
     this.docName,
-    this.session_price,
-    this.id,
+    //this.session_price,
+    //this.id,
     this.date,
     this.time,
   }) : super(key: key);
@@ -34,6 +34,10 @@ enum SingingCharacter { point }
 class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   SingingCharacter _character = SingingCharacter.point;
 
+  TextEditingController docNameController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
+/*
   var user;
 
   @override
@@ -45,6 +49,30 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   _getUserData() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     user = jsonDecode(localStorage.get('user'));
+  }
+  */
+
+  void _dispaly() async {
+    var data = {
+      'name': docNameController.text,
+      'date': dateController.text,
+      'time': timeController.text,
+    };
+
+    var response = await CallApi().postData(data, '/appointments');
+
+    var body = json.decode(response.body);
+
+    if (body['success']) {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      localStorage.setString('token', json.encode(body['data']['token']));
+      localStorage.setString('user', json.encode(body['data']['user']));
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
+    } else {
+      //....
+    }
   }
 
   @override
@@ -115,9 +143,10 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(height: Dimensions.heightSize),
-          _titleData('Doctor Name', Strings.fee, widget.docName,
-              widget.session_price + ' L.E'),
-          _titleData(Strings.date, Strings.time, widget.date, widget.time),
+          _titleData('Doctor Name', Strings.fee, widget.docName),
+          // widget.session_price + ' L.E'),
+          _titleData(Strings.date, widget.date, widget.time),
+          //Strings.time
         ],
       ),
     );
@@ -193,7 +222,7 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
     );
   }
 
-  _titleData(String title1, String title2, String value1, String value2) {
+  _titleData(String title1, String title2, String value1) {
     return Padding(
       padding: const EdgeInsets.only(
         top: Dimensions.heightSize,
@@ -217,10 +246,12 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: Dimensions.defaultTextSize)),
+              /*
               Text(value2,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: Dimensions.defaultTextSize)),
+                      */
             ],
           ),
         ],
@@ -266,8 +297,12 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                       ),
                     ),
                     onTap: () {
+                      _dispaly();
+
+                      /*
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => DashboardScreen()));
+                          */
                     },
                   )
                 ],
@@ -280,14 +315,13 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
 
   _createAppointment() async {
     var data = {
-      'doc_id': 158,//widget.id,
-      'patient_id': 3,//user['id'],
+      'doc_id': 158, //widget.id,
+      'patient_id': 3, //user['id'],
       'status': 'pending',
       'date': widget.date,
       'time': widget.time,
-      'session_price': widget.session_price,
+      //'session_price': widget.session_price,
     };
-
 
     var response = await CallApi().postDataWithToken(data, '/appointments');
 
@@ -295,9 +329,6 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
 
     if (body['success']) {
       _showPaymentSuccessDialog();
-    }
-    else {
-      
-    }
+    } else {}
   }
 }

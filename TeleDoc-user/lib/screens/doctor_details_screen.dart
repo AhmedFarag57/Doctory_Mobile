@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teledoc/data/doctor.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/set_appointment_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -8,22 +13,34 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  final String image, name, session_price, rating, clinic_address, id;
+  // String dName;
+  // DoctorDetailsScreen({this.dName});
+
+  final String image,
+      name,
+      rating,
+      id,
+      specialist,
+      available,
+      session_price,
+      clinic_address;
   //final int id;
 
-  const DoctorDetailsScreen(
-<<<<<<< HEAD
-      {Key key,
-      this.image,
-      this.name,
-      this.session_price,
-      this.rating,
-      this.clinic_address,
-      this.id})
-=======
-      {Key key, this.image, this.name, this.specialist, this.available})
->>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
-      : super(key: key);
+  // final Map<String, dynamic> Doctor;
+
+  const DoctorDetailsScreen({
+    Key key,
+    this.image,
+    this.name,
+    this.session_price,
+    this.rating,
+    this.clinic_address,
+    //this.Doctor,
+    this.id,
+    this.specialist,
+    this.available,
+  }) : super(key: key);
+
   @override
   _DoctorDetailsScreenState createState() => _DoctorDetailsScreenState();
 }
@@ -31,6 +48,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   @override
   Widget build(BuildContext context) {
+    //final Doctor = ModalRoute.of(context).settings.arguments as Map;
     return SafeArea(
       child: Scaffold(
         backgroundColor: CustomColor.secondaryColor,
@@ -126,21 +144,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SetAppointmentScreen(
-<<<<<<< HEAD
                     id: widget.id,
-                    image: widget.image,
                     name: widget.name,
-                    session_price: widget.session_price,
-                    rating: widget.rating,
-                    clinic_address: widget.clinic_address,
-=======
-                  /*
-            image: widget.image,
-            name: widget.name,
-            specialist: widget.specialist,
-            available: widget.available,
-            */
->>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
+                    specialist: widget.specialist,
+                    available: widget.available,
                   )));
         },
       ),
@@ -158,7 +165,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Dr. " + widget.name,
+            //"${widget.dName}",
+            widget.name,
+
+            //Doctor[index]['name'],
             style: TextStyle(
                 fontSize: Dimensions.largeTextSize,
                 fontWeight: FontWeight.bold,
@@ -167,6 +177,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           SizedBox(
             height: Dimensions.heightSize,
           ),
+          /*
           Text(
             widget.session_price + ' L.E',
             style: TextStyle(
@@ -175,12 +186,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           SizedBox(
             height: Dimensions.heightSize * 0.5,
           ),
+          */
           MyRating(
-<<<<<<< HEAD
-            rating: widget.rating,
-=======
             rating: '5',
->>>>>>> ad6ea53b41f531b25106b887a91e5b0a10e0a74d
           ),
           SizedBox(
             height: Dimensions.heightSize * 0.5,
@@ -194,12 +202,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               SizedBox(
                 width: Dimensions.heightSize * 0.5,
               ),
+              /*
               Text(
                 widget.clinic_address,
                 style: TextStyle(
                     fontSize: Dimensions.defaultTextSize,
                     color: Colors.black.withOpacity(0.7)),
               ),
+             */
             ],
           ),
           SizedBox(
