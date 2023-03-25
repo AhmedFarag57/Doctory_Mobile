@@ -56,6 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // ignore: deprecated_member_use
                 label: "Home",
               ),
+              /*
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
                 icon: Container(
@@ -98,6 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // ignore: deprecated_member_use
                 label: "Search",
               ),
+              */
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
                 icon: Container(
@@ -136,11 +138,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     switch (currentIndex) {
       case 0:
         return HomeScreen();
+      /*
       case 1:
         return NearbyScreen();
       case 2:
         return SearchResultScreen();
-      case 3:
+        */
+      case 1:
         return NotificationScreen(); //EmergencyScreen();
     }
   }

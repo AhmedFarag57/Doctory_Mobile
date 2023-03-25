@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/top_doctor.dart';
+import 'package:teledoc/models/Doctor.dart';
 import 'package:teledoc/screens/doctor_details_screen.dart';
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 
 class DoctorWidget extends StatelessWidget {
+  List<Doctor> listModel = [];
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,17 +18,17 @@ class DoctorWidget extends StatelessWidget {
         height: 200,
         width: MediaQuery.of(context).size.width,
         child: ListView.builder(
-          itemCount: TopDoctorList.list().length,
+          itemCount: listModel.length,
           scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            TopDoctor topDoctor = TopDoctorList.list()[index];
+          itemBuilder: (context, i) {
+            final nDataList = listModel[i];
+            TopDoctor topDoctor = TopDoctorList.list()[i];
             return Padding(
               padding: const EdgeInsets.only(
                   left: Dimensions.widthSize * 2,
                   right: Dimensions.widthSize,
                   top: 10,
-                  bottom: 10
-              ),
+                  bottom: 10),
               child: GestureDetector(
                 child: Container(
                   width: 150,
@@ -45,36 +47,37 @@ class DoctorWidget extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                          topDoctor.image
+                      Image.asset(topDoctor.image),
+                      SizedBox(
+                        height: Dimensions.heightSize,
                       ),
-                      SizedBox(height: Dimensions.heightSize,),
                       Text(
                         topDoctor.name,
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: Dimensions.defaultTextSize,
-                            fontWeight: FontWeight.bold
-                        ),
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Text(
                         topDoctor.specialist,
                         style: TextStyle(
                             color: Colors.blueAccent,
-                            fontSize: Dimensions.smallTextSize
-                        ),
+                            fontSize: Dimensions.smallTextSize),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Container(
                         height: 30,
                         width: 30,
                         decoration: BoxDecoration(
-                          color: CustomColor.primaryColor,
-                          borderRadius: BorderRadius.circular(15)
-                        ),
+                            color: CustomColor.primaryColor,
+                            borderRadius: BorderRadius.circular(15)),
                         child: Icon(
                           Icons.call,
                           color: Colors.white,
@@ -85,13 +88,15 @@ class DoctorWidget extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      DoctorDetailsScreen(
-                        image: topDoctor.image,
-                        name: topDoctor.name,
-                        session_price: topDoctor.specialist,
-                        rating: topDoctor.available,
-                      )));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => DoctorDetailsScreen(
+                            //dName: nDataList.name,
+
+                            //image: topDoctor.image,
+                            name: topDoctor.name,
+                            //session_price: topDoctor.specialist,
+                            //rating: topDoctor.available,
+                          )));
                 },
               ),
             );
