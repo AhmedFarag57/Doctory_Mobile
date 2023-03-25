@@ -268,6 +268,7 @@ class _SignInScreenState extends State<SignInScreen> {
               localStorage.setString(
                   'token', json.encode(body['data']['token']));
               localStorage.setString('user', json.encode(body['data']['user']));
+              localStorage.setString('model', json.encode(body['data']['model']));
 
               print(body['data']['token']);
 
