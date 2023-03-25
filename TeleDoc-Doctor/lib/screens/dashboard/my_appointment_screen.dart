@@ -23,13 +23,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
   bool isLoading = false;
 
   var user;
+  var model;
   var appointmentsRequest;
+  var todayAppointments;
 
   @override
   void initState() {
-    super.initState();
-
+    // ...
     loadData();
+
+    super.initState();
   }
 
   loadData() async {
@@ -37,19 +40,31 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
 
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     user = jsonDecode(localStorage.getString('user'));
-    var id = user['id'];
+    model = jsonDecode(localStorage.getString('model'));
+    var id = model['id'];
     var response;
     var body;
 
-    response = await CallApi()
-        .getDataWithToken('/doctors/' + id.toString() + '/appointments/request');
-
+    /**
+     * Get the Requested Appointment
+     */
+    response = await CallApi().getDataWithToken(
+        '/doctors/' + id.toString() + '/appointments/request');
+        
     body = jsonDecode(response.body);
-
     if (body['success']) {
       appointmentsRequest = body['data'];
     }
 
+    /**
+     * Get the Today appointment
+     */
+    response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments/today');
+    body = jsonDecode(response.body);
+    if (body['success']) {
+      todayAppointments = body['data'];
+    }
 
     setState(() => isLoading = false);
   }
@@ -176,9 +191,9 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
   pageViewWidget(int i) {
     switch (i) {
       case 0:
-        return AppointmentRequestWidget();
+        return AppointmentRequestWidget(appointmentsRequest);
       case 1:
-        return TodayAppointmentWidget();
+        return TodayAppointmentWidget(todayAppointments);
     }
   }
 }

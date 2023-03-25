@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:doctor/data/recent.dart';
+import 'package:doctor/models/doctor.dart';
 import 'package:doctor/network_utils/api.dart';
 import 'package:doctor/screens/loading/loading_screen.dart';
 import 'package:doctor/dialog/model/session.dart';
@@ -40,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var user = jsonDecode(localStorage.getString('user'));
-    var id = user['id'];
+    var model = jsonDecode(localStorage.getString('model'));
+    var id = model['id'];
     var response;
     var body;
 
@@ -58,7 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // ..
 
     // get recently appointed
-    response = await CallApi().getDataWithToken('/doctors/' + id.toString() + '/appointments');
+    response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments');
 
     body = json.decode(response.body);
 
