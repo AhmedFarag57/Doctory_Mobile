@@ -34,39 +34,21 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  //List<Doctor> listModel = [];
+
   var user;
   var doctors;
-
   bool isloading = false;
 
   @override
   void initState() {
-    // _getUserData();
-    // _getAllDoctors();
-    super.initState();
+
     _loadingdata();
+
+    super.initState();
   }
 
-/*
-  _getUserData() async {
-    // Get the user data from phone storage
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = jsonDecode(localStorage.get('user'));
-  }
-
-  _getAllDoctors() async {
-    var response = await CallApi().getDataWithToken('/doctors');
-    var body = jsonDecode(response.body);
-
-    if (body['success']) {
-      doctors = body['data'];
-      // print(doctors);
-      // print(user);
-    }
-  }
-*/
   _loadingdata() async {
+
     setState(() => isloading = true);
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     user = jsonDecode(localStorage.get('user'));
@@ -74,93 +56,90 @@ class _HomeScreenState extends State<HomeScreen> {
     var response;
     var body;
 
-    response = await CallApi().getDataWithToken('/doctors/');
+    response = await CallApi().getDataWithToken('/doctors');
 
     body = jsonDecode(response.body);
 
     if (body['success']) {
       doctors = body['data'];
-/*
-      for (Map i in body) {
-        listModel.add(doctors.fromJson(i));
-      }
-      */
+
       setState(() => isloading = false);
     }
+
   }
 
   @override
   Widget build(BuildContext context) => isloading
-      ? const LoadingPage()
-      : SafeArea(
-          child: Scaffold(
-            key: scaffoldKey,
-            drawer: Drawer(
-              child: Container(
-                color: CustomColor.primaryColor,
-                child: ListView(
-                  //portant: Remove any padding from the ListView.
-                  padding: EdgeInsets.zero,
-                  children: <Widget>[
-                    DrawerHeader(
-                      child: profileWidget(context),
-                      decoration: BoxDecoration(
-                        color: CustomColor.primaryColor,
-                      ),
-                    ),
-                    listData('assets/images/icon/appointment.png',
-                        Strings.myAppointment, MyAppointmentScreen()),
-                    listData('assets/images/icon/change.png',
-                        Strings.changePassword, ChangePasswordScreen()),
-                    listData('assets/images/icon/card.png', Strings.myCard,
-                        MyCardScreen()),
-                    listData('assets/images/icon/reminder.png',
-                        Strings.pillReminder, PillReminderScreen()),
-                    listData('assets/images/icon/settings.png',
-                        Strings.helpSupport, HelpSupportScreen()),
-                    logoutListData('assets/images/icon/signout.png',
-                        Strings.signOut, SignInScreen()),
-                  ],
-                ),
-              ),
-            ),
-            body: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Image.asset(
-                  'assets/images/home_bg.png',
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  width: MediaQuery.of(context).size.width,
-                  fit: BoxFit.fill,
-                  //colorBlendMode: BlendMode.dst,
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
+  ? const LoadingPage()
+  : SafeArea(
+      child: Scaffold(
+        key: scaffoldKey,
+        drawer: Drawer(
+          child: Container(
+            color: CustomColor.primaryColor,
+            child: ListView(
+              //portant: Remove any padding from the ListView.
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  child: profileWidget(context),
                   decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: FractionalOffset.topCenter,
-                          end: FractionalOffset.bottomCenter,
-                          colors: [
-                        Colors.grey.withOpacity(0.5),
-                        Color(0xFF4C6BFF),
-                      ])),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Image.asset(
-                    'assets/images/bg.png',
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.fill,
+                    color: CustomColor.primaryColor,
                   ),
                 ),
-                bodyWidget(context)
+                listData('assets/images/icon/appointment.png',
+                    Strings.myAppointment, MyAppointmentScreen()),
+                listData('assets/images/icon/change.png',
+                    Strings.changePassword, ChangePasswordScreen()),
+                listData('assets/images/icon/card.png', Strings.myCard,
+                    MyCardScreen()),
+                listData('assets/images/icon/reminder.png',
+                    Strings.pillReminder, PillReminderScreen()),
+                listData('assets/images/icon/settings.png',
+                    Strings.helpSupport, HelpSupportScreen()),
+                logoutListData('assets/images/icon/signout.png',
+                    Strings.signOut, SignInScreen()),
               ],
             ),
           ),
-        );
+        ),
+        body: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Image.asset(
+              'assets/images/home_bg.png',
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.fill,
+              //colorBlendMode: BlendMode.dst,
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.4,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: FractionalOffset.topCenter,
+                      end: FractionalOffset.bottomCenter,
+                      colors: [
+                    Colors.grey.withOpacity(0.5),
+                    Color(0xFF4C6BFF),
+                  ])),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Image.asset(
+                'assets/images/bg.png',
+                height: MediaQuery.of(context).size.height * 0.5,
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fill,
+              ),
+            ),
+            bodyWidget(context)
+          ],
+        ),
+      ),
+    );
 
   profileWidget(BuildContext context) {
     return Padding(
@@ -620,15 +599,11 @@ class _HomeScreenState extends State<HomeScreen> {
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
               itemCount: doctors.length,
-              //itemCount: NearbyList.list().length,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                //final nDataList = listModel[i];
-                //final doctors = listModel[index];
                 Nearby nearby = NearbyList.list()[index];
-                // Doctor doctor = doctors[index];
                 return Padding(
                   padding: const EdgeInsets.only(
                       left: Dimensions.widthSize * 2,
@@ -665,8 +640,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   "DR : " + doctors[index]['name'],
-                                  // nDataList.name,
-                                  //nearby.name,
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
@@ -719,8 +692,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => DoctorDetailsScreen(
+                                id: doctors[index]['id'].toString(),
                                 name: doctors[index]['name'],
-                                // dName: nDataList.name,
                                 // image: nearby.image,
                                 //name: nearby.name,
                                 // arguments: Doctor,

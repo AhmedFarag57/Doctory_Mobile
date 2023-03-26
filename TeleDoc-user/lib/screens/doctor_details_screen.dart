@@ -13,8 +13,6 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  // String dName;
-  // DoctorDetailsScreen({this.dName});
 
   final String image,
       name,
@@ -24,9 +22,6 @@ class DoctorDetailsScreen extends StatefulWidget {
       available,
       session_price,
       clinic_address;
-  //final int id;
-
-  // final Map<String, dynamic> Doctor;
 
   const DoctorDetailsScreen({
     Key key,
@@ -35,7 +30,6 @@ class DoctorDetailsScreen extends StatefulWidget {
     this.session_price,
     this.rating,
     this.clinic_address,
-    //this.Doctor,
     this.id,
     this.specialist,
     this.available,
