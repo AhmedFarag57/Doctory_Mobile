@@ -28,7 +28,7 @@ class SetAppointmentScreen extends StatefulWidget {
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   var user;
-  var appointments;
+  var doctor_times;
 
   bool isloading = false;
 
@@ -46,12 +46,15 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
     var response;
     var body;
 
-    response = await CallApi().getDataWithToken('/appointments/');
+    print(widget.id);
+
+    response =
+        await CallApi().getDataWithToken('/doctors/' + widget.id + '/times');
 
     body = jsonDecode(response.body);
 
     if (body['success']) {
-      appointments = body['data'];
+      doctor_times = body['data'];
 
       setState(() => isloading = false);
     }
@@ -217,7 +220,6 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
     );
   }
 
-/*
   selectDateWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -269,7 +271,8 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       ),
     );
   }
-  */
+
+  /*
   selectDateWidget(BuildContext context) {
     int _value1 = 1;
     return Padding(
@@ -320,9 +323,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       ),
     );
   }
+  */
 
   selectTimeWidget(BuildContext context) {
-    int _value = 1;
     return Padding(
       padding: const EdgeInsets.only(
         left: Dimensions.marginSize,
@@ -347,39 +350,14 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
               alignment: Alignment.centerLeft,
               child: Container(
                 child: Wrap(
-                  spacing: 5.0, runSpacing: 5.0,
+                  spacing: 5.0,
+                  runSpacing: 5.0,
                   children: <Widget>[
-                      FilterChipWidget(chipName: appointments['time']),
-/*
-                      List<Widget>.generate(
-                    appointments.length,
-                    (index) => ChoiceChip(
-                      label: Text(appointments[index]['time']),
-                      selected: _value == index,
-                      onSelected: (selected) {
-                        setState(() {
-                          _value = selected ? index : 0;
-                        });
-                      },
-                    ),
-                  ).toList(),
-                  */
-
-                  
-                    FilterChipWidget(chipName: '9:00 am'),
-                    FilterChipWidget(chipName: '10:00 am'),
-                    FilterChipWidget(chipName: '11:00 am'),
-                    FilterChipWidget(chipName: '12:00 pm'),
-                    FilterChipWidget(chipName: '1:00 pm'),
-                    FilterChipWidget(chipName: '2:00 pm'),
-                    FilterChipWidget(chipName: '3:00 pm'),
-                    FilterChipWidget(chipName: '4:00 pm'),
-                    FilterChipWidget(chipName: '5:00 pm'),
-                    FilterChipWidget(chipName: '6:00 pm'),
-                    FilterChipWidget(chipName: '7:00 pm'),
-                    
-                  //).toList(),
-        ]),
+                    // ....
+                    for (int index = 0; index < doctor_times.length; index++)
+                      FilterChipWidget(chipName: doctor_times[index]['time']),
+                  ],
+                ),
               ),
             ),
           ),
@@ -387,14 +365,14 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       ),
     );
   }
-/*
+
   Future<void> _selectDate(BuildContext context) async {
     int _value1 = 1;
     List<Widget>.generate(
       3,
       (int index) {
         return ChoiceChip(
-          label: Text(appointments[index]['date']),
+          label: Text(doctor_times[index]['date']),
           selected: _value1 == index,
           onSelected: (bool selected) {
             setState(() {
@@ -405,7 +383,6 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       },
     ).toList();
 
-    
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
@@ -417,9 +394,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
         date = "${selectedDate.toLocal()}".split(' ')[0];
         print('date: ' + date);
       });
-      
   }
-  */
 
   nextButtonWidget(BuildContext context) {
     return Positioned(
@@ -444,12 +419,14 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           ),
         ),
         onTap: () {
+          /*
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => AppointmentSummeryScreen(
                     docName: widget.name,
                     date: appointments['date'],
                     time: appointments['time'],
                   )));
+                  */
         },
       ),
     );
