@@ -10,7 +10,9 @@ import 'package:doctor/widgets/back_widget.dart';
 import 'package:doctor/screens/dashboard_screen.dart';
 import 'package:doctor/screens/auth/sign_up_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
+import '../../dialog/loading_dialog.dart';
+import '../../dialog/message_dialog.dart';
 import '../../network_utils/api.dart';
 import 'forgot_password_screen.dart';
 
@@ -28,7 +30,7 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _toggleVisibility = true;
   bool checkedValue = false;
 
-  void _signin() async {
+  void loginRequest(BuildContext context) async {
     var data = {
       'email': emailController.text,
       'password': passwordController.text
@@ -39,14 +41,26 @@ class _SignInScreenState extends State<SignInScreen> {
     var body = json.decode(response.body);
 
     if (body['success']) {
+      // .. 
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setString('token', json.encode(body['data']['token']));
       localStorage.setString('user', json.encode(body['data']['user']));
+      localStorage.setString('model', json.encode(body['data']['model']));
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-    } else {
-      // ....
+      print(body['data']['token']);
+
+      LaravelEcho.init(token: body['data']['token']);
+
+      Navigator.of(context).pop();
+
+      Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => DashboardScreen()));
+    }
+    else
+    {
+      // ..
+      Navigator.of(context).pop();
+      showErrorDialog(context, body['message']);
     }
   }
 
@@ -268,15 +282,12 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
         ),
-        onTap: () {
-
-          Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-          /*
+        onTap: () async {
           if (formKey.currentState.validate()) {
-            _signin();
+            showLoadingDialog(context);
+
+            loginRequest(context);
           }
-          */
         },
       ),
     );
@@ -318,5 +329,29 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Colors.black),
       ),
     );
+  }
+
+  Future<bool> showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
+
+  Future<bool> showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
+          ),
+        )) ??
+        false;
   }
 }

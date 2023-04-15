@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teledoc/data/doctor.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/set_appointment_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -8,12 +13,28 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  final String image, name, specialist, available;
 
-  const DoctorDetailsScreen({Key key, this.image, this.name, this.specialist, this.available}) :
-        super
-(key:
-  key);
+  final String image,
+      name,
+      rating,
+      id,
+      specialist,
+      available,
+      session_price,
+      clinic_address;
+
+  const DoctorDetailsScreen({
+    Key key,
+    this.image,
+    this.name,
+    this.session_price,
+    this.rating,
+    this.clinic_address,
+    this.id,
+    this.specialist,
+    this.available,
+  }) : super(key: key);
+
   @override
   _DoctorDetailsScreenState createState() => _DoctorDetailsScreenState();
 }
@@ -21,6 +42,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   @override
   Widget build(BuildContext context) {
+    //final Doctor = ModalRoute.of(context).settings.arguments as Map;
     return SafeArea(
       child: Scaffold(
         backgroundColor: CustomColor.secondaryColor,
@@ -29,7 +51,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.doctorDetails,),
+              BackWidget(
+                name: Strings.doctorDetails,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -41,7 +65,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
         left: Dimensions.marginSize,
         right: Dimensions.marginSize,
       ),
@@ -49,12 +73,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: Stack(
           children: [
             Image.asset(
@@ -70,12 +93,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.5,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(Dimensions.radius * 2),
-                    topRight: Radius.circular(Dimensions.radius * 2),
-                  )
-                ),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(Dimensions.radius * 2),
+                      topRight: Radius.circular(Dimensions.radius * 2),
+                    )),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -94,7 +116,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   appointmentButtonWidget(BuildContext context) {
     return Positioned(
       right: Dimensions.marginSize,
-      top: - 25,
+      top: -25,
       child: GestureDetector(
         child: Container(
           height: 50,
@@ -111,17 +133,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               ),
             ],
           ),
-          child: Image.asset(
-              'assets/images/calender.png'
-          ),
+          child: Image.asset('assets/images/calender.png'),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => SetAppointmentScreen(
-            image: widget.image,
-            name: widget.name,
-            specialist: widget.specialist,
-            available: widget.available,
-          )));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => SetAppointmentScreen(
+                    id: widget.id,
+                    name: widget.name,
+                    specialist: widget.specialist,
+                    available: widget.available,
+                  )));
         },
       ),
     );
@@ -138,41 +159,56 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            //"${widget.dName}",
             widget.name,
+
+            //Doctor[index]['name'],
             style: TextStyle(
                 fontSize: Dimensions.largeTextSize,
                 fontWeight: FontWeight.bold,
-                color: Colors.black
-            ),
+                color: Colors.black),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
+          /*
           Text(
-            widget.specialist,
+            widget.session_price + ' L.E',
             style: TextStyle(
-                fontSize: Dimensions.defaultTextSize,
-                color: Colors.blue
-            ),
+                fontSize: Dimensions.defaultTextSize, color: Colors.blue),
           ),
-          SizedBox(height: Dimensions.heightSize * 0.5,),
-          MyRating(rating: '5',),
-          SizedBox(height: Dimensions.heightSize * 0.5,),
+          SizedBox(
+            height: Dimensions.heightSize * 0.5,
+          ),
+          */
+          MyRating(
+            rating: '5',
+          ),
+          SizedBox(
+            height: Dimensions.heightSize * 0.5,
+          ),
           Row(
             children: [
               Icon(
-                Icons.history,
+                Icons.home_work,
                 size: 18,
               ),
-              SizedBox(width: Dimensions.heightSize * 0.5,),
+              SizedBox(
+                width: Dimensions.heightSize * 0.5,
+              ),
+              /*
               Text(
-                widget.available,
+                widget.clinic_address,
                 style: TextStyle(
                     fontSize: Dimensions.defaultTextSize,
-                    color: Colors.black.withOpacity(0.7)
-                ),
+                    color: Colors.black.withOpacity(0.7)),
               ),
+             */
             ],
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           Row(
             children: [
               Expanded(
@@ -181,56 +217,54 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   height: 80,
                   decoration: BoxDecoration(
                       color: CustomColor.primaryColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius)
-                  ),
+                      borderRadius: BorderRadius.circular(Dimensions.radius)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         Strings.totalPatients,
-                        style: TextStyle(
-                            color: Colors.white
-                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Text(
-                        '12,265',
+                        '120',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: Dimensions.largeTextSize,
-                            fontWeight: FontWeight.bold
-                        ),
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: Dimensions.widthSize,),
+              SizedBox(
+                width: Dimensions.widthSize,
+              ),
               Expanded(
                 flex: 1,
                 child: Container(
                   height: 80,
                   decoration: BoxDecoration(
                       color: CustomColor.accentColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius)
-                  ),
+                      borderRadius: BorderRadius.circular(Dimensions.radius)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         Strings.yearsOfExperience,
-                        style: TextStyle(
-                            color: Colors.white
-                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Text(
-                        '35y',
+                        '10y',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: Dimensions.largeTextSize,
-                            fontWeight: FontWeight.bold
-                        ),
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

@@ -1,3 +1,4 @@
+import 'package:doctor/models/doctor.dart';
 import 'package:flutter/material.dart';
 
 import 'package:doctor/utils/dimensions.dart';
@@ -12,6 +13,7 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,7 +24,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.notification,),
+              BackWidget(
+                name: Strings.notification,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -34,18 +38,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
       ),
       child: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: ListView.builder(
           itemCount: NotificationList.list().length,
           itemBuilder: (context, index) {
@@ -71,8 +74,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      left: Dimensions.marginSize,
-                      right: Dimensions.marginSize,
+                    left: Dimensions.marginSize,
+                    right: Dimensions.marginSize,
                     top: Dimensions.heightSize,
                     bottom: Dimensions.heightSize,
                   ),
@@ -91,33 +94,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   notification.title,
                                   style: TextStyle(
                                       fontSize: Dimensions.largeTextSize,
-                                      color: Colors.black
-                                  ),
+                                      color: Colors.black),
                                 ),
                               ],
                             ),
-                            SizedBox(height: Dimensions.heightSize * 0.5,),
+                            SizedBox(
+                              height: Dimensions.heightSize * 0.5,
+                            ),
                             Text(
                               notification.subTitle,
                               style: TextStyle(
                                   fontSize: Dimensions.smallTextSize,
-                                  color: Colors.grey
-                              ),
+                                  color: Colors.grey),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: Dimensions.widthSize,),
+                      SizedBox(
+                        width: Dimensions.widthSize,
+                      ),
                       Expanded(
                           flex: 1,
                           child: Text(
                             notification.time,
-                            style: TextStyle(
-                              color: CustomColor.greyColor
-                            ),
+                            style: TextStyle(color: CustomColor.greyColor),
                             textAlign: TextAlign.end,
-                          )
-                      )
+                          ))
                     ],
                   ),
                 ),

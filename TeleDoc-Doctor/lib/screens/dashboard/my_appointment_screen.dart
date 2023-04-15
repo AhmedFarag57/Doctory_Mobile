@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:doctor/widgets/appointment/appointment_request_widget.dart';
 import 'package:doctor/widgets/appointment/today_appointment_widget.dart';
 import 'package:doctor/widgets/header_widget.dart';
@@ -6,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../network_utils/api.dart';
+import '../loading/loading_screen.dart';
 
 class MyAppointmentScreen extends StatefulWidget {
   @override
@@ -13,50 +19,96 @@ class MyAppointmentScreen extends StatefulWidget {
 }
 
 class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
-
   int totalPages = 2;
+  bool isLoading = false;
+
+  var user;
+  var model;
+  var appointmentsRequest;
+  var todayAppointments;
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: CustomColor.secondaryColor,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              HeaderWidget(name: Strings.myAppointment,),
-              bodyWidget(context),
-            ],
-          ),
-        ),
-      ),
-    );
+  void initState() {
+    // ...
+    loadData();
+
+    super.initState();
   }
+
+  loadData() async {
+    setState(() => isLoading = true);
+
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    user = jsonDecode(localStorage.getString('user'));
+    model = jsonDecode(localStorage.getString('model'));
+    var id = model['id'];
+    var response;
+    var body;
+
+    /**
+     * Get the Requested Appointment
+     */
+    response = await CallApi().getDataWithToken(
+        '/doctors/' + id.toString() + '/appointments/request');
+        
+    body = jsonDecode(response.body);
+    if (body['success']) {
+      appointmentsRequest = body['data'];
+    }
+
+    /**
+     * Get the Today appointment
+     */
+    response = await CallApi()
+        .getDataWithToken('/doctors/' + id.toString() + '/appointments/today');
+    body = jsonDecode(response.body);
+    if (body['success']) {
+      todayAppointments = body['data'];
+    }
+
+    setState(() => isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) => isLoading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            backgroundColor: CustomColor.secondaryColor,
+            body: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  HeaderWidget(
+                    name: Strings.myAppointment,
+                  ),
+                  bodyWidget(context),
+                ],
+              ),
+            ),
+          ),
+        );
 
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
       ),
       child: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: PageView.builder(
             itemCount: totalPages,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(
-                  top: Dimensions.heightSize * 2
-                ),
+                padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -81,13 +133,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                                       style: TextStyle(
                                           color: CustomColor.primaryColor,
                                           fontSize: Dimensions.defaultTextSize,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(height: Dimensions.heightSize,),
+                                    SizedBox(
+                                      height: Dimensions.heightSize,
+                                    ),
                                     Container(
                                       height: 2,
-                                      color: index == 0 ? CustomColor.primaryColor : Colors.black.withOpacity(0.7),
+                                      color: index == 0
+                                          ? CustomColor.primaryColor
+                                          : Colors.black.withOpacity(0.7),
                                     )
                                   ],
                                 ),
@@ -102,14 +157,16 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                                       style: TextStyle(
                                           color: CustomColor.primaryColor,
                                           fontSize: Dimensions.defaultTextSize,
-                                          fontWeight: FontWeight.bold
-                                      ),
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(height: Dimensions.heightSize,),
+                                    SizedBox(
+                                      height: Dimensions.heightSize,
+                                    ),
                                     Container(
                                       height: 2,
-                                      color: index == 1 ? CustomColor.primaryColor : Colors.black
-                                          .withOpacity(0.7),
+                                      color: index == 1
+                                          ? CustomColor.primaryColor
+                                          : Colors.black.withOpacity(0.7),
                                     )
                                   ],
                                 ),
@@ -126,18 +183,17 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
                   ),
                 ),
               );
-            }
-        ),
+            }),
       ),
     );
   }
 
   pageViewWidget(int i) {
-    switch(i) {
-      case 0 :
-        return AppointmentRequestWidget();
-      case 1 :
-        return TodayAppointmentWidget();
+    switch (i) {
+      case 0:
+        return AppointmentRequestWidget(appointmentsRequest);
+      case 1:
+        return TodayAppointmentWidget(todayAppointments);
     }
   }
 }
