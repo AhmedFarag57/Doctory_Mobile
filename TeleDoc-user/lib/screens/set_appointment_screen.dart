@@ -419,14 +419,12 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           ),
         ),
         onTap: () {
-          /*
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => AppointmentSummeryScreen(
                     docName: widget.name,
-                    date: appointments['date'],
-                    time: appointments['time'],
+                    date: doctor_times['date'],
+                    time: doctor_times['time'],
                   )));
-                  */
         },
       ),
     );
