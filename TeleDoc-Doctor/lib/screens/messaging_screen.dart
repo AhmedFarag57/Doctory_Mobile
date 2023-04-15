@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:doctor/dialog/loading_dialog.dart';
 import 'package:doctor/screens/loading/loading_screen.dart';
+import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor/data/message.dart';
 import 'package:doctor/widgets/back_widget.dart';
@@ -10,6 +11,7 @@ import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/custom_style.dart';
+import 'package:pusher_client/pusher_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../network_utils/api.dart';
@@ -35,6 +37,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
   var user_id;
   var response;
   var body;
+
   bool isLoading = false;
 
   _MessagingScreenState(var id, var chat_id) {
@@ -44,9 +47,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
   @override
   void initState() {
+    // ..
+    listenChatChannel();
+    
     // ...
     loadData();
-
+    
     super.initState();
   }
 
@@ -75,6 +81,37 @@ class _MessagingScreenState extends State<MessagingScreen> {
     setState(() => isLoading = false);
   }
 
+  void listenChatChannel() {
+    // ...
+    LaravelEcho.instance.private('chat.${chat_id}').listen('.message.sent',
+        (e) {
+      // ..
+      if (e is PusherEvent) {
+        if (e.data != null) {
+          _handleNewMessage(jsonDecode(e.data));
+        }
+      }
+    }).error((err) {
+      // ...
+    });
+  }
+
+  void leaveChatChannel() {
+    // ...
+    try {
+      LaravelEcho.instance.leave('chat.${chat_id}');
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void _handleNewMessage(var data) {
+    // ...
+    setState(() {
+      messages.insert(0, data['message']);
+    });
+  }
+
   TextEditingController messageController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -90,8 +127,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
               child: Stack(
                 children: [
                   BackWidget(
-                    name: Strings.chatWithPatient,
-                  ),
+                      name: Strings.chatWithPatient,
+                      onTap: () {
+                        leaveChatChannel();
+                      }),
                   bodyWidget(context),
                   typeMessageWidget(context)
                 ],
@@ -181,133 +220,132 @@ class _MessagingScreenState extends State<MessagingScreen> {
               padding: const EdgeInsets.only(
                 bottom: Dimensions.heightSize,
               ),
-              child: messages[index]['user_id'] != user_id
-              ? Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: Dimensions.marginSize,
-                      left: Dimensions.marginSize,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: CustomColor.greenLightColor,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          bottomLeft: Radius.circular(30.0),
-                          bottomRight: Radius.circular(30.0),
-                        )
-                      ),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
+              child: messages[index]['user_id'] == user_id
+                  ? Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            right: Dimensions.marginSize,
+                            left: Dimensions.marginSize,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: CustomColor.greenLightColor,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30.0),
+                                  bottomLeft: Radius.circular(30.0),
+                                  bottomRight: Radius.circular(30.0),
+                                )),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: Dimensions.marginSize,
+                                  right: Dimensions.marginSize,
+                                  top: Dimensions.heightSize,
+                                  bottom: Dimensions.heightSize,
+                                ),
+                                child: Text(
+                                  messages[index]['message'],
+                                  style: TextStyle(
+                                    color: CustomColor.greyColor,
+                                    fontSize: Dimensions.defaultTextSize,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            right: Dimensions.marginSize,
+                          ),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              'seen message',
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.3),
+                                fontSize: Dimensions.extraSmallTextSize,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: ClipRRect(
+                                child: Image.asset(
+                                  'assets/images/profile.png',
+                                  height: 20,
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  messages[index]['user']['name'],
+                                  style: TextStyle(
+                                    color: CustomColor.redDarkColor,
+                                    fontSize: Dimensions.smallTextSize,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                                Text(
+                                  '5:20pm',
+                                  style: TextStyle(
+                                    color: Colors.black.withOpacity(0.3),
+                                    fontSize: Dimensions.extraSmallTextSize,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Padding(
                           padding: const EdgeInsets.only(
                             left: Dimensions.marginSize,
                             right: Dimensions.marginSize,
-                            top: Dimensions.heightSize,
-                            bottom: Dimensions.heightSize,
                           ),
-                          child: Text(
-                            messages[index]['message'],
-                            style: TextStyle(
-                              color: CustomColor.greyColor,
-                              fontSize: Dimensions.defaultTextSize,
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              color: CustomColor.yellowLightColor,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(30.0),
+                                bottomLeft: Radius.circular(30.0),
+                                bottomRight: Radius.circular(30.0),
+                              ),
+                            ),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: Dimensions.marginSize,
+                                  right: Dimensions.marginSize,
+                                  top: Dimensions.heightSize,
+                                  bottom: Dimensions.heightSize,
+                                ),
+                                child: Text(
+                                  messages[index]['message'],
+                                  style: TextStyle(
+                                    color: CustomColor.greyColor,
+                                    fontSize: Dimensions.defaultTextSize,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: Dimensions.marginSize,
-                    ),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      child: Text(
-                        'seen message',
-                        style: TextStyle(
-                          color: Colors.black.withOpacity(0.3),
-                          fontSize: Dimensions.extraSmallTextSize,
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-              : Column(
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: ClipRRect(
-                          child: Image.asset(
-                            'assets/images/profile.png',
-                            height: 20,
-                          ),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            messages[index]['user']['name'],
-                            style: TextStyle(
-                              color: CustomColor.redDarkColor,
-                              fontSize: Dimensions.smallTextSize,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                          Text(
-                            '5:20pm',
-                            style: TextStyle(
-                              color: Colors.black.withOpacity(0.3),
-                              fontSize: Dimensions.extraSmallTextSize,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: Dimensions.marginSize,
-                      right: Dimensions.marginSize,
-                    ),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: CustomColor.yellowLightColor,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(30.0),
-                          bottomLeft: Radius.circular(30.0),
-                          bottomRight: Radius.circular(30.0),
-                        ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: Dimensions.marginSize,
-                            right: Dimensions.marginSize,
-                            top: Dimensions.heightSize,
-                            bottom: Dimensions.heightSize,
-                          ),
-                          child: Text(
-                            messages[index]['message'],
-                            style: TextStyle(
-                              color: CustomColor.greyColor,
-                              fontSize: Dimensions.defaultTextSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             );
           },
         ),
@@ -409,13 +447,14 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
                         if (body['success']) {
                           // ...
+                          /*
                           setState(() {
                             messages.insert(0, body['data']);
                           });
+                          */
                         } else {
                           // else of body['success']
-                          // ....
-                          print('unsend');
+                          // ...
                         }
                       } else {
                         // else of formKey.currentState.validate()

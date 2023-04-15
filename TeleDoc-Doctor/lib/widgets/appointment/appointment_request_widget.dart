@@ -21,7 +21,7 @@ class AppointmentRequestWidget extends StatelessWidget {
     this.appointmentsRequest = appointmentsRequest;
   }
 
-  accept_reject(var appointment_id, bool action) async {
+  accept_reject(var appointment_id, bool action, BuildContext context) async {
     
     var response;
     var body;
@@ -37,7 +37,7 @@ class AppointmentRequestWidget extends StatelessWidget {
     body = jsonDecode(response.body);
 
     if (body['success']) {
-      
+      Navigator.of(context).pop();
     }
   }
 
@@ -168,11 +168,12 @@ class AppointmentRequestWidget extends StatelessWidget {
                                   onTap: () {
                                     showLoadingDialog(context);
                                     accept_reject(
-                                        appointmentsRequest[index]['id'], true);
-
+                                        appointmentsRequest[index]['id'], true, context);
+                                    /*
                                     Timer(Duration(seconds: 2), () {
                                       Navigator.of(context).pop();
                                     });
+                                    */
                                   },
                                 ),
                                 SizedBox(
@@ -197,11 +198,12 @@ class AppointmentRequestWidget extends StatelessWidget {
                                     showLoadingDialog(context);
                                     accept_reject(
                                         appointmentsRequest[index]['id'],
-                                        false);
-
+                                        false, context);
+                                    /*
                                     Timer(Duration(seconds: 2), () {
                                       Navigator.of(context).pop();
                                     });
+                                    */
                                   },
                                 )
                               ],

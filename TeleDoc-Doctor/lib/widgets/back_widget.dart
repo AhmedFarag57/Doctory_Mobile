@@ -4,8 +4,9 @@ import 'package:doctor/utils/strings.dart';
 
 class BackWidget extends StatefulWidget {
   final String name;
+  final onTap;
 
-  const BackWidget({Key key, this.name}) : super(key: key);
+  const BackWidget({Key key, this.name, this.onTap}) : super(key: key);
 
   @override
   _BackWidgetState createState() => _BackWidgetState();
@@ -41,14 +42,15 @@ class _BackWidgetState extends State<BackWidget> {
                         ),
                         Text(
                           Strings.back,
-                          style: TextStyle(
-                            color: Colors.white
-                          ),
+                          style: TextStyle(color: Colors.white),
                         )
                       ],
                     ),
                   ),
                   onTap: () {
+                    if (widget.onTap != null) {
+                      widget.onTap();
+                    }
                     Navigator.of(context).pop();
                   },
                 ),
@@ -64,8 +66,7 @@ class _BackWidgetState extends State<BackWidget> {
               style: TextStyle(
                   fontSize: Dimensions.extraLargeTextSize,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white
-              ),
+                  color: Colors.white),
               textAlign: TextAlign.center,
             ),
           ),

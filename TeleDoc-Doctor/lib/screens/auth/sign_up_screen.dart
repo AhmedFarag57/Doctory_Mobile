@@ -10,9 +10,10 @@ import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:doctor/screens/auth/otp/email_verification_screen.dart';
 
+import '../../dialog/loading_dialog.dart';
+import '../../dialog/message_dialog.dart';
 import '../../dialog/success_dialog.dart';
 import '../../network_utils/api.dart';
-import '../loading/loading_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -25,32 +26,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController ssnController = TextEditingController();
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
-  bool isLoading = false;
+
+  void signupRequest(BuildContext context) async {
+    var data = {
+      'name': nameController.text,
+      'email': emailController.text,
+      'password': passwordController.text,
+      'session_price': 0,
+    };
+
+    var response = await CallApi().postData(data, '/doctors');
+
+    var body = json.decode(response.body);
+
+    if (!(body['message'] == 'The given data was invalid.')) {
+      if (body['success']) {
+        Navigator.of(context).pop();
+
+        showSuccessDialog(context);
+      } else {
+        Navigator.of(context).pop();
+        showErrorDialog(context, body['message']);
+      }
+    } else {
+      showErrorDialog(context, body['message']);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => isLoading
-      ? const LoadingPage()
-      : SafeArea(
-          child: Scaffold(
-            backgroundColor: CustomColor.secondaryColor,
-            body: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  BackWidget(
-                    name: Strings.createAnAccount,
-                  ),
-                  bodyWidget(context)
-                ],
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondaryColor,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              BackWidget(
+                name: Strings.createAnAccount,
               ),
-            ),
+              bodyWidget(context)
+            ],
           ),
-        );
+        ),
+      ),
+    );
+  }
 
   bodyWidget(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -215,36 +240,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 obscureText: _toggleVisibility,
               ),
             ),
-            _titleData("SSN"),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: ssnController,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: "Type SSN",
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: CustomStyle.textStyle,
-                ),
-              ),
-            ),
             SizedBox(height: Dimensions.heightSize),
           ],
         ));
@@ -310,30 +305,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         //           emailAddress: emailController.text,
         //         )));
         if (formKey.currentState.validate()) {
-          setState(() => isLoading = true);
+          showLoadingDialog(context);
 
-          var data = {
-            'name': nameController.text,
-            'email': emailController.text,
-            'password': passwordController.text,
-            'ssn': ssnController.text,
-            'isDoctor': true
-          };
-
-          var response = await CallApi().postData(data, '/doctors');
-
-          var body = json.decode(response.body);
-
-          if (body['success']) {
-            setState(() => isLoading = false);
-
-            showSuccessDialog(context);
-          } else {
-            
-            setState(() => isLoading = false);
-
-            //showSuccessDialog(context);
-          }
+          signupRequest(context);
         }
       },
     );
@@ -584,6 +558,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         false;
   }
 
+  Future<bool> showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
+
   Future<bool> showSuccessDialog(BuildContext context) async {
     return (await showDialog(
           barrierDismissible: true,
@@ -593,6 +576,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
             subTitle: "Account created successfully",
             buttonName: Strings.ok,
             moved: SignInScreen(),
+          ),
+        )) ??
+        false;
+  }
+
+  Future<bool> showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
           ),
         )) ??
         false;
