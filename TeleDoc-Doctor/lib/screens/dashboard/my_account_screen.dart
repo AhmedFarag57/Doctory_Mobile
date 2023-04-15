@@ -14,7 +14,9 @@ import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../dialog/loading_dialog.dart';
 import '../../network_utils/api.dart';
+import '../../utils/laravel_echo/laravel_echo.dart';
 
 class MyAccountScreen extends StatefulWidget {
   @override
@@ -22,28 +24,48 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen> {
-  bool isLoading = false;
+
+  void logoutRequest(BuildContext context) async {
+    var response = await CallApi().getDataWithToken('/logout');
+
+    var body = json.decode(response.body);
+
+    if (body['success']) {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      localStorage.remove('user');
+      localStorage.remove('token');
+
+      LaravelEcho.instance.disconnect();
+
+      Navigator.of(context).pop();
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => SignInScreen()));
+    } else {
+      // ..
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => isLoading
-      ? const LoadingPage()
-      : SafeArea(
-          child: Scaffold(
-            backgroundColor: CustomColor.secondaryColor,
-            body: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  HeaderWidget(
-                    name: Strings.myAccount,
-                  ),
-                  bodyWidget(context),
-                ],
-              ),
+  Widget build(BuildContext context){
+    return SafeArea(
+        child: Scaffold(
+          backgroundColor: CustomColor.secondaryColor,
+          body: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              children: [
+                HeaderWidget(
+                  name: Strings.myAccount,
+                ),
+                bodyWidget(context),
+              ],
             ),
           ),
-        );
+        ),
+      );
+  }
 
   bodyWidget(BuildContext context) {
     return Padding(
@@ -349,26 +371,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   ),
                 ),
                 onTap: () async {
-                  setState(() => isLoading = true);
+                  showLoadingDialog(context);
 
-                  var response = await CallApi().getDataWithToken('/logout');
-
-                  var body = json.decode(response.body);
-
-                  if (body['success']) {
-                    SharedPreferences localStorage =
-                        await SharedPreferences.getInstance();
-                    localStorage.remove('user');
-                    localStorage.remove('token');
-
-                    setState(() => isLoading = false);
-
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SignInScreen()));
-                  } else {
-                    print("Error");
-                    setState(() => isLoading = false);
-                  }
+                  logoutRequest(context);
                 },
               ),
             ],
@@ -379,5 +384,14 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         ],
       ),
     );
+  }
+
+  Future<bool> showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
   }
 }

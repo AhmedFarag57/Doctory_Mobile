@@ -99,7 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SvgPicture.asset(
-                        'assets/svg/user.svg',
+                        'assets/svg/profile.svg',
                         color: currentIndex == 3 ? Colors.white : Colors.grey,
                       ),
                     ),
