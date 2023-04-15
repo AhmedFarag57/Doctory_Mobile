@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teledoc/screens/appointment_summery_screen.dart';
 import 'package:teledoc/screens/input_patient_details_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -12,69 +13,77 @@ import 'package:teledoc/widgets/filter_chip_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 import '../network_utils/api.dart';
+import 'loading/loading_screen.dart';
 
 class SetAppointmentScreen extends StatefulWidget {
-  /*
-  final String image, name, specialist, available;
+  final String id, name, specialist, available;
 
   const SetAppointmentScreen(
-      {Key key, this.image, this.name, this.specialist, this.available})
+      {Key key, this.id, this.name, this.specialist, this.available})
       : super(key: key);
-      */
+
   @override
   _SetAppointmentScreenState createState() => _SetAppointmentScreenState();
 }
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
-  DateTime selectedDate = DateTime.now();
-  String date = 'Select date';
   var user;
-  var doctors;
+  var doctor_times;
+
+  bool isloading = false;
 
   @override
   void initState() {
-    _getUserData();
-    _getAllDoctors();
-
     super.initState();
+    _loadingdata();
   }
 
-  _getUserData() async {
-    // Get the user data from phone storage
+  _loadingdata() async {
+    setState(() => isloading = true);
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     user = jsonDecode(localStorage.get('user'));
-  }
+    var id = user['id'];
+    var response;
+    var body;
 
-  _getAllDoctors() async {
-    var response = await CallApi().getDataWithToken('/doctors');
-    var body = jsonDecode(response.body);
+    print(widget.id);
+
+    response =
+        await CallApi().getDataWithToken('/doctors/' + widget.id + '/times');
+
+    body = jsonDecode(response.body);
 
     if (body['success']) {
-      doctors = body['data'];
+      doctor_times = body['data'];
+
+      setState(() => isloading = false);
     }
   }
 
+  DateTime selectedDate = DateTime.now();
+  String date = 'Select date';
+
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: CustomColor.secondaryColor,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              BackWidget(
-                name: Strings.setAppointment,
+  Widget build(BuildContext context) => isloading
+      ? const LoadingPage()
+      : SafeArea(
+          child: Scaffold(
+            backgroundColor: CustomColor.secondaryColor,
+            body: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  BackWidget(
+                    name: Strings.setAppointment,
+                  ),
+                  bodyWidget(context),
+                  nextButtonWidget(context)
+                ],
               ),
-              bodyWidget(context),
-              nextButtonWidget(context)
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
+        );
 
   bodyWidget(BuildContext context) {
     return Padding(
@@ -152,8 +161,8 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    doctors['name'],
-                    //widget.name,
+                    // doctors['name'],
+                    widget.name,
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: Dimensions.defaultTextSize,
@@ -163,6 +172,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
+                  /*
                   Text(
                     doctors['session_price'].toString(),
                     //widget.specialist,
@@ -174,6 +184,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
+                  
                   Text(
                     doctors['phone_number'],
                     //widget.available,
@@ -199,6 +210,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   MyRating(
                     rating: '5',
                   )
+                  */
                 ],
               )
             ],
@@ -260,6 +272,59 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
     );
   }
 
+  /*
+  selectDateWidget(BuildContext context) {
+    int _value1 = 1;
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            Strings.selectDate,
+            style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: Dimensions.largeTextSize),
+          ),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                child: Wrap(
+                  spacing: 5.0,
+                  runSpacing: 5.0,
+                  children: List<Widget>.generate(
+                    appointments.length,
+                    (int index) {
+                      return ChoiceChip(
+                        label: Text(appointments[index]['date']),
+                        selected: _value1 == index,
+                        onSelected: (bool selected) {
+                          setState(() {
+                            _value1 = selected ? index : null;
+                          });
+                        },
+                      );
+                    },
+                  ).toList(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  */
+
   selectTimeWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -288,18 +353,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   spacing: 5.0,
                   runSpacing: 5.0,
                   children: <Widget>[
-                    FilterChipWidget(chipName: '8:00 am'),
-                    FilterChipWidget(chipName: '9:00 am'),
-                    FilterChipWidget(chipName: '10:00 am'),
-                    FilterChipWidget(chipName: '11:00 am'),
-                    FilterChipWidget(chipName: '12:00 pm'),
-                    FilterChipWidget(chipName: '1:00 pm'),
-                    FilterChipWidget(chipName: '2:00 am'),
-                    FilterChipWidget(chipName: '3:00 am'),
-                    FilterChipWidget(chipName: '4:00 am'),
-                    FilterChipWidget(chipName: '5:00 am'),
-                    FilterChipWidget(chipName: '6:00 pm'),
-                    FilterChipWidget(chipName: '7:00 pm'),
+                    // ....
+                    for (int index = 0; index < doctor_times.length; index++)
+                      FilterChipWidget(chipName: doctor_times[index]['time']),
                   ],
                 ),
               ),
@@ -311,6 +367,22 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    int _value1 = 1;
+    List<Widget>.generate(
+      3,
+      (int index) {
+        return ChoiceChip(
+          label: Text(doctor_times[index]['date']),
+          selected: _value1 == index,
+          onSelected: (bool selected) {
+            setState(() {
+              _value1 = selected ? index : null;
+            });
+          },
+        );
+      },
+    ).toList();
+
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
@@ -348,7 +420,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
         ),
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => InputPatientDetailsScreen()));
+              builder: (context) => AppointmentSummeryScreen(
+                    docName: widget.name,
+                    date: doctor_times['date'],
+                    time: doctor_times['time'],
+                  )));
         },
       ),
     );

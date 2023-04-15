@@ -11,6 +11,7 @@ import 'package:teledoc/screens/drawer/help_support_screen.dart';
 import 'package:teledoc/screens/drawer/my_appointment_screen.dart';
 import 'package:teledoc/screens/drawer/my_card_screen.dart';
 import 'package:teledoc/screens/drawer/pill_reminder_screen.dart';
+import 'package:teledoc/screens/loading/loading_screen.dart';
 import 'package:teledoc/screens/notification_screen.dart';
 import 'package:teledoc/screens/search_result_screen.dart';
 import 'package:teledoc/screens/specialist_details_screen.dart';
@@ -22,6 +23,7 @@ import 'package:teledoc/screens/auth/sign_in_screen.dart';
 import 'package:teledoc/network_utils/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teledoc/models/Doctor.dart';
+import 'package:wave/config.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -32,35 +34,44 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+
   var user;
   var doctors;
+  bool isloading = false;
 
   @override
   void initState() {
-    _getUserData();
-    _getAllDoctors();
+
+    _loadingdata();
 
     super.initState();
   }
 
-  _getUserData() async {
-    // Get the user data from phone storage
+  _loadingdata() async {
+
+    setState(() => isloading = true);
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     user = jsonDecode(localStorage.get('user'));
-  }
+    var id = user['id'];
+    var response;
+    var body;
 
-  _getAllDoctors() async {
-    var response = await CallApi().getDataWithToken('/doctors');
-    var body = jsonDecode(response.body);
+    response = await CallApi().getDataWithToken('/doctors');
+
+    body = jsonDecode(response.body);
 
     if (body['success']) {
       doctors = body['data'];
+
+      setState(() => isloading = false);
     }
+
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
+  Widget build(BuildContext context) => isloading
+  ? const LoadingPage()
+  : SafeArea(
       child: Scaffold(
         key: scaffoldKey,
         drawer: Drawer(
@@ -84,8 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     MyCardScreen()),
                 listData('assets/images/icon/reminder.png',
                     Strings.pillReminder, PillReminderScreen()),
-                listData('assets/images/icon/settings.png', Strings.helpSupport,
-                    HelpSupportScreen()),
+                listData('assets/images/icon/settings.png',
+                    Strings.helpSupport, HelpSupportScreen()),
                 logoutListData('assets/images/icon/signout.png',
                     Strings.signOut, SignInScreen()),
               ],
@@ -129,7 +140,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
 
   profileWidget(BuildContext context) {
     return Padding(
@@ -141,13 +151,15 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/images/profile.png',
         ),
         title: Text(
-          user['name'],
+          user["name"],
+
           //Strings.demoName,
           style: TextStyle(
               color: Colors.white,
               fontSize: Dimensions.largeTextSize,
               fontWeight: FontWeight.bold),
         ),
+        /*
         subtitle: Text(
           user['phone_number'],
           //Strings.demoPhoneNumber,
@@ -156,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: Dimensions.defaultTextSize,
           ),
         ),
+        */
       ),
     );
   }
@@ -382,6 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+/*
   categoryWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: Dimensions.heightSize * 2),
@@ -445,7 +459,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+*/
+/*
   topDoctorWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -472,7 +487,8 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
-              itemCount: TopDoctorList.list().length,
+              // itemCount: TopDoctorList.list().length,
+              itemCount: doctors.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 TopDoctor topDoctor = TopDoctorList.list()[index];
@@ -505,7 +521,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: Dimensions.heightSize,
                           ),
                           Text(
-                            topDoctor.name,
+                            doctors[index]['name'],
+                            //topDoctor.name,
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: Dimensions.defaultTextSize,
@@ -540,8 +557,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => DoctorDetailsScreen(
                                 image: topDoctor.image,
                                 name: topDoctor.name,
-                                specialist: topDoctor.specialist,
-                                available: topDoctor.available,
+                                //  specialist: topDoctor.specialist,
+                                //available: topDoctor.available,
                               )));
                     },
                   ),
@@ -553,7 +570,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
+*/
   nearbyDoctorWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -582,13 +599,11 @@ class _HomeScreenState extends State<HomeScreen> {
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
               itemCount: doctors.length,
-              //itemCount: NearbyList.list().length,
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                //Nearby nearby = NearbyList.list()[index];
-                // Doctor doctor = doctors[index];
+                Nearby nearby = NearbyList.list()[index];
                 return Padding(
                   padding: const EdgeInsets.only(
                       left: Dimensions.widthSize * 2,
@@ -616,7 +631,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            //Image.asset(nearby.image),
+                            Image.asset(nearby.image),
                             SizedBox(
                               width: Dimensions.widthSize,
                             ),
@@ -624,8 +639,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  doctors[index]['name'],
-                                  //nearby.name,
+                                  "DR : " + doctors[index]['name'],
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
@@ -635,9 +649,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                /*
                                 Text(
-                                  doctors[index]['session_price'].toString(),
-                                  //nearby.specialist,
+                                  // doctors[index]['session_price'].toString(),
+                                  nearby.specialist,
                                   style: TextStyle(
                                       color: Colors.blueAccent,
                                       fontSize: Dimensions.smallTextSize),
@@ -646,9 +661,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                */
                                 Text(
-                                  doctors[index]['phone_number'],
-                                  //nearby.available,
+                                  // doctors[index]['phone_number'],
+                                  nearby.available,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
@@ -657,14 +673,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
+                                /*
                                 Text(
-                                  doctors[index]['clinic_address'],
-                                  //nearby.address,
+                                  // doctors[index]['clinic_address'],
+                                  nearby.address,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
                                       fontSize: Dimensions.smallTextSize),
                                   textAlign: TextAlign.center,
                                 ),
+                                */
                               ],
                             )
                           ],
@@ -672,15 +690,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onTap: () {
-                      /*
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DoctorDetailsScreen(
-                              image: nearby.image,
-                              name: nearby.name,
-                              specialist: nearby.specialist,
-                              available: nearby.available,
-                            )));
-                  */
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => DoctorDetailsScreen(
+                                id: doctors[index]['id'].toString(),
+                                name: doctors[index]['name'],
+                                // image: nearby.image,
+                                //name: nearby.name,
+                                // arguments: Doctor,
+                                //specialist: nearby.specialist,
+                                //available: nearby.available,
+                              )));
                     },
                   ),
                 );

@@ -106,7 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       'ssn': ssnController.text
     };
 
-    var response = await CallApi().postData(data, '/register');
+    var response = await CallApi().postData(data, '/patients');
 
     var body = json.decode(response.body);
 
@@ -114,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.of(context).pop();
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => SignInScreen()));
-          
+
       // Navigator.of(context).push(MaterialPageRoute(
       //     builder: (context) => EmailVerificationScreen(
       //           emailAddress: emailController.text,
@@ -148,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   }
                 },
                 decoration: InputDecoration(
-                  hintText: 'Ahmed Farag',
+                  hintText: 'Enter your name',
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   labelStyle: CustomStyle.textStyle,

@@ -3,17 +3,14 @@ class Strings {
   static String appName = 'TeleDoc';
 
   //onBoard screen
-  static const String title1 = 'Thousands Of Doctor';
+  static const String title1 = 'Specialist doctors';
   static const String title2 = 'Live Talk With Doctor';
   static const String title3 = 'Chat With Doctor';
-  static const String subTitle1 =
-      'Aenean leoigula porttitor eu,consequat vitae eleifend acenimliquam lorem ante dapibus in viverra quis feugiat';
-  static const String subTitle2 =
-      'Aenean leoigula porttitor eu,consequat vitae eleifend '
-      'acenimliquam lorem ante dapibus in viverra quis feugiat';
-  static const String subTitle3 =
-      'Aenean leoigula porttitor eu,consequat vitae eleifend '
-      'acenimliquam lorem ante dapibus in viverra quis feugiat';
+  static const String subTitle1 = '';
+  static const String subTitle2 = ' '
+      '';
+  static const String subTitle3 = ''
+      '';
   static String getStarted = 'Get Started';
 
   //intro screen
@@ -77,11 +74,11 @@ class Strings {
   static String ok = 'Ok';
 
   //home screen
-  static String letsFindYourSpecialist = "Let's Find Your Specialist";
+  static String letsFindYourSpecialist = "Let's Find Your therapist";
   static String searchDoctor = "Search Doctor";
   static String demoPhoneNumber = "1234-456-789";
-  static String topDoctor = 'Top Doctor';
-  static String nearbyDoctor = 'Nearby Doctor';
+  static String topDoctor = 'Doctors';
+  static String nearbyDoctor = ' Doctors';
   static String myAppointment = 'My Appointment';
   static String changePassword = 'Change Password';
   static String myCard = 'My Card';

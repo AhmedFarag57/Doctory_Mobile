@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teledoc/data/doctor.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/set_appointment_screen.dart';
 
 import 'package:teledoc/utils/dimensions.dart';
@@ -8,11 +13,28 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  final String image, name, specialist, available;
 
-  const DoctorDetailsScreen(
-      {Key key, this.image, this.name, this.specialist, this.available})
-      : super(key: key);
+  final String image,
+      name,
+      rating,
+      id,
+      specialist,
+      available,
+      session_price,
+      clinic_address;
+
+  const DoctorDetailsScreen({
+    Key key,
+    this.image,
+    this.name,
+    this.session_price,
+    this.rating,
+    this.clinic_address,
+    this.id,
+    this.specialist,
+    this.available,
+  }) : super(key: key);
+
   @override
   _DoctorDetailsScreenState createState() => _DoctorDetailsScreenState();
 }
@@ -20,6 +42,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   @override
   Widget build(BuildContext context) {
+    //final Doctor = ModalRoute.of(context).settings.arguments as Map;
     return SafeArea(
       child: Scaffold(
         backgroundColor: CustomColor.secondaryColor,
@@ -115,12 +138,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SetAppointmentScreen(
-                  /*
-            image: widget.image,
-            name: widget.name,
-            specialist: widget.specialist,
-            available: widget.available,
-            */
+                    id: widget.id,
+                    name: widget.name,
+                    specialist: widget.specialist,
+                    available: widget.available,
                   )));
         },
       ),
@@ -138,7 +159,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+            //"${widget.dName}",
             widget.name,
+
+            //Doctor[index]['name'],
             style: TextStyle(
                 fontSize: Dimensions.largeTextSize,
                 fontWeight: FontWeight.bold,
@@ -147,14 +171,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           SizedBox(
             height: Dimensions.heightSize,
           ),
+          /*
           Text(
-            widget.specialist,
+            widget.session_price + ' L.E',
             style: TextStyle(
                 fontSize: Dimensions.defaultTextSize, color: Colors.blue),
           ),
           SizedBox(
             height: Dimensions.heightSize * 0.5,
           ),
+          */
           MyRating(
             rating: '5',
           ),
@@ -164,18 +190,20 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           Row(
             children: [
               Icon(
-                Icons.history,
+                Icons.home_work,
                 size: 18,
               ),
               SizedBox(
                 width: Dimensions.heightSize * 0.5,
               ),
+              /*
               Text(
-                widget.available,
+                widget.clinic_address,
                 style: TextStyle(
                     fontSize: Dimensions.defaultTextSize,
                     color: Colors.black.withOpacity(0.7)),
               ),
+             */
             ],
           ),
           SizedBox(
@@ -201,7 +229,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         height: Dimensions.heightSize * 0.5,
                       ),
                       Text(
-                        '12,265',
+                        '120',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: Dimensions.largeTextSize,
@@ -232,7 +260,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         height: Dimensions.heightSize * 0.5,
                       ),
                       Text(
-                        '35y',
+                        '10y',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: Dimensions.largeTextSize,

@@ -13,7 +13,6 @@ class NearbyScreen extends StatefulWidget {
 }
 
 class _NearbyScreenState extends State<NearbyScreen> {
-
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -35,15 +34,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
             Container(
               height: MediaQuery.of(context).size.height * 0.4,
               decoration: BoxDecoration(
-                  gradient: LinearGradient (
+                  gradient: LinearGradient(
                       begin: FractionalOffset.topCenter,
                       end: FractionalOffset.bottomCenter,
                       colors: [
-                        Colors.grey.withOpacity(0.5),
-                        Color(0xFF4C6BFF),
-                      ]
-                  )
-              ),
+                    Colors.grey.withOpacity(0.5),
+                    Color(0xFF4C6BFF),
+                  ])),
             ),
             Positioned(
               bottom: 0,
@@ -71,9 +68,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
   bodyWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-          top: Dimensions.heightSize
-      ),
+      padding: const EdgeInsets.only(top: Dimensions.heightSize),
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -97,9 +92,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       ),
                       Text(
                         Strings.back,
-                        style: TextStyle(
-                            color: Colors.white
-                        ),
+                        style: TextStyle(color: Colors.white),
                       )
                     ],
                   ),
@@ -122,12 +115,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.extraLargeTextSize * 1.6,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: Dimensions.heightSize * 2,),
+                SizedBox(
+                  height: Dimensions.heightSize * 2,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(
                     left: Dimensions.marginSize * 2,
@@ -139,17 +133,17 @@ class _NearbyScreenState extends State<NearbyScreen> {
                       style: CustomStyle.textStyle,
                       controller: searchController,
                       keyboardType: TextInputType.text,
-                      validator: (String value){
-                        if(value.isEmpty){
+                      validator: (String value) {
+                        if (value.isEmpty) {
                           return Strings.pleaseFillOutTheField;
-                        }else{
+                        } else {
                           return null;
                         }
                       },
                       decoration: InputDecoration(
                         hintText: Strings.searchDoctor,
-                        contentPadding: EdgeInsets.symmetric(vertical: 5.0, horizontal:
-                        5.0),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 5.0),
                         labelStyle: CustomStyle.textStyle,
                         filled: true,
                         fillColor: Colors.white,
@@ -163,9 +157,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                             Icons.search,
                             color: Colors.grey,
                           ),
-                          onPressed: (){
-
-                          },
+                          onPressed: () {},
                         ),
                       ),
                     ),
@@ -173,7 +165,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 ),
               ],
             ),
-            SizedBox(height: Dimensions.heightSize * 2,),
+            SizedBox(
+              height: Dimensions.heightSize * 2,
+            ),
             detailsWidget(context)
           ],
         ),
@@ -195,8 +189,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimensions.radius * 2),
               topRight: Radius.circular(Dimensions.radius * 2),
-            )
-        ),
+            )),
         child: CustomGoogleMap.map,
       ),
     );
@@ -220,8 +213,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   left: Dimensions.widthSize * 2,
                   right: Dimensions.widthSize,
                   top: 10,
-                  bottom: 10
-              ),
+                  bottom: 10),
               child: GestureDetector(
                 child: Container(
                   width: 150,
@@ -232,48 +224,50 @@ class _NearbyScreenState extends State<NearbyScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(
-                          topDoctor.image
+                      Image.asset(topDoctor.image),
+                      SizedBox(
+                        height: Dimensions.heightSize,
                       ),
-                      SizedBox(height: Dimensions.heightSize,),
                       Text(
                         topDoctor.name,
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: Dimensions.defaultTextSize,
-                            fontWeight: FontWeight.bold
-                        ),
+                            fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Text(
                         topDoctor.specialist,
                         style: TextStyle(
                             color: Colors.blueAccent,
-                            fontSize: Dimensions.smallTextSize
-                        ),
+                            fontSize: Dimensions.smallTextSize),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: Dimensions.heightSize * 0.5,),
+                      SizedBox(
+                        height: Dimensions.heightSize * 0.5,
+                      ),
                       Text(
                         topDoctor.available,
                         style: TextStyle(
                             color: Colors.black.withOpacity(0.6),
-                            fontSize: Dimensions.smallTextSize
-                        ),
+                            fontSize: Dimensions.smallTextSize),
                         textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                      DoctorDetailsScreen(
-                        image: topDoctor.image,
-                        name: topDoctor.name,
-                        specialist: topDoctor.specialist,
-                        available: topDoctor.available,
-                      )));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => DoctorDetailsScreen(
+                          //image: topDoctor.image,
+                          //name: topDoctor.name,
+
+                          //session_price: topDoctor.specialist,
+                          // rating: topDoctor.available,
+                          )));
                 },
               ),
             );

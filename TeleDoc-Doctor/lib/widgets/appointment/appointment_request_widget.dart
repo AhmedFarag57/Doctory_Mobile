@@ -1,23 +1,43 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:doctor/data/recent.dart';
+import 'package:doctor/screens/dashboard/home_screen.dart';
+import 'package:doctor/screens/loading/loading_screen.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../dialog/loading_dialog.dart';
 import '../../network_utils/api.dart';
 
 class AppointmentRequestWidget extends StatelessWidget {
-  var patients;
+  var appointmentsRequest;
 
-  _getAllPatients() async {
-    var response = await CallApi().getDataWithToken('/id/sessions');
-    var body = jsonDecode(response.body);
+  AppointmentRequestWidget(var appointmentsRequest) {
+    this.appointmentsRequest = appointmentsRequest;
+  }
+
+  accept_reject(var appointment_id, bool action, BuildContext context) async {
+    
+    var response;
+    var body;
+
+    var data = {
+      'appointment_id': appointment_id,
+      'action': action
+    };
+
+    response = await CallApi()
+        .postDataWithToken(data, '/doctors/appointments/request');
+
+    body = jsonDecode(response.body);
 
     if (body['success']) {
-      patients = body['data'];
+      Navigator.of(context).pop();
     }
   }
 
@@ -44,7 +64,7 @@ class AppointmentRequestWidget extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: ListView.builder(
-            itemCount: RecentList.list().length,
+            itemCount: appointmentsRequest.length,
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
@@ -90,8 +110,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  patients['fake_name'],
-                                  //recent.name,
+                                  appointmentsRequest[index]['name'],
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: Dimensions.defaultTextSize,
@@ -102,7 +121,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  recent.problem,
+                                  appointmentsRequest[index]['status'],
                                   style: TextStyle(
                                       color: Colors.blueAccent,
                                       fontSize: Dimensions.smallTextSize),
@@ -112,7 +131,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                                   height: Dimensions.heightSize * 0.5,
                                 ),
                                 Text(
-                                  patients['date_time'],
+                                  '${appointmentsRequest[index]['time']} / ${appointmentsRequest[index]['date']}',
                                   //'${recent.time} ${recent.date}',
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.6),
@@ -122,55 +141,6 @@ class AppointmentRequestWidget extends StatelessWidget {
                                 SizedBox(
                                   height: Dimensions.heightSize * 0.5,
                                 ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/message.png'),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: Dimensions.widthSize * 0.5,
-                                    ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/call.png'),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: Dimensions.widthSize * 0.5,
-                                    ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/video.png'),
-                                      ),
-                                    ),
-                                  ],
-                                )
                               ],
                             ),
                           ),
@@ -181,36 +151,61 @@ class AppointmentRequestWidget extends StatelessWidget {
                             flex: 1,
                             child: Column(
                               children: [
-                                Container(
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                      color: CustomColor.primaryColor,
-                                      borderRadius: BorderRadius.circular(
-                                          Dimensions.radius)),
-                                  child: Center(
-                                    child: Text(
-                                      Strings.accept,
-                                      style: TextStyle(color: Colors.white),
+                                GestureDetector(
+                                  child: Container(
+                                    height: 25,
+                                    decoration: BoxDecoration(
+                                        color: CustomColor.primaryColor,
+                                        borderRadius: BorderRadius.circular(
+                                            Dimensions.radius)),
+                                    child: Center(
+                                      child: Text(
+                                        Strings.accept,
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                                   ),
+                                  onTap: () {
+                                    showLoadingDialog(context);
+                                    accept_reject(
+                                        appointmentsRequest[index]['id'], true, context);
+                                    /*
+                                    Timer(Duration(seconds: 2), () {
+                                      Navigator.of(context).pop();
+                                    });
+                                    */
+                                  },
                                 ),
                                 SizedBox(
                                   height: Dimensions.heightSize,
                                 ),
-                                Container(
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                      color: CustomColor.secondaryColor,
-                                      borderRadius: BorderRadius.circular(
-                                          Dimensions.radius)),
-                                  child: Center(
-                                    child: Text(
-                                      Strings.reject,
-                                      style: TextStyle(
-                                          color: CustomColor.primaryColor),
+                                GestureDetector(
+                                  child: Container(
+                                    height: 25,
+                                    decoration: BoxDecoration(
+                                        color: CustomColor.secondaryColor,
+                                        borderRadius: BorderRadius.circular(
+                                            Dimensions.radius)),
+                                    child: Center(
+                                      child: Text(
+                                        Strings.reject,
+                                        style: TextStyle(
+                                            color: CustomColor.primaryColor),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  onTap: () {
+                                    showLoadingDialog(context);
+                                    accept_reject(
+                                        appointmentsRequest[index]['id'],
+                                        false, context);
+                                    /*
+                                    Timer(Duration(seconds: 2), () {
+                                      Navigator.of(context).pop();
+                                    });
+                                    */
+                                  },
+                                )
                               ],
                             ),
                           )
@@ -220,15 +215,12 @@ class AppointmentRequestWidget extends StatelessWidget {
                   ),
                   onTap: () {
                     openPatientDetailsDialog(
-                      context,
-                      recent.image,
-                      patients['fake_name'],
-                      //recent.name,
-                      recent.problem,
-                      patients['date_time'],
-                      //recent.time,
-                      recent.date,
-                    );
+                        context,
+                        recent.image,
+                        appointmentsRequest[index]['name'],
+                        appointmentsRequest[index]['status'],
+                        appointmentsRequest[index]['time'],
+                        appointmentsRequest[index]['date']);
                   },
                 ),
               );
@@ -239,8 +231,17 @@ class AppointmentRequestWidget extends StatelessWidget {
     );
   }
 
+  Future<bool> showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
+
   openPatientDetailsDialog(
-      BuildContext context, image, name, problem, time, date) {
+      BuildContext context, image, name, status, time, date) {
     showGeneralDialog(
         barrierLabel:
             MaterialLocalizations.of(context).modalBarrierDismissLabel,
@@ -320,7 +321,7 @@ class AppointmentRequestWidget extends StatelessWidget {
                                         height: Dimensions.heightSize * 0.5,
                                       ),
                                       Text(
-                                        problem,
+                                        status,
                                         style: TextStyle(
                                             color: Colors.blueAccent,
                                             fontSize: Dimensions.smallTextSize),
@@ -340,58 +341,6 @@ class AppointmentRequestWidget extends StatelessWidget {
                                       SizedBox(
                                         height: Dimensions.heightSize * 0.5,
                                       ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                                color: CustomColor.primaryColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Image.asset(
-                                                  'assets/images/message.png'),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: Dimensions.widthSize * 0.5,
-                                          ),
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                                color: CustomColor.primaryColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Image.asset(
-                                                  'assets/images/call.png'),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: Dimensions.widthSize * 0.5,
-                                          ),
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                                color: CustomColor.primaryColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(15)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Image.asset(
-                                                  'assets/images/video.png'),
-                                            ),
-                                          ),
-                                        ],
-                                      )
                                     ],
                                   ),
                                 ],
@@ -399,14 +348,9 @@ class AppointmentRequestWidget extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: Dimensions.heightSize),
-                          _titleData(Strings.name, Strings.age, name, '69'),
-                          _titleData(Strings.patientSex, Strings.patientId,
-                              'Male', '7865KD'),
+                          _titleData(Strings.name, 'Status', name, status),
                           _titleData(Strings.date, Strings.time, date, time),
-                          _titleData(Strings.chamber, Strings.roomNo,
-                              'Modern Hospital', '250'),
-                          _titleData(
-                              Strings.fee, 'Status', '\$250', 'Appointment'),
+                          _titleData(Strings.fee, '', '\$250', ''),
                           SizedBox(height: Dimensions.heightSize),
                           Row(
                             children: [

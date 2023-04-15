@@ -6,25 +6,24 @@ import 'package:doctor/dialog/success_dialog.dart';
 import 'package:doctor/screens/dashboard_screen.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-
   final String emailAddress;
 
   const EmailVerificationScreen({Key key, this.emailAddress}) : super(key: key);
 
   @override
-  _EmailVerificationScreenState createState() => _EmailVerificationScreenState();
+  _EmailVerificationScreenState createState() =>
+      _EmailVerificationScreenState();
 }
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
-
   TextEditingController emailController = TextEditingController();
   String _emailAddress;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _emailAddress = widget.emailAddress;
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -55,23 +54,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   // action to be performed after OTP validation is success
   void moveToNextScreen(context) {
     showSuccessDialog(context);
-    print('open dialog');
 
     /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
         DashboardScreen()));*/
   }
 
-    Future<bool> showSuccessDialog(BuildContext context) async {
-      return (await showDialog(
-        barrierDismissible: true,
-        context: context,
-        builder: (context) => SuccessDialog(
-          title: Strings.success,
-          subTitle: Strings.nowCheckYourEmail,
-          buttonName: Strings.ok,
-          moved: DashboardScreen(),
-        ),
-      )) ?? false;
-    }
-
+  Future<bool> showSuccessDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => SuccessDialog(
+            title: Strings.success,
+            subTitle: Strings.nowCheckYourEmail,
+            buttonName: Strings.ok,
+            moved: DashboardScreen(),
+          ),
+        )) ??
+        false;
+  }
 }

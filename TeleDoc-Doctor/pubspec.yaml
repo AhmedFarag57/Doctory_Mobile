@@ -51,6 +51,14 @@ dependencies:
   weekday_selector: ^1.0.0
   smart_select: ^4.3.2
   shared_preferences: ^2.0.15
+  laravel_echo:
+    git:
+      url: https://github.com/kakajansh/echo.git
+      ref: master
+  pusher_client:
+    git:
+      url: https://github.com/DumbDev168/pusher_client.git
+      ref: master
 
 dev_dependencies:
   flutter_test:
