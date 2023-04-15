@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:teledoc/screens/loading/loading_screen.dart';
 
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
@@ -27,8 +28,12 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
+  bool isLoading = false;
 
   void _signin() async {
+
+    setState(() => isLoading = true);
+
     var data = {
       'email': emailController.text,
       'password': passwordController.text
@@ -43,35 +48,41 @@ class _SignInScreenState extends State<SignInScreen> {
       localStorage.setString('token', json.encode(body['data']['token']));
       localStorage.setString('user', json.encode(body['data']['user']));
 
+      print(body['data']['token']);
+
+      setState(() => isLoading = false);
+
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
     } else {
-      // ....
+      //....
     }
+
+    setState(() => isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: CustomColor.secondaryColor,
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              BackWidget(
-                name: Strings.signInAccount,
-              ),
-              bodyWidget(context)
-            ],
-          ),
+  Widget build(BuildContext context) => isLoading
+  ? const LoadingPage()
+  : SafeArea(
+    child: Scaffold(
+      backgroundColor: CustomColor.secondaryColor,
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          children: [
+            BackWidget(
+              name: Strings.signInAccount,
+            ),
+            bodyWidget(context)
+          ],
         ),
-        resizeToAvoidBottomInset: false,
       ),
-    );
-  }
-
+      resizeToAvoidBottomInset: false,
+    ),
+  );
+  
   bodyWidget(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -269,6 +280,8 @@ class _SignInScreenState extends State<SignInScreen> {
         onTap: () {
           if (formKey.currentState.validate()) {
             _signin();
+            //Navigator.of(context)
+            //   .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
           }
         },
       ),

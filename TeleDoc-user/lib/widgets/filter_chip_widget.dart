@@ -1,4 +1,3 @@
-
 import 'package:teledoc/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:teledoc/utils/dimensions.dart';
@@ -24,7 +23,7 @@ class _FilterChipWidgetState extends State<FilterChipWidget> {
         fontSize: Dimensions.defaultTextSize,
       ),
       selected: _isSelected,
-      shape:RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30.0),
       ),
       backgroundColor: CustomColor.secondaryColor,

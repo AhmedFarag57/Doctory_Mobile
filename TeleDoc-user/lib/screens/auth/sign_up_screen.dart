@@ -9,6 +9,7 @@ import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/custom_style.dart';
 import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/screens/auth/otp/email_verification_screen.dart';
+import 'package:teledoc/screens/auth/sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -21,7 +22,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController ssnController = TextEditingController();
 
   bool _toggleVisibility = true;
@@ -103,19 +103,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
       'name': nameController.text,
       'email': emailController.text,
       'password': passwordController.text,
-      //'password_confirmation': confirmPasswordController.text,
       'ssn': ssnController.text
     };
 
-    var response = await CallApi().postData(data, '/register');
+    var response = await CallApi().postData(data, '/patients');
 
     var body = json.decode(response.body);
 
     if (body['success']) {
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => EmailVerificationScreen(
-                emailAddress: emailController.text,
-              )));
+      Navigator.of(context).pop();
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => SignInScreen()));
+
+      // Navigator.of(context).push(MaterialPageRoute(
+      //     builder: (context) => EmailVerificationScreen(
+      //           emailAddress: emailController.text,
+      //         )));
     } else {
       errorMessages = body['errors'];
       print(errorMessages);
@@ -145,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   }
                 },
                 decoration: InputDecoration(
-                  hintText: 'Ahmed Farag',
+                  hintText: 'Enter your name',
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   labelStyle: CustomStyle.textStyle,

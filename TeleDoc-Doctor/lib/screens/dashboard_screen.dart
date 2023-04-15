@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Home"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -65,7 +65,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Calendar"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -85,7 +85,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Star"
               ),
               BottomNavigationBarItem(
                 // ignore: deprecated_member_use
@@ -99,13 +99,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: SvgPicture.asset(
-                        'assets/svg/user.svg',
+                        'assets/svg/profile.svg',
                         color: currentIndex == 3 ? Colors.white : Colors.grey,
                       ),
                     ),
                   ),
                   // ignore: deprecated_member_use
-                  title: Container()
+                  label: "Profile"
               ),
             ]),
       ),
@@ -116,13 +116,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   _onTapIndex(index) {
     setState(() {
       currentIndex = index;
-      print('index: $index');
     });
     goToScreen(currentIndex);
   }
 
   goToScreen(int currentIndex) {
-    print('indexx: $currentIndex');
     switch(currentIndex){
       case 0:
         return HomeScreen();
