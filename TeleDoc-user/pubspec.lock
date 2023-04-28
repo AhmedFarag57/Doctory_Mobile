@@ -310,6 +310,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.4"
+  laravel_echo:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "80c5b94e5de575220b038de21387d6bcb47feb3c"
+      url: "https://github.com/kakajansh/echo.git"
+    source: git
+    version: "1.0.0-beta.1"
   location:
     dependency: "direct main"
     description:
@@ -478,6 +487,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
+  pusher_client:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "81870488665b2c4dbc35e50554c07d5d9b0a7cdb"
+      url: "https://github.com/DumbDev168/pusher_client.git"
+    source: git
+    version: "2.0.0"
   rolling_nav_bar:
     dependency: "direct main"
     description:

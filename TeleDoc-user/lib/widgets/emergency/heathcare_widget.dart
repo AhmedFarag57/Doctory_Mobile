@@ -5,6 +5,10 @@ import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 
 class HealthCareWidget extends StatelessWidget {
+  final doctors;
+
+  HealthCareWidget(this.doctors);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,7 +20,7 @@ class HealthCareWidget extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: ListView.builder(
-          itemCount: NearbyList.list().length,
+          itemCount: doctors.length,
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
@@ -27,8 +31,7 @@ class HealthCareWidget extends StatelessWidget {
                   left: Dimensions.widthSize * 2,
                   right: Dimensions.widthSize,
                   top: 10,
-                  bottom: 10
-              ),
+                  bottom: 10),
               child: GestureDetector(
                 child: Container(
                   width: 150,
@@ -50,38 +53,41 @@ class HealthCareWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.asset(
-                            nearby.image
+                        Image.asset(nearby.image),
+                        SizedBox(
+                          width: Dimensions.widthSize,
                         ),
-                        SizedBox(width: Dimensions.widthSize,),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              nearby.name,
+                              'Dr. ' + doctors[index]['name'],
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: Dimensions.defaultTextSize,
-                                  fontWeight: FontWeight.bold
-                              ),
+                                  fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: Dimensions.heightSize * 0.5,),
+                            SizedBox(
+                              height: Dimensions.heightSize * 0.5,
+                            ),
                             Text(
                               nearby.specialist,
                               style: TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontSize: Dimensions.smallTextSize
+                                color: Colors.blueAccent,
+                                fontSize: Dimensions.smallTextSize,
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            SizedBox(height: Dimensions.heightSize * 0.5,),
+                            SizedBox(
+                              height: Dimensions.heightSize * 0.5,
+                            ),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.4,
                               height: 30,
                               decoration: BoxDecoration(
                                 color: CustomColor.primaryColor,
-                                borderRadius: BorderRadius.circular(15)
+                                borderRadius: BorderRadius.circular(15),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -90,8 +96,8 @@ class HealthCareWidget extends StatelessWidget {
                                     height: 20,
                                     width: 20,
                                     decoration: BoxDecoration(
-                                        color: CustomColor.secondaryColor,
-                                        borderRadius: BorderRadius.circular(10)
+                                      color: CustomColor.secondaryColor,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Icon(
                                       Icons.call,
@@ -99,24 +105,26 @@ class HealthCareWidget extends StatelessWidget {
                                       size: 12,
                                     ),
                                   ),
-                                  SizedBox(width: Dimensions.widthSize,),
+                                  SizedBox(
+                                    width: Dimensions.widthSize,
+                                  ),
                                   Text(
                                     Strings.callNow,
                                     style: TextStyle(
-                                      color: Colors.white
+                                      color: Colors.white,
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ),
                 onTap: () {
-
+                  // ..
                 },
               ),
             );

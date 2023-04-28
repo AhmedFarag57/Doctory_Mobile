@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/pill_reminder.dart';
 import 'package:teledoc/screens/set_pill_reminder_screen.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';
@@ -27,8 +26,11 @@ class _PillReminderScreenState extends State<PillReminderScreen> {
           child: FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                  SetPillReminderScreen()));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SetPillReminderScreen(),
+                ),
+              );
             },
           ),
         ),
@@ -37,7 +39,10 @@ class _PillReminderScreenState extends State<PillReminderScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.pillReminder,),
+              BackWidget(
+                name: Strings.pillReminder,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),

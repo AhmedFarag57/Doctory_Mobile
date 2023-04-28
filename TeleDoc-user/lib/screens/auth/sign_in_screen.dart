@@ -1,8 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:teledoc/screens/loading/loading_screen.dart';
-
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
@@ -11,8 +8,10 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/screens/dashboard_screen.dart';
 import 'package:teledoc/screens/auth/sign_up_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../network_utils/api.dart';
+import 'package:teledoc/utils/laravel_echo/laravel_echo.dart';
+import 'package:teledoc/dialog/loading_dialog.dart';
+import 'package:teledoc/dialog/message_dialog.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -28,61 +27,75 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
-  bool isLoading = false;
 
-  void _signin() async {
-
-    setState(() => isLoading = true);
+  Future _loginRequest(BuildContext context) async {
+    // Show the Loading Dialog
+    _showLoadingDialog(context);
 
     var data = {
       'email': emailController.text,
-      'password': passwordController.text
+      'password': passwordController.text,
+      'app': 'patient',
     };
 
-    var response = await CallApi().postData(data, '/login');
+    try {
+      var response = await CallApi().postData(data, '/login');
+      var body = json.decode(response.body);
+      if (response.statusCode == 201) {
+        // ..
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        localStorage.setString('token', json.encode(body['data']['token']));
+        localStorage.setString('user', json.encode(body['data']['user']));
+        localStorage.setString('model', json.encode(body['data']['model']));
 
-    var body = json.decode(response.body);
+        print(body['data']['token']);
 
-    if (body['success']) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['data']['token']));
-      localStorage.setString('user', json.encode(body['data']['user']));
+        LaravelEcho.init(token: body['data']['token']);
 
-      print(body['data']['token']);
+        Navigator.of(context).pop();
 
-      setState(() => isLoading = false);
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-    } else {
-      //....
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(),
+          ),
+        );
+      } else {
+        // Pop the loading dialog
+        Navigator.of(context).pop();
+        // Show the server error message
+        _showErrorDialog(context, body['message']);
+      }
+    } catch (e) {
+      // Pop the loading dialog
+      Navigator.of(context).pop();
+      // Show the error in Error dialog
+      _showErrorDialog(context, e.message);
     }
-
-    setState(() => isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) => isLoading
-  ? const LoadingPage()
-  : SafeArea(
-    child: Scaffold(
-      backgroundColor: CustomColor.secondaryColor,
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            BackWidget(
-              name: Strings.signInAccount,
-            ),
-            bodyWidget(context)
-          ],
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondaryColor,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              BackWidget(
+                name: Strings.signInAccount,
+                active: false,
+              ),
+              bodyWidget(context)
+            ],
+          ),
         ),
+        resizeToAvoidBottomInset: false,
       ),
-      resizeToAvoidBottomInset: false,
-    ),
-  );
-  
+    );
+  }
+
   bodyWidget(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -279,9 +292,7 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
         onTap: () {
           if (formKey.currentState.validate()) {
-            _signin();
-            //Navigator.of(context)
-            //   .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
+            _loginRequest(context);
           }
         },
       ),
@@ -324,5 +335,29 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Colors.black),
       ),
     );
+  }
+
+  Future<bool> _showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
+
+  Future<bool> _showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
+          ),
+        )) ??
+        false;
   }
 }

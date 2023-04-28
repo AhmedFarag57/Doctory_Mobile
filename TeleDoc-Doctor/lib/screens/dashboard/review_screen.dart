@@ -1,11 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:doctor/data/review.dart';
 import 'package:doctor/widgets/header_widget.dart';
 import 'package:doctor/widgets/my_rating.dart';
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReviewScreen extends StatefulWidget {
   @override
@@ -13,6 +15,36 @@ class ReviewScreen extends StatefulWidget {
 }
 
 class _ReviewScreenState extends State<ReviewScreen> {
+  var model;
+  var user;
+  var _totalPeopleRated = 0;
+  var _totalAppointed = 0;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  Future _loadData() async {
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      user = jsonDecode(localStorage.getString('user'));
+      model = jsonDecode(localStorage.getString('model'));
+      Timer(
+        Duration(seconds: 1),
+        (() {
+          setState(() {
+            _isLoading = false;
+          });
+        }),
+      );
+    } catch (e) {
+      // Handle the error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +56,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              HeaderWidget(name: Strings.review,),
+              HeaderWidget(
+                name: Strings.review,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -34,35 +68,65 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   bodyWidget(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
+    if (_isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(
           top: 80,
-      ),
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              infoWidget(context),
-              SizedBox(height: Dimensions.heightSize * 2,),
-              statisticWidgets(context),
-              SizedBox(height: Dimensions.heightSize * 2,),
-              ratingDetailsWidget(context),
-              SizedBox(height: Dimensions.heightSize * 2,),
-              reviewWidget(context)
-            ],
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                infoWidget(context),
+                SizedBox(
+                  height: Dimensions.heightSize * 2,
+                ),
+                statisticWidgets(context),
+                SizedBox(
+                  height: Dimensions.heightSize * 2,
+                ),
+                ratingDetailsWidget(context),
+                SizedBox(
+                  height: Dimensions.heightSize * 2,
+                ),
+                reviewWidget(context)
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   infoWidget(BuildContext context) {
@@ -92,40 +156,44 @@ class _ReviewScreenState extends State<ReviewScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                  'assets/images/profile.png'
+              Image.asset('assets/images/profile.png'),
+              SizedBox(
+                width: Dimensions.widthSize,
               ),
-              SizedBox(width: Dimensions.widthSize,),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Strings.demoName,
+                    'Dr. ' + user['name'],
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.black,
+                      fontSize: Dimensions.defaultTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
                     Strings.demoSpecialist,
                     style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize
+                      color: Colors.blueAccent,
+                      fontSize: Dimensions.smallTextSize,
                     ),
                     textAlign: TextAlign.start,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Row(
                     children: [
-                      MyRating(rating: '4',),
+                      MyRating(
+                        rating: model['rating'].toString(),
+                      ),
                       Text(
-                        '4.00 (150)',
-                        style: TextStyle(
-                          fontSize: Dimensions.largeTextSize
-                        ),
+                        "(${model['rating'].toString()})",
+                        style: TextStyle(fontSize: Dimensions.largeTextSize),
                       )
                     ],
                   ),
@@ -151,8 +219,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: Container(
               height: 100,
               decoration: BoxDecoration(
-                  color: CustomColor.primaryColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radius)
+                color: CustomColor.primaryColor,
+                borderRadius: BorderRadius.circular(Dimensions.radius),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -160,32 +228,36 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   Text(
                     Strings.totalPeopleRated,
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: Dimensions.largeTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize,),
+                  SizedBox(
+                    height: Dimensions.heightSize,
+                  ),
                   Text(
-                    '150',
+                    _totalPeopleRated.toString(),
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.extraLargeTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: Dimensions.extraLargeTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          SizedBox(width: Dimensions.widthSize,),
+          SizedBox(
+            width: Dimensions.widthSize,
+          ),
           Expanded(
             flex: 1,
             child: Container(
               height: 100,
               decoration: BoxDecoration(
-                  color: CustomColor.accentColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radius)
+                color: CustomColor.accentColor,
+                borderRadius: BorderRadius.circular(Dimensions.radius),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -193,18 +265,20 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   Text(
                     Strings.appointedBooked,
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: Dimensions.largeTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize,),
+                  SizedBox(
+                    height: Dimensions.heightSize,
+                  ),
                   Text(
-                    '499',
+                    _totalAppointed.toString(),
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.extraLargeTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: Dimensions.extraLargeTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -238,20 +312,19 @@ class _ReviewScreenState extends State<ReviewScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-                left: Dimensions.marginSize
-            ),
+            padding: const EdgeInsets.only(left: Dimensions.marginSize),
             child: Text(
               Strings.recentlyReview,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: Dimensions.heightSize,),
+          SizedBox(
+            height: Dimensions.heightSize,
+          ),
           Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
@@ -267,8 +340,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       left: Dimensions.widthSize * 2,
                       right: Dimensions.widthSize,
                       top: 10,
-                      bottom: 10
-                  ),
+                      bottom: 10),
                   child: GestureDetector(
                     child: Container(
                       width: 150,
@@ -292,11 +364,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           children: [
                             Expanded(
                               flex: 1,
-                              child: Image.asset(
-                                  review.image
-                              ),
+                              child: Image.asset(review.image),
                             ),
-                            SizedBox(width: Dimensions.widthSize,),
+                            SizedBox(
+                              width: Dimensions.widthSize,
+                            ),
                             Expanded(
                               flex: 3,
                               child: Column(
@@ -307,32 +379,38 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontSize: Dimensions.defaultTextSize,
-                                        fontWeight: FontWeight.bold
-                                    ),
+                                        fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.center,
                                   ),
-                                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                                  SizedBox(
+                                    height: Dimensions.heightSize * 0.5,
+                                  ),
                                   Row(
                                     children: [
                                       Text(
                                         review.date,
                                         style: TextStyle(
-                                            color: Colors.black.withOpacity(0.6),
-                                            fontSize: Dimensions.smallTextSize
-                                        ),
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            fontSize: Dimensions.smallTextSize),
                                         textAlign: TextAlign.center,
                                       ),
-                                      SizedBox(width: Dimensions.widthSize * 0.5,),
-                                      MyRating(rating: review.rating,),
+                                      SizedBox(
+                                        width: Dimensions.widthSize * 0.5,
+                                      ),
+                                      MyRating(
+                                        rating: review.rating,
+                                      ),
                                     ],
                                   ),
-                                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                                  SizedBox(
+                                    height: Dimensions.heightSize * 0.5,
+                                  ),
                                   Text(
                                     review.comment,
                                     style: TextStyle(
                                         color: Colors.black.withOpacity(0.6),
-                                        fontSize: Dimensions.smallTextSize
-                                    ),
+                                        fontSize: Dimensions.smallTextSize),
                                     textAlign: TextAlign.start,
                                   ),
                                 ],
@@ -342,9 +420,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         ),
                       ),
                     ),
-                    onTap: () {
-
-                    },
+                    onTap: () {},
                   ),
                 );
               },
@@ -364,12 +440,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          MyRating(rating: rating),
-          Text(count)
-        ],
+        children: [MyRating(rating: rating), Text(count)],
       ),
     );
   }
-
 }

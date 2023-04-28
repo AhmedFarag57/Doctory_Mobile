@@ -1,11 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:teledoc/data/doctor.dart';
-import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/set_appointment_screen.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';
@@ -13,26 +7,16 @@ import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-
-  final String image,
-      name,
-      rating,
-      id,
-      specialist,
-      available,
-      session_price,
-      clinic_address;
+  final String image, name, rating, id, sessionPrice, phone;
 
   const DoctorDetailsScreen({
     Key key,
     this.image,
     this.name,
-    this.session_price,
+    this.sessionPrice,
     this.rating,
-    this.clinic_address,
     this.id,
-    this.specialist,
-    this.available,
+    this.phone,
   }) : super(key: key);
 
   @override
@@ -42,7 +26,6 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    //final Doctor = ModalRoute.of(context).settings.arguments as Map;
     return SafeArea(
       child: Scaffold(
         backgroundColor: CustomColor.secondaryColor,
@@ -53,6 +36,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             children: [
               BackWidget(
                 name: Strings.doctorDetails,
+                active: true,
               ),
               bodyWidget(context),
             ],
@@ -73,15 +57,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radius * 2),
+            topRight: Radius.circular(Dimensions.radius * 2),
+          ),
+        ),
         child: Stack(
           children: [
             Image.asset(
-              'assets/images/doctor.png',
+              widget.image,
               fit: BoxFit.fill,
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
@@ -93,20 +78,21 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.5,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(Dimensions.radius * 2),
-                      topRight: Radius.circular(Dimensions.radius * 2),
-                    )),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(Dimensions.radius * 2),
+                    topRight: Radius.circular(Dimensions.radius * 2),
+                  ),
+                ),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
                     appointmentButtonWidget(context),
-                    detailsWidget(context)
+                    detailsWidget(context),
                   ],
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -136,13 +122,18 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           child: Image.asset('assets/images/calender.png'),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).push(
+            MaterialPageRoute(
               builder: (context) => SetAppointmentScreen(
-                    id: widget.id,
-                    name: widget.name,
-                    specialist: widget.specialist,
-                    available: widget.available,
-                  )));
+                id: widget.id,
+                name: widget.name,
+                phone: widget.phone,
+                image: widget.image,
+                rating: widget.rating,
+                sessionPrice: widget.sessionPrice,
+              ),
+            ),
+          );
         },
       ),
     );
@@ -159,30 +150,28 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            //"${widget.dName}",
-            widget.name,
-
-            //Doctor[index]['name'],
+            'Dr. ' + widget.name,
             style: TextStyle(
-                fontSize: Dimensions.largeTextSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
+              fontSize: Dimensions.largeTextSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
           SizedBox(
             height: Dimensions.heightSize,
           ),
-          /*
           Text(
-            widget.session_price + ' L.E',
+            widget.sessionPrice + ' L.E',
             style: TextStyle(
-                fontSize: Dimensions.defaultTextSize, color: Colors.blue),
+              fontSize: Dimensions.defaultTextSize,
+              color: Colors.blue,
+            ),
           ),
           SizedBox(
             height: Dimensions.heightSize * 0.5,
           ),
-          */
           MyRating(
-            rating: '5',
+            rating: widget.rating,
           ),
           SizedBox(
             height: Dimensions.heightSize * 0.5,
@@ -190,20 +179,19 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           Row(
             children: [
               Icon(
-                Icons.home_work,
+                Icons.phone,
                 size: 18,
               ),
               SizedBox(
                 width: Dimensions.heightSize * 0.5,
               ),
-              /*
               Text(
-                widget.clinic_address,
+                widget.phone,
                 style: TextStyle(
-                    fontSize: Dimensions.defaultTextSize,
-                    color: Colors.black.withOpacity(0.7)),
+                  fontSize: Dimensions.defaultTextSize,
+                  color: Colors.black.withOpacity(0.7),
+                ),
               ),
-             */
             ],
           ),
           SizedBox(
@@ -216,8 +204,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 child: Container(
                   height: 80,
                   decoration: BoxDecoration(
-                      color: CustomColor.primaryColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius)),
+                    color: CustomColor.primaryColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radius),
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -231,9 +220,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       Text(
                         '120',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: Dimensions.largeTextSize,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: Dimensions.largeTextSize,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -247,8 +237,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 child: Container(
                   height: 80,
                   decoration: BoxDecoration(
-                      color: CustomColor.accentColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius)),
+                    color: CustomColor.accentColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radius),
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -262,9 +253,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       Text(
                         '10y',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: Dimensions.largeTextSize,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: Dimensions.largeTextSize,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),

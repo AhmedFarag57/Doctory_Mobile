@@ -4,7 +4,7 @@ import 'package:teledoc/utils/dimensions.dart';
 
 class FilterChipWidget extends StatefulWidget {
   final String chipName;
-
+  
   FilterChipWidget({Key key, this.chipName}) : super(key: key);
 
   @override

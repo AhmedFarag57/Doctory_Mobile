@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
@@ -11,9 +9,9 @@ import 'package:doctor/screens/dashboard_screen.dart';
 import 'package:doctor/screens/auth/sign_up_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
-import '../../dialog/loading_dialog.dart';
-import '../../dialog/message_dialog.dart';
-import '../../network_utils/api.dart';
+import 'package:doctor/dialog/loading_dialog.dart';
+import 'package:doctor/dialog/message_dialog.dart';
+import 'package:doctor/network_utils/api.dart';
 import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -30,37 +28,48 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _toggleVisibility = true;
   bool checkedValue = false;
 
-  void loginRequest(BuildContext context) async {
+  Future _loginRequest(BuildContext context) async {
+    // Show the Loading Dialog
+    showLoadingDialog(context);
+
     var data = {
       'email': emailController.text,
-      'password': passwordController.text
+      'password': passwordController.text,
+      'app': 'doctor',
     };
 
-    var response = await CallApi().postData(data, '/login');
+    try {
+      var response = await CallApi().postData(data, '/login');
+      var body = json.decode(response.body);
+      if (response.statusCode == 201) {
+        // ..
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        localStorage.setString('token', json.encode(body['data']['token']));
+        localStorage.setString('user', json.encode(body['data']['user']));
+        localStorage.setString('model', json.encode(body['data']['model']));
 
-    var body = json.decode(response.body);
+        print(body['data']['token']);
 
-    if (body['success']) {
-      // .. 
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['data']['token']));
-      localStorage.setString('user', json.encode(body['data']['user']));
-      localStorage.setString('model', json.encode(body['data']['model']));
+        LaravelEcho.init(token: body['data']['token']);
 
-      print(body['data']['token']);
+        Navigator.of(context).pop();
 
-      LaravelEcho.init(token: body['data']['token']);
-
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(),
+          ),
+        );
+      } else {
+        // Pop the loading dialog
+        Navigator.of(context).pop();
+        // Show the server error message
+        showErrorDialog(context, body['message']);
+      }
+    } catch (e) {
+      // Pop the loading dialog
       Navigator.of(context).pop();
-
-      Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => DashboardScreen()));
-    }
-    else
-    {
-      // ..
-      Navigator.of(context).pop();
-      showErrorDialog(context, body['message']);
+      // Show the error in Error dialog
+      showErrorDialog(context, e.message);
     }
   }
 
@@ -98,8 +107,9 @@ class _SignInScreenState extends State<SignInScreen> {
           height: height * 0.7,
           width: width,
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(Dimensions.radius * 2)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(Dimensions.radius * 2),
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -127,9 +137,10 @@ class _SignInScreenState extends State<SignInScreen> {
       child: Text(
         Strings.welcomeBack,
         style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: Dimensions.extraLargeTextSize),
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: Dimensions.extraLargeTextSize,
+        ),
       ),
     );
   }
@@ -263,30 +274,35 @@ class _SignInScreenState extends State<SignInScreen> {
   signInButtonWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          left: Dimensions.marginSize, right: Dimensions.marginSize),
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+      ),
       child: GestureDetector(
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius:
-                  BorderRadius.all(Radius.circular(Dimensions.radius))),
+            color: CustomColor.primaryColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(
+                Dimensions.radius,
+              ),
+            ),
+          ),
           child: Center(
             child: Text(
               Strings.signIn.toUpperCase(),
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: Dimensions.largeTextSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        onTap: () async {
+        onTap: () {
           if (formKey.currentState.validate()) {
-            showLoadingDialog(context);
-
-            loginRequest(context);
+            _loginRequest(context);
           }
         },
       ),
@@ -305,13 +321,17 @@ class _SignInScreenState extends State<SignInScreen> {
           child: Text(
             Strings.signUp.toUpperCase(),
             style: TextStyle(
-                color: CustomColor.primaryColor,
-                fontWeight: FontWeight.bold,
-                decoration: TextDecoration.underline),
+              color: CustomColor.primaryColor,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+            ),
           ),
           onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => SignUpScreen()));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => SignUpScreen(),
+              ),
+            );
           },
         )
       ],

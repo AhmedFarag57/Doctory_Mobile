@@ -13,11 +13,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primaryColor: CustomColor.primaryColor,
-          fontFamily: 'Ubuntu'
+        primaryColor: CustomColor.primaryColor,
+        fontFamily: 'Ubuntu',
       ),
       home: SplashScreen(),
     );
   }
-  // Samir
 }

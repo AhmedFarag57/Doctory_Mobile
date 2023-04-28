@@ -1,22 +1,19 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:doctor/screens/auth/sign_in_screen.dart';
 import 'package:doctor/screens/help_support_screen.dart';
-import 'package:doctor/screens/loading/loading_screen.dart';
 import 'package:doctor/screens/my_card_screen.dart';
 import 'package:doctor/screens/my_profile_screen.dart';
 import 'package:doctor/screens/settings_screen.dart';
 import 'package:doctor/widgets/header_widget.dart';
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../dialog/loading_dialog.dart';
-import '../../network_utils/api.dart';
-import '../../utils/laravel_echo/laravel_echo.dart';
+import 'package:doctor/dialog/loading_dialog.dart';
+import 'package:doctor/network_utils/api.dart';
+import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 
 class MyAccountScreen extends StatefulWidget {
   @override
@@ -24,76 +21,134 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen> {
+  var user;
+  var model;
 
-  void logoutRequest(BuildContext context) async {
-    var response = await CallApi().getDataWithToken('/logout');
+  bool _isLoading = true;
 
-    var body = json.decode(response.body);
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-    if (body['success']) {
+  Future _loadData() async {
+    try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.remove('user');
-      localStorage.remove('token');
+      user = jsonDecode(localStorage.getString('user'));
+      model = jsonDecode(localStorage.getString('model'));
+      Timer(
+        Duration(seconds: 1),
+        (() {
+          setState(() {
+            _isLoading = false;
+          });
+        }),
+      );
+    } catch (e) {
+      // Handle the error
+    }
+  }
 
-      LaravelEcho.instance.disconnect();
-
+  Future _logoutRequest(BuildContext context) async {
+    // Show the loading dialog
+    showLoadingDialog(context);
+    try {
+      var response = await CallApi().getDataWithToken('/logout');
+      if (response.statusCode == 200) {
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        localStorage.remove('user');
+        localStorage.remove('token');
+        localStorage.remove('model');
+        // Disconnect the LaravelEcho
+        LaravelEcho.instance.disconnect();
+        // Pop the loading dialog
+        Navigator.of(context).pop();
+        // Go to Signin Screen
+        _goToSigninScreen(context);
+      } else {
+        throw Exception(response.reasonPharse);
+      }
+    } catch (e) {
+      // Pop the loading dialog
       Navigator.of(context).pop();
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => SignInScreen()));
-    } else {
-      // ..
+      // Handle the error
     }
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-          backgroundColor: CustomColor.secondaryColor,
-          body: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Stack(
-              children: [
-                HeaderWidget(
-                  name: Strings.myAccount,
-                ),
-                bodyWidget(context),
-              ],
-            ),
-          ),
-        ),
-      );
-  }
-
-  bodyWidget(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 80,
-      ),
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
-        child: SingleChildScrollView(
-          child: Column(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondaryColor,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
             children: [
-              infoWidget(context),
-              SizedBox(
-                height: Dimensions.heightSize * 2,
+              HeaderWidget(
+                name: Strings.myAccount,
               ),
-              actionWidget(context)
+              bodyWidget(context),
             ],
           ),
         ),
       ),
     );
+  }
+
+  bodyWidget(BuildContext context) {
+    if (_isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+        ),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                infoWidget(context),
+                SizedBox(
+                  height: Dimensions.heightSize * 2,
+                ),
+                actionWidget(context)
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   infoWidget(BuildContext context) {
@@ -131,31 +186,34 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Strings.demoName,
+                    'Dr. ' + user['name'],
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.black,
+                      fontSize: Dimensions.defaultTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
                   Text(
-                    Strings.demoSpecialist,
+                    user['email'],
                     style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize),
+                      color: Colors.blueAccent,
+                      fontSize: Dimensions.smallTextSize,
+                    ),
                     textAlign: TextAlign.start,
                   ),
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
                   Text(
-                    Strings.demoPhoneNumber,
+                    _getMobilePhone(),
                     style: TextStyle(
-                        color: Colors.black.withOpacity(0.6),
-                        fontSize: Dimensions.smallTextSize),
+                      color: Colors.black.withOpacity(0.6),
+                      fontSize: Dimensions.smallTextSize,
+                    ),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -183,15 +241,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   child: Container(
                     height: 150,
                     decoration: BoxDecoration(
-                        color: CustomColor.primaryColor,
-                        borderRadius: BorderRadius.circular(Dimensions.radius)),
+                      color: CustomColor.primaryColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radius),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/icon/profile_icon.png',
+                          Icon(
+                            Icons.person,
+                            color: Colors.white,
+                            size: 64.0,
                           ),
                           SizedBox(
                             height: Dimensions.heightSize,
@@ -199,17 +260,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           Text(
                             Strings.myProfile,
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimensions.largeTextSize),
-                          )
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimensions.largeTextSize,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MyProfileScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MyProfileScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -222,15 +287,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   child: Container(
                     height: 150,
                     decoration: BoxDecoration(
-                        color: CustomColor.accentColor,
-                        borderRadius: BorderRadius.circular(Dimensions.radius)),
+                      color: CustomColor.accentColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radius),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/icon/wallet.png',
+                          Icon(
+                            Icons.wallet,
+                            color: Colors.white,
+                            size: 64.0,
                           ),
                           SizedBox(
                             height: Dimensions.heightSize,
@@ -238,17 +306,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           Text(
                             Strings.myWallet,
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimensions.largeTextSize),
-                          )
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimensions.largeTextSize,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MyCardScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MyCardScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -265,15 +337,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   child: Container(
                     height: 150,
                     decoration: BoxDecoration(
-                        color: CustomColor.accentColor,
-                        borderRadius: BorderRadius.circular(Dimensions.radius)),
+                      color: CustomColor.accentColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radius),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/icon/settings.png',
+                          Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                            size: 64.0,
                           ),
                           SizedBox(
                             height: Dimensions.heightSize,
@@ -281,17 +356,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           Text(
                             Strings.settings,
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimensions.largeTextSize),
-                          )
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimensions.largeTextSize,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SettingsScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SettingsScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -304,15 +383,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   child: Container(
                     height: 150,
                     decoration: BoxDecoration(
-                        color: CustomColor.primaryColor,
-                        borderRadius: BorderRadius.circular(Dimensions.radius)),
+                      color: CustomColor.primaryColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radius),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(
-                            'assets/images/icon/support.png',
+                          Icon(
+                            Icons.support_agent,
+                            color: Colors.white,
+                            size: 64.0,
                           ),
                           SizedBox(
                             height: Dimensions.heightSize,
@@ -320,17 +402,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           Text(
                             Strings.helpSupport,
                             style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimensions.largeTextSize),
-                          )
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimensions.largeTextSize,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => HelpSupportScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => HelpSupportScreen(),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -346,15 +432,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   height: 150,
                   width: MediaQuery.of(context).size.width * 0.4,
                   decoration: BoxDecoration(
-                      color: CustomColor.primaryColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radius)),
+                    color: CustomColor.primaryColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radius),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(
-                          'assets/images/icon/signout.png',
+                        Icon(
+                          Icons.logout,
+                          color: Colors.white,
+                          size: 64.0,
                         ),
                         SizedBox(
                           height: Dimensions.heightSize,
@@ -362,18 +451,17 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         Text(
                           Strings.signOut,
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimensions.largeTextSize),
-                        )
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimensions.largeTextSize,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                onTap: () async {
-                  showLoadingDialog(context);
-
-                  logoutRequest(context);
+                onTap: () {
+                  _logoutRequest(context);
                 },
               ),
             ],
@@ -393,5 +481,24 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           builder: (context) => LoadingDialog(),
         )) ??
         false;
+  }
+
+  _goToSigninScreen(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) {
+          return SignInScreen();
+        },
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  String _getMobilePhone() {
+    if (model['phone'] != null) {
+      return model['phone'];
+    } else {
+      return 'Phone: Unknown';
+    }
   }
 }

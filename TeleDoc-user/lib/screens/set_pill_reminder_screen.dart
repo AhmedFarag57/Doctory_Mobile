@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:teledoc/utils/custom_style.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';
@@ -15,7 +14,6 @@ class SetPillReminderScreen extends StatefulWidget {
 enum SingingCharacter { after, before }
 
 class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final values = List.filled(7, false);
@@ -33,7 +31,10 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.pillReminder,),
+              BackWidget(
+                name: Strings.pillReminder,
+                active: true,
+              ),
               bodyWidget(context),
               buttonWidget(context)
             ],
@@ -58,8 +59,7 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimensions.radius * 2),
               topRight: Radius.circular(Dimensions.radius * 2),
-            )
-        ),
+            )),
         child: inputFiledWidget(context),
       ),
     );
@@ -72,8 +72,7 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
           padding: const EdgeInsets.only(
               top: Dimensions.heightSize * 2,
               left: Dimensions.marginSize,
-              right: Dimensions.marginSize
-          ),
+              right: Dimensions.marginSize),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -86,16 +85,17 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
                   style: CustomStyle.textStyle,
                   controller: nameController,
                   keyboardType: TextInputType.text,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
                     hintText: Strings.name,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                     labelStyle: CustomStyle.textStyle,
                     filled: true,
                     fillColor: Colors.white,
@@ -109,13 +109,14 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
               ),
               _titleData(Strings.selectDay),
               selectWeekday(context),
-              SizedBox(height: Dimensions.heightSize,),
+              SizedBox(
+                height: Dimensions.heightSize,
+              ),
               selectTimeWidget(context),
               setEatingTimeWidget(context)
             ],
           ),
-        )
-    );
+        ));
   }
 
   _titleData(String title) {
@@ -126,9 +127,7 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
       ),
       child: Text(
         title,
-        style: TextStyle(
-            color: Colors.black
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     );
   }
@@ -176,64 +175,65 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('9:00am'),
-                            Icon(
-                              Icons.watch_later_outlined
-                            )
+                            Icon(Icons.watch_later_outlined)
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: Dimensions.widthSize,),
-                index == 0 ? Expanded(
-                  flex: 1,
-                  child: GestureDetector(
-                    child: Container(
-                      height: Dimensions.buttonHeight,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(Dimensions.radius),
-                          color: Colors.green
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        if(timeCount < 3){
-                          timeCount++;
-                        }
-                      });
-                    },
-                  ),
-                )
+                SizedBox(
+                  width: Dimensions.widthSize,
+                ),
+                index == 0
+                    ? Expanded(
+                        flex: 1,
+                        child: GestureDetector(
+                          child: Container(
+                            height: Dimensions.buttonHeight,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(Dimensions.radius),
+                                color: Colors.green),
+                            child: Icon(
+                              Icons.add,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              if (timeCount < 3) {
+                                timeCount++;
+                              }
+                            });
+                          },
+                        ),
+                      )
                     : Expanded(
-                  flex: 1,
-                  child: GestureDetector(
-                    child: Container(
-                      height: Dimensions.buttonHeight,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(Dimensions.radius),
-                          color: Colors.red
-                      ),
-                      child: Icon(
-                        Icons.delete,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        if(timeCount > 1){
-                          timeCount--;
-                        }
-                      });
-                    },
-                  ),
-                )
+                        flex: 1,
+                        child: GestureDetector(
+                          child: Container(
+                            height: Dimensions.buttonHeight,
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(Dimensions.radius),
+                                color: Colors.red),
+                            child: Icon(
+                              Icons.delete,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              if (timeCount > 1) {
+                                timeCount--;
+                              }
+                            });
+                          },
+                        ),
+                      )
               ],
             ),
           );
@@ -249,13 +249,21 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
           title: const Text('After Eat'),
           value: SingingCharacter.after,
           groupValue: _character,
-          onChanged: (SingingCharacter value) { setState(() { _character = value; }); },
+          onChanged: (SingingCharacter value) {
+            setState(() {
+              _character = value;
+            });
+          },
         ),
         RadioListTile<SingingCharacter>(
           title: const Text('Before Eat'),
           value: SingingCharacter.before,
           groupValue: _character,
-          onChanged: (SingingCharacter value) { setState(() { _character = value; }); },
+          onChanged: (SingingCharacter value) {
+            setState(() {
+              _character = value;
+            });
+          },
         ),
       ],
     );
@@ -275,25 +283,24 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
                 height: Dimensions.buttonHeight,
                 decoration: BoxDecoration(
                     color: CustomColor.primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius * 0.5))
-                ),
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(Dimensions.radius * 0.5))),
                 child: Center(
                   child: Text(
                     Strings.done.toUpperCase(),
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-              onTap: () {
-
-              },
+              onTap: () {},
             ),
           ),
-          SizedBox(width: Dimensions.widthSize,),
+          SizedBox(
+            width: Dimensions.widthSize,
+          ),
           Expanded(
             flex: 1,
             child: GestureDetector(
@@ -301,22 +308,21 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
                 height: Dimensions.buttonHeight,
                 decoration: BoxDecoration(
                     color: Colors.transparent,
-                    borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius * 0.5)),
-                    border: Border.all(color: Colors.black.withOpacity(0.7))
-                ),
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(Dimensions.radius * 0.5)),
+                    border: Border.all(color: Colors.black.withOpacity(0.7))),
                 child: Center(
                   child: Text(
                     Strings.close.toUpperCase(),
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.7),
                         fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
               onTap: () {
-
+                Navigator.of(context).pop();
               },
             ),
           ),
@@ -324,5 +330,4 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
       ),
     );
   }
-
 }

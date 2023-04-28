@@ -43,7 +43,10 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.addNewCard,),
+              BackWidget(
+                name: Strings.addNewCard,
+                active: true,
+              ),
               bodyWidget(context),
               buttonWidget(context)
             ],
