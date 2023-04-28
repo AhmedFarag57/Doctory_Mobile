@@ -1,25 +1,25 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 import 'package:teledoc/screens/appointment_summery_screen.dart';
-import 'package:teledoc/screens/input_patient_details_screen.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/widgets/back_widget.dart';
-import 'package:teledoc/widgets/filter_chip_widget.dart';
+import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/widgets/my_rating.dart';
 
-import '../network_utils/api.dart';
-import 'loading/loading_screen.dart';
-
 class SetAppointmentScreen extends StatefulWidget {
-  final String id, name, specialist, available;
+  final String id, name, image, sessionPrice, phone, rating;
 
   const SetAppointmentScreen(
-      {Key key, this.id, this.name, this.specialist, this.available})
+      {Key key,
+      this.id,
+      this.name,
+      this.image,
+      this.phone,
+      this.rating,
+      this.sessionPrice})
       : super(key: key);
 
   @override
@@ -27,96 +27,128 @@ class SetAppointmentScreen extends StatefulWidget {
 }
 
 class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
-  var user;
-  var doctor_times;
+  var doctorTimes;
+  bool _isLoading = true;
+  bool _isSelected = false;
 
-  bool isloading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadingdata();
-  }
-
-  _loadingdata() async {
-    setState(() => isloading = true);
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = jsonDecode(localStorage.get('user'));
-    var id = user['id'];
-    var response;
-    var body;
-
-    print(widget.id);
-
-    response =
-        await CallApi().getDataWithToken('/doctors/' + widget.id + '/times');
-
-    body = jsonDecode(response.body);
-
-    if (body['success']) {
-      doctor_times = body['data'];
-
-      setState(() => isloading = false);
-    }
-  }
+  bool _dateSelectedFlag = true;
+  String _timeIdSelected = '';
+  String _timeFromSelected = '';
+  String _timeToSelected = '';
+  String _dateSelected;
 
   DateTime selectedDate = DateTime.now();
   String date = 'Select date';
 
   @override
-  Widget build(BuildContext context) => isloading
-      ? const LoadingPage()
-      : SafeArea(
-          child: Scaffold(
-            backgroundColor: CustomColor.secondaryColor,
-            body: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  BackWidget(
-                    name: Strings.setAppointment,
-                  ),
-                  bodyWidget(context),
-                  nextButtonWidget(context)
-                ],
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future _loadData() async {
+    var response, body;
+    try {
+      response = await CallApi().getDataWithToken(
+        '/doctors/' + widget.id + '/times',
+      );
+      if (response.statusCode == 200) {
+        body = jsonDecode(response.body);
+        doctorTimes = body['data'];
+        setState(() => _isLoading = false);
+      } else {
+        // ..
+        throw Exception();
+      }
+    } catch (e) {
+      // pop the loading dialog
+      setState(() => _isLoading = false);
+      // handle the error
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondaryColor,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              BackWidget(
+                name: Strings.setAppointment,
+                active: true,
               ),
-            ),
+              bodyWidget(context),
+              nextButtonWidget(context),
+            ],
           ),
-        );
+        ),
+      ),
+    );
+  }
 
   bodyWidget(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 80,
-        left: Dimensions.marginSize,
-        right: Dimensions.marginSize,
-      ),
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
+    if (_isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+          left: Dimensions.marginSize,
+          right: Dimensions.marginSize,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimensions.radius * 2),
               topRight: Radius.circular(Dimensions.radius * 2),
-            )),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            profileWidget(context),
-            SizedBox(
-              height: Dimensions.heightSize * 3,
             ),
-            selectDateWidget(context),
-            SizedBox(
-              height: Dimensions.heightSize * 3,
+          ),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
             ),
-            selectTimeWidget(context)
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+          left: Dimensions.marginSize,
+          right: Dimensions.marginSize,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              profileWidget(context),
+              SizedBox(
+                height: Dimensions.heightSize * 3,
+              ),
+              selectDateWidget(context),
+              SizedBox(
+                height: Dimensions.heightSize * 3,
+              ),
+              selectTimeWidget(context),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   profileWidget(BuildContext context) {
@@ -146,13 +178,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /*
               Image.asset(
                 widget.image,
                 height: 60,
                 width: 60,
               ),
-              */
               SizedBox(
                 width: Dimensions.widthSize,
               ),
@@ -161,56 +191,42 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    // doctors['name'],
                     widget.name,
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: Dimensions.heightSize * 0.5,
-                  ),
-                  /*
-                  Text(
-                    doctors['session_price'].toString(),
-                    //widget.specialist,
-                    style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: Dimensions.heightSize * 0.5,
-                  ),
-                  
-                  Text(
-                    doctors['phone_number'],
-                    //widget.available,
-                    style: TextStyle(
-                        color: Colors.black.withOpacity(0.6),
-                        fontSize: Dimensions.smallTextSize),
+                      color: Colors.black,
+                      fontSize: Dimensions.defaultTextSize,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
                   Text(
-                    doctors['clinic_address'],
+                    widget.sessionPrice + ' L.E',
                     style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.blueAccent,
+                      fontSize: Dimensions.smallTextSize,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
+                  Text(
+                    widget.phone,
+                    style: TextStyle(
+                      color: Colors.black.withOpacity(0.6),
+                      fontSize: Dimensions.smallTextSize,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(
                     height: Dimensions.heightSize * 0.5,
                   ),
                   MyRating(
-                    rating: '5',
+                    rating: widget.rating,
                   )
-                  */
                 ],
               )
             ],
@@ -232,9 +248,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           Text(
             Strings.selectDate,
             style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: Dimensions.largeTextSize),
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: Dimensions.largeTextSize,
+            ),
           ),
           SizedBox(
             height: Dimensions.heightSize,
@@ -244,8 +261,11 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
               height: Dimensions.buttonHeight,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black.withOpacity(0.1)),
-                  borderRadius: BorderRadius.circular(Dimensions.radius)),
+                border: Border.all(
+                  color: Colors.black.withOpacity(0.1),
+                ),
+                borderRadius: BorderRadius.circular(Dimensions.radius),
+              ),
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: Dimensions.marginSize,
@@ -255,75 +275,24 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      date,
-                      style: TextStyle(color: Colors.black.withOpacity(0.7)),
+                      _getDate(),
+                      style: TextStyle(
+                        color: Colors.black.withOpacity(0.7),
+                      ),
                     ),
-                    Image.asset('assets/images/calender.png')
+                    Image.asset('assets/images/calender.png'),
                   ],
                 ),
               ),
             ),
             onTap: () {
-              _selectDate(context);
+              //_selectDate(context);
             },
           ),
         ],
       ),
     );
   }
-
-  /*
-  selectDateWidget(BuildContext context) {
-    int _value1 = 1;
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: Dimensions.marginSize,
-        right: Dimensions.marginSize,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            Strings.selectDate,
-            style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: Dimensions.largeTextSize),
-          ),
-          SizedBox(
-            height: Dimensions.heightSize,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                child: Wrap(
-                  spacing: 5.0,
-                  runSpacing: 5.0,
-                  children: List<Widget>.generate(
-                    appointments.length,
-                    (int index) {
-                      return ChoiceChip(
-                        label: Text(appointments[index]['date']),
-                        selected: _value1 == index,
-                        onSelected: (bool selected) {
-                          setState(() {
-                            _value1 = selected ? index : null;
-                          });
-                        },
-                      );
-                    },
-                  ).toList(),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  */
 
   selectTimeWidget(BuildContext context) {
     return Padding(
@@ -337,9 +306,10 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           Text(
             Strings.selectTime,
             style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: Dimensions.largeTextSize),
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: Dimensions.largeTextSize,
+            ),
           ),
           SizedBox(
             height: Dimensions.heightSize,
@@ -353,9 +323,12 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
                   spacing: 5.0,
                   runSpacing: 5.0,
                   children: <Widget>[
-                    // ....
-                    for (int index = 0; index < doctor_times.length; index++)
-                      FilterChipWidget(chipName: doctor_times[index]['time']),
+                    for (int index = 0; index < doctorTimes.length; index++)
+                      _buildChipWidget(
+                        doctorTimes[index]['id'],
+                        doctorTimes[index]['time_from'],
+                        doctorTimes[index]['time_to'],
+                      ),
                   ],
                 ),
               ),
@@ -372,7 +345,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       3,
       (int index) {
         return ChoiceChip(
-          label: Text(doctor_times[index]['date']),
+          label: Text(doctorTimes[index]['date']),
           selected: _value1 == index,
           onSelected: (bool selected) {
             setState(() {
@@ -406,27 +379,95 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
           height: Dimensions.buttonHeight,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius * 0.5)),
+            color: CustomColor.primaryColor,
+            borderRadius: BorderRadius.circular(Dimensions.radius * 0.5),
+          ),
           child: Center(
             child: Text(
               Strings.next.toUpperCase(),
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: Dimensions.largeTextSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AppointmentSummeryScreen(
-                    docName: widget.name,
-                    date: doctor_times['date'],
-                    time: doctor_times['time'],
-                  )));
+          if (_dateSelectedFlag && _isSelected) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AppointmentSummeryScreen(
+                  id: widget.id,
+                  docName: widget.name,
+                  sessionPrice: widget.sessionPrice,
+                  date: _getDate(),
+                  timeId: _timeIdSelected,
+                  timeFrom: _timeFromSelected,
+                  timeTo: _timeToSelected,
+                ),
+              ),
+            );
+          } else {
+            _showInSnackBar('You Must choce Time & Date');
+          }
         },
       ),
     );
+  }
+
+  Widget _buildChipWidget(id, timeFrom, timeTo) {
+    return FilterChip(
+      label: Text(
+        _getTimeFormated(timeFrom.toString())
+        +' - '+
+        _getTimeFormated(timeTo.toString()),
+      ),
+      labelStyle: TextStyle(
+        color: CustomColor.greyColor,
+        fontSize: Dimensions.defaultTextSize,
+      ),
+      selected: timeFrom == _timeFromSelected,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      backgroundColor: CustomColor.secondaryColor,
+      onSelected: (isSelected) {
+        setState(() {
+          _isSelected = isSelected;
+          if (_isSelected) {
+            _timeFromSelected = timeFrom.toString();
+            _timeToSelected = timeTo.toString();
+            _timeIdSelected = id.toString();
+          } else {
+            _timeFromSelected = '';
+            _timeToSelected = '';
+            _timeIdSelected = '';
+          }
+        });
+      },
+      selectedColor: CustomColor.primaryColor.withOpacity(0.2),
+      pressElevation: 10,
+    );
+  }
+
+  void _showInSnackBar(String value) {
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
+      content: new Text(value),
+      duration: Duration(seconds: 3),
+    ));
+  }
+
+  String _getDate() {
+    String year = selectedDate.year.toString();
+    String month = selectedDate.month.toString();
+    String day = selectedDate.day.toString();
+    return year + '-' + month + '-' + day;
+  }
+
+  _getTimeFormated(time) {
+    DateTime tmp = DateTime.parse('2023-04-26 '+ time);
+    String formattedDate = DateFormat('hh:mm a').format(tmp);
+    return formattedDate;
   }
 }

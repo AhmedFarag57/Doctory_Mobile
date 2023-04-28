@@ -51,11 +51,22 @@ dependencies:
   weekday_selector: ^1.0.0
   shared_preferences: ^2.0.15
   age_calculator: ^1.0.0
+  laravel_echo:
+    git:
+      url: https://github.com/kakajansh/echo.git
+      ref: master
+  pusher_client:
+    git:
+      url: https://github.com/DumbDev168/pusher_client.git
+      ref: master
+
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+    
+    
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

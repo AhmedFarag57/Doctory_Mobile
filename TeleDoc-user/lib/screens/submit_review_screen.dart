@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teledoc/screens/messaging_screen.dart';
 import 'package:teledoc/widgets/back_widget.dart';
-
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
@@ -21,13 +19,17 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: CustomColor.secondaryColor,
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.submitReview,),
+              BackWidget(
+                name: Strings.submitReview,
+                active: true,
+              ),
               bodyWidget(context),
               nextButtonWidget(context)
             ],
@@ -78,37 +80,6 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
           SizedBox(height: Dimensions.heightSize),
           reviewWidget(context)
         ],
-      ),
-    );
-  }
-
-  nextButtonWidget(BuildContext context) {
-    return Positioned(
-      bottom: Dimensions.heightSize * 2,
-      left: Dimensions.marginSize * 2,
-      right: Dimensions.marginSize * 2,
-      child: GestureDetector(
-        child: Container(
-          height: Dimensions.buttonHeight,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius * 0.5))
-          ),
-          child: Center(
-            child: Text(
-              Strings.finish.toUpperCase(),
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
-            ),
-          ),
-        ),
-        onTap: () {
-          
-        },
       ),
     );
   }
@@ -167,12 +138,42 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
         ),
       ),
       onTap: () {
-        print('click');
         openContactDoctorDialog(context);
       },
     );
   }
 
+  nextButtonWidget(BuildContext context) {
+    return Positioned(
+      bottom: Dimensions.heightSize * 2,
+      left: Dimensions.marginSize * 2,
+      right: Dimensions.marginSize * 2,
+      child: GestureDetector(
+        child: Container(
+          height: Dimensions.buttonHeight,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              color: CustomColor.primaryColor,
+              borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius * 0.5))
+          ),
+          child: Center(
+            child: Text(
+              Strings.finish.toUpperCase(),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: Dimensions.largeTextSize,
+                  fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
+        ),
+        onTap: () {
+          
+        },
+      ),
+    );
+  }
+ 
   reviewWidget(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,9 +181,9 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
         Text(
           Strings.giveYourRating,
           style: TextStyle(
-              fontSize: Dimensions.extraLargeTextSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black
+            fontSize: Dimensions.extraLargeTextSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
         SizedBox(height: Dimensions.heightSize,),
@@ -365,8 +366,13 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                             ),
                             onTap: () {
                               Navigator.of(context).pop();
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                              MessagingScreen()));
+                              /*
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => MessagingScreen(),
+                                ),
+                              );
+                              */
                             },
                           ),
                           SizedBox(width: Dimensions.widthSize),

@@ -107,7 +107,7 @@ class Strings {
   static String hospital = 'Hospital';
   static String addHospital = 'Add Hospital';
   static String visitingTime = 'Visiting Time';
-  static String setVisitingTime = 'Set Visiting Time';
+  static String setSessionTime = 'Set Session Time';
   static String save = 'Save';
   static String nameOfDegree = 'Name Of Degree';
   static String concentrationMajorGroup = 'Concentration/Major/Group';

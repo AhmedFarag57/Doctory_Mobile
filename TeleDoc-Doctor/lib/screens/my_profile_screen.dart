@@ -1,16 +1,17 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:doctor/network_utils/api.dart';
 import 'package:doctor/screens/add_medical_degree_screen.dart';
 import 'package:doctor/screens/set_visiting_time_screen.dart';
 import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-
-import 'package:image_picker/image_picker.dart';
 import 'package:smart_select/smart_select.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -19,11 +20,16 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
+  var user;
+  var model;
+  var times;
+
+  bool _isLoading = true;
 
   File _image;
   File file;
 
-  List<int> specialistValue = [1,2];
+  List<int> specialistValue = [1, 2];
   List<S2Choice<int>> specialistItemList = [
     S2Choice<int>(value: 1, title: 'Medicine Specialist'),
     S2Choice<int>(value: 2, title: 'Liver Specialist'),
@@ -37,7 +43,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     S2Choice<int>(value: 10, title: 'Gynecologists'),
   ];
 
-  List<int> hospitalValue = [4,2];
+  List<int> hospitalValue = [4, 2];
   List<S2Choice<int>> hospitalItemList = [
     S2Choice<int>(value: 1, title: 'Modern Hospital'),
     S2Choice<int>(value: 2, title: 'Family Support Hospital'),
@@ -52,6 +58,36 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future _loadData() async {
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      user = jsonDecode(localStorage.getString('user'));
+      model = jsonDecode(localStorage.getString('model'));
+
+      var response = await CallApi().getDataWithToken(
+        '/doctors/' + model['id'].toString() + '/times',
+      );
+
+      if (response.statusCode == 200) {
+        var body = jsonDecode(response.body);
+        times = body['data'];
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        throw Exception(response.reasonPharse);
+      }
+    } catch (e) {
+      // Handle the error
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -61,7 +97,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.myProfile,),
+              BackWidget(
+                name: Strings.myProfile,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -71,43 +110,71 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   bodyWidget(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
+    if (_isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(
           top: 80,
-      ),
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              infoWidget(context),
-              SizedBox(height: Dimensions.heightSize,),
-              contactInfo('assets/images/icon/call_icon.png', Strings.demoPhoneNumber),
-              contactInfo('assets/images/icon/mail.png', Strings.demoEmail),
-              contactInfo('assets/images/icon/bag.png', '35yr Experience'),
-              contactInfo('assets/images/icon/dollar.png', '\$250'),
-              SizedBox(height: Dimensions.heightSize,),
-              specialistWidget(context),
-              _divider(),
-              medicalDegreeWidget(context),
-              _divider(),
-              hospitalWidget(context),
-              _divider(),
-              visitingTimeWidget(context),
-              _divider(),
-            ],
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                infoWidget(context),
+                SizedBox(
+                  height: Dimensions.heightSize,
+                ),
+                contactInfo(Icons.phone, _getMobilePhone()),
+                contactInfo(Icons.email, user['email']),
+                contactInfo(Icons.rate_review, '35yr Experience'),
+                contactInfo(Icons.monetization_on, model['session_price']),
+                SizedBox(
+                  height: Dimensions.heightSize,
+                ),
+                //specialistWidget(context),
+                //_divider(),
+                //medicalDegreeWidget(context),
+                //_divider(),
+                //hospitalWidget(context),
+                //_divider(),
+                visitingTimeWidget(context),
+                _divider(),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   infoWidget(BuildContext context) {
@@ -142,12 +209,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 width: 80,
                 child: Stack(
                   children: [
-                    _image == null ? Image.asset(
-                        'assets/images/profile.png'
-                    ) : Image.file(
-                      _image,
-                      fit: BoxFit.cover,
-                    ),
+                    _image == null
+                        ? Image.asset('assets/images/profile.png')
+                        : Image.file(
+                            _image,
+                            fit: BoxFit.cover,
+                          ),
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -156,9 +223,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           height: 30,
                           width: 30,
                           decoration: BoxDecoration(
-                            color: CustomColor.secondaryColor,
-                            borderRadius: BorderRadius.circular(15)
-                          ),
+                              color: CustomColor.secondaryColor,
+                              borderRadius: BorderRadius.circular(15)),
                           child: Icon(
                             Icons.camera_alt,
                             size: 18,
@@ -173,26 +239,28 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ],
                 ),
               ),
-              SizedBox(width: Dimensions.widthSize,),
+              SizedBox(
+                width: Dimensions.widthSize,
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    Strings.demoName,
+                    'Dr. ' + user['name'],
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: Dimensions.defaultTextSize,
-                        fontWeight: FontWeight.bold
-                    ),
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
+                  SizedBox(
+                    height: Dimensions.heightSize * 0.5,
+                  ),
                   Text(
                     Strings.demoSpecialist,
                     style: TextStyle(
                         color: Colors.blueAccent,
-                        fontSize: Dimensions.smallTextSize
-                    ),
+                        fontSize: Dimensions.smallTextSize),
                     textAlign: TextAlign.start,
                   ),
                 ],
@@ -215,9 +283,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         height: Dimensions.buttonHeight,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(Dimensions.radius)
-        ),
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(Dimensions.radius)),
         child: Padding(
           padding: const EdgeInsets.only(
             left: Dimensions.marginSize,
@@ -226,14 +293,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.asset(
-                icon
-              ),
+              Icon(icon),
               Text(
                 name,
-                style: TextStyle(
-                  color: Colors.black.withOpacity(0.7)
-                ),
+                style: TextStyle(color: Colors.black.withOpacity(0.7)),
               )
             ],
           ),
@@ -268,8 +331,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: Dimensions.largeTextSize,
-                    fontWeight: FontWeight.bold
-                ),
+                    fontWeight: FontWeight.bold),
               ),
               IconButton(
                   icon: Icon(
@@ -277,10 +339,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     color: CustomColor.primaryColor,
                   ),
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                        AddMedicalDegreeScreen()));
-                  }
-              )
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AddMedicalDegreeScreen()));
+                  })
             ],
           ),
           _title('MBBS (DMCH)'),
@@ -315,29 +376,32 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               Text(
                 Strings.visitingTime,
                 style: TextStyle(
-                    color: Colors.black,
-                    fontSize: Dimensions.largeTextSize,
-                    fontWeight: FontWeight.bold
+                  color: Colors.black,
+                  fontSize: Dimensions.largeTextSize,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               IconButton(
-                  icon: Icon(
-                    Icons.mode_edit,
-                    color: CustomColor.primaryColor,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-                        SetVisitingTimeScreen()));
-                  }
+                icon: Icon(
+                  Icons.mode_edit,
+                  color: CustomColor.primaryColor,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SetVisitingTimeScreen(),
+                    ),
+                  );
+                },
               )
             ],
           ),
-          _title('Mon  13:00 - 17:00'),
-          _title('Tue   15:00 - 16:00'),
-          _title('Wed  14:00 - 20:00'),
-          _title('Thu   13:00 - 19:00'),
-          _title('Fri     21:00 - 23:00'),
-          _title('Sat    14:00 - 20:00'),
+          for (int index = 0; index < times.length; index++)
+            _doctorTime(
+              times[index]['date'],
+              _getTimeFormated(times[index]['time_from']),
+              _getTimeFormated(times[index]['time_to']),
+            )
         ],
       ),
     );
@@ -345,11 +409,19 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
   _title(value) {
     return Padding(
-      padding: const EdgeInsets.only(
-        top: Dimensions.heightSize * 0.5
-      ),
+      padding: const EdgeInsets.only(top: Dimensions.heightSize * 0.5),
       child: Text(
         value,
+        style: CustomStyle.textStyle,
+      ),
+    );
+  }
+
+  _doctorTime(date, timeFrom, timeTo) {
+    return Padding(
+      padding: const EdgeInsets.only(top: Dimensions.heightSize * 0.5),
+      child: Text(
+        '${date} / ${timeFrom} - ${timeTo}',
         style: CustomStyle.textStyle,
       ),
     );
@@ -361,26 +433,37 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         left: Dimensions.marginSize,
         right: Dimensions.marginSize,
       ),
-      child: Divider(color: Colors.grey.withOpacity(0.5),),
+      child: Divider(
+        color: Colors.grey.withOpacity(0.5),
+      ),
     );
   }
 
   Future<void> _openImageSourceOptions(BuildContext context) {
-    return showDialog(context: context,
+    return showDialog(
+        context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 GestureDetector(
-                  child: Icon(Icons.camera_alt, size: 40.0, color: Colors.blue,),
-                  onTap: (){
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 40.0,
+                    color: Colors.blue,
+                  ),
+                  onTap: () {
                     Navigator.of(context).pop();
                   },
                 ),
                 GestureDetector(
-                  child: Icon(Icons.photo, size: 40.0, color: Colors.green,),
-                  onTap: (){
+                  child: Icon(
+                    Icons.photo,
+                    size: 40.0,
+                    color: Colors.green,
+                  ),
+                  onTap: () {
                     Navigator.of(context).pop();
                   },
                 ),
@@ -390,4 +473,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         });
   }
 
+  _getTimeFormated(time) {
+    DateTime tmp = DateTime.parse('2023-04-26 '+ time);
+    String formattedDate = DateFormat('hh:mm a').format(tmp);
+    return formattedDate;
+  }
+
+  String _getMobilePhone() {
+    if (model['phone'] != null) {
+      return model['phone'];
+    } else {
+      return 'Unknown';
+    }
+  }
 }

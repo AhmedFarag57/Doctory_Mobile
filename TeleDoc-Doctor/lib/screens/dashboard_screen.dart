@@ -12,7 +12,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-
   int currentIndex = 0;
 
   @override
@@ -22,92 +21,101 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottomNavigationBar: new Material(
         elevation: 10,
         child: new BottomNavigationBar(
-            elevation: 25,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: currentIndex ,
-            onTap: _onTapIndex,
-            items: [
-              BottomNavigationBarItem(
-                // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: currentIndex == 0 ? CustomColor.primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/home.svg',
-                        color: currentIndex == 0 ? Colors.white : Colors.grey,
-                      ),
-                    ),
+          elevation: 25,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: currentIndex,
+          onTap: _onTapIndex,
+          items: [
+            BottomNavigationBarItem(
+              // ignore: deprecated_member_use
+              icon: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: currentIndex == 0
+                      ? CustomColor.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset(
+                    'assets/svg/home.svg',
+                    color: currentIndex == 0 ? Colors.white : Colors.grey,
                   ),
-                  // ignore: deprecated_member_use
-                  label: "Home"
+                ),
               ),
-              BottomNavigationBarItem(
-                // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 1 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/calendar.svg',
-                        color: currentIndex == 1 ? Colors.white : Colors.grey,
-                      ),
-                    ),
+              // ignore: deprecated_member_use
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              // ignore: deprecated_member_use
+              icon: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: currentIndex == 1
+                      ? CustomColor.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.calendar_today_rounded,
+                    color: currentIndex == 1 ? Colors.white : Colors.grey,
                   ),
-                  // ignore: deprecated_member_use
-                  label: "Calendar"
+                ),
               ),
-              BottomNavigationBarItem(
-                // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 2 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/star.svg',
-                        color: currentIndex == 2 ? Colors.white : Colors.grey,
-                      ),
-                    ),
+              // ignore: deprecated_member_use
+              label: "Calendar",
+            ),
+            BottomNavigationBarItem(
+              // ignore: deprecated_member_use
+              icon: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: currentIndex == 2
+                      ? CustomColor.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset(
+                    'assets/svg/star.svg',
+                    color: currentIndex == 2 ? Colors.white : Colors.grey,
                   ),
-                  // ignore: deprecated_member_use
-                  label: "Star"
+                ),
               ),
-              BottomNavigationBarItem(
-                // ignore: deprecated_member_use
-                  icon: Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        color: currentIndex == 3 ? CustomColor.primaryColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SvgPicture.asset(
-                        'assets/svg/profile.svg',
-                        color: currentIndex == 3 ? Colors.white : Colors.grey,
-                      ),
-                    ),
+              // ignore: deprecated_member_use
+              label: "Review",
+            ),
+            BottomNavigationBarItem(
+              // ignore: deprecated_member_use
+              icon: Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: currentIndex == 3
+                      ? CustomColor.primaryColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SvgPicture.asset(
+                    'assets/svg/profile.svg',
+                    color: currentIndex == 3 ? Colors.white : Colors.grey,
                   ),
-                  // ignore: deprecated_member_use
-                  label: "Profile"
+                ),
               ),
-            ]),
+              // ignore: deprecated_member_use
+              label: "Profile",
+            ),
+          ],
+        ),
       ),
       body: goToScreen(currentIndex),
     );
@@ -121,7 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   goToScreen(int currentIndex) {
-    switch(currentIndex){
+    switch (currentIndex) {
       case 0:
         return HomeScreen();
       case 1:
