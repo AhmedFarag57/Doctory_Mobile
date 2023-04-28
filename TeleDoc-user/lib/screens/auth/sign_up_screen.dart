@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:teledoc/network_utils/api.dart';
-
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
@@ -10,6 +8,8 @@ import 'package:teledoc/utils/custom_style.dart';
 import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/screens/auth/otp/email_verification_screen.dart';
 import 'package:teledoc/screens/auth/sign_in_screen.dart';
+import 'package:teledoc/dialog/loading_dialog.dart';
+import 'package:teledoc/dialog/message_dialog.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -22,11 +22,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController ssnController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
-  var errorMessages = [];
+
+  Future _signupRequest(BuildContext context) async {
+    // Show Loading Dialog
+    _showLoadingDialog(context);
+
+    var response, body;
+    try {
+      var data = {
+        'name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text,
+        'password_confirmation': confirmPasswordController.text,
+        'app': 'patient',
+      };
+
+      response = await CallApi().postData(data, '/register');
+      body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        // Pop the Loading Dialog
+        Navigator.of(context).pop();
+        // Show the Success Dialog
+        _showSuccessDialog(context, 'User Created Successfully');
+        // Go to Email verification screen
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => EmailVerificationScreen(
+        //       emailAddress: emailController.text,
+        //     ),
+        //   ),
+        // );
+      } else {
+        throw Exception();
+      }
+    } catch (e) {
+      // Pop the Loading dialog
+      Navigator.of(context).pop();
+      // Show error message
+      _showErrorDialog(context, body['message']);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               BackWidget(
                 name: Strings.createAnAccount,
+                active: true,
               ),
               bodyWidget(context)
             ],
@@ -98,33 +138,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  _register() async {
-    var data = {
-      'name': nameController.text,
-      'email': emailController.text,
-      'password': passwordController.text,
-      'ssn': ssnController.text
-    };
-
-    var response = await CallApi().postData(data, '/patients');
-
-    var body = json.decode(response.body);
-
-    if (body['success']) {
-      Navigator.of(context).pop();
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => SignInScreen()));
-
-      // Navigator.of(context).push(MaterialPageRoute(
-      //     builder: (context) => EmailVerificationScreen(
-      //           emailAddress: emailController.text,
-      //         )));
-    } else {
-      errorMessages = body['errors'];
-      print(errorMessages);
-    }
-  }
-
   inputFieldWidget(BuildContext context) {
     return Form(
         key: formKey,
@@ -148,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   }
                 },
                 decoration: InputDecoration(
-                  hintText: 'Enter your name',
+                  hintText: 'Enter your fake name',
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   labelStyle: CustomStyle.textStyle,
@@ -180,37 +193,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
                 decoration: InputDecoration(
                   hintText: Strings.demoEmail,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
-                ),
-              ),
-            ),
-            _titleData(Strings.ssn),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: ssnController,
-                keyboardType: TextInputType.number,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: Strings.demoSsn,
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   labelStyle: CustomStyle.textStyle,
@@ -271,53 +253,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 obscureText: _toggleVisibility,
               ),
             ),
-            // _titleData(Strings.confirmPassword),
-            // Material(
-            //   elevation: 10.0,
-            //   shadowColor: CustomColor.secondaryColor,
-            //   borderRadius: BorderRadius.circular(Dimensions.radius),
-            //   child: TextFormField(
-            //     style: CustomStyle.textStyle,
-            //     controller: confirmPasswordController,
-            //     validator: (String value) {
-            //       if (value.isEmpty) {
-            //         return Strings.pleaseFillOutTheField;
-            //       } else {
-            //         return null;
-            //       }
-            //     },
-            //     decoration: InputDecoration(
-            //       hintText: Strings.typePassword,
-            //       contentPadding:
-            //           EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-            //       labelStyle: CustomStyle.textStyle,
-            //       focusedBorder: CustomStyle.focusBorder,
-            //       enabledBorder: CustomStyle.focusErrorBorder,
-            //       focusedErrorBorder: CustomStyle.focusErrorBorder,
-            //       errorBorder: CustomStyle.focusErrorBorder,
-            //       filled: true,
-            //       fillColor: Colors.white,
-            //       suffixIcon: IconButton(
-            //         onPressed: () {
-            //           setState(() {
-            //             _toggleVisibility = !_toggleVisibility;
-            //           });
-            //         },
-            //         icon: _toggleVisibility
-            //             ? Icon(
-            //                 Icons.visibility_off,
-            //                 color: CustomColor.greyColor,
-            //               )
-            //             : Icon(
-            //                 Icons.visibility,
-            //                 color: CustomColor.greyColor,
-            //               ),
-            //       ),
-            //       hintStyle: CustomStyle.textStyle,
-            //     ),
-            //     obscureText: _toggleVisibility,
-            //   ),
-            // ),
+            _titleData(Strings.confirmPassword),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: confirmPasswordController,
+                validator: (String value) {
+                  if (value.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
+                  ),
+                  hintStyle: CustomStyle.textStyle,
+                ),
+                obscureText: _toggleVisibility,
+              ),
+            ),
             SizedBox(height: Dimensions.heightSize),
           ],
         ));
@@ -378,9 +360,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       onTap: () {
-        // Register Button
         if (formKey.currentState.validate()) {
-          _register();
+          _signupRequest(context);
         }
       },
     );
@@ -626,6 +607,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ],
             ),
+          ),
+        )) ??
+        false;
+  }
+
+  Future<bool> _showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
+
+  Future<bool> _showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
+          ),
+        )) ??
+        false;
+  }
+
+  Future<bool> _showSuccessDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Success",
+            subTitle: message,
+            action: true,
+            moved: SignInScreen(),
+            img: 'tik.png',
+            buttonName: Strings.ok,
           ),
         )) ??
         false;

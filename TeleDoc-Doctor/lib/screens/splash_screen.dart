@@ -9,19 +9,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
-    
     super.initState();
-
     Timer(
-        Duration(
-            seconds: 3
+      Duration(seconds: 3),
+      () => Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => OnBoardScreen(),
         ),
-            () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>
-            OnBoardScreen()
-        ))
+      ),
     );
   }
 
@@ -46,7 +43,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(90),
                   color: Colors.white,
-                  border: Border.all(color: CustomColor.primaryColor.withOpacity(0.4), width: 10)
+                  border: Border.all(
+                    color: CustomColor.primaryColor.withOpacity(0.4),
+                    width: 10,
+                  ),
                 ),
                 child: Image.asset(
                   'assets/images/splash_logo.png',
