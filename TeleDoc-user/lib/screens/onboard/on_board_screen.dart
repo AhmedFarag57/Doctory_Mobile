@@ -159,12 +159,9 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
                                         ),
                                       ),
                                     ),
-                                    onTap: () {
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)
-                                      => SignInScreen()));
-                                    },
-                                  ),
+                                    onTap: () => _goSignInScreen(context),
                                 ),
+                                )
                               ),
                             ],
                           ),
@@ -177,5 +174,13 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
             }),
       ),
     );
+  }
+
+  _goSignInScreen(context) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context){ 
+           return SignInScreen();
+        }
+    ), (Route<dynamic> route) => false);
   }
 }

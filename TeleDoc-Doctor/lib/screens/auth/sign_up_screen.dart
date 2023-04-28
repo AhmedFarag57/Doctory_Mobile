@@ -1,19 +1,16 @@
 import 'dart:convert';
-
 import 'package:doctor/screens/auth/sign_in_screen.dart';
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:doctor/screens/auth/otp/email_verification_screen.dart';
-
-import '../../dialog/loading_dialog.dart';
-import '../../dialog/message_dialog.dart';
-import '../../dialog/success_dialog.dart';
-import '../../network_utils/api.dart';
+import 'package:doctor/dialog/loading_dialog.dart';
+import 'package:doctor/dialog/message_dialog.dart';
+import 'package:doctor/dialog/success_dialog.dart';
+import 'package:doctor/network_utils/api.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -26,32 +23,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController passwordConfirmController = TextEditingController();
 
   bool _toggleVisibility = true;
   bool checkedValue = false;
 
-  void signupRequest(BuildContext context) async {
-    var data = {
-      'name': nameController.text,
-      'email': emailController.text,
-      'password': passwordController.text,
-      'session_price': 0,
-    };
+  Future _signupRequest(BuildContext context) async {
+    // Show the loading dialog
+    showLoadingDialog(context);
+    
+    var response, body;
+    try {
+      // ..
+      var data = {
+        'name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text,
+        'password_confirmation': passwordConfirmController.text,
+        'app': 'doctor',
+      };
 
-    var response = await CallApi().postData(data, '/doctors');
+      response = await CallApi().postData(data, '/register');
+      body = json.decode(response.body);
 
-    var body = json.decode(response.body);
-
-    if (!(body['message'] == 'The given data was invalid.')) {
-      if (body['success']) {
+      if (response.statusCode == 200) {
+        // Pop the loading dialog
         Navigator.of(context).pop();
-
+        // Show success message
         showSuccessDialog(context);
+        // Go to Email verification screen
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => EmailVerificationScreen(
+        //       emailAddress: emailController.text,
+        //     ),
+        //   ),
+        // );
       } else {
+        // Pop the loading dialog
         Navigator.of(context).pop();
+        // Show the sereve error message
         showErrorDialog(context, body['message']);
       }
-    } else {
+    } catch (e) {
+      // Pop the loading dialog
+      Navigator.of(context).pop();
+      // Show the error message
       showErrorDialog(context, body['message']);
     }
   }
@@ -68,11 +85,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               BackWidget(
                 name: Strings.createAnAccount,
+                active: true,
               ),
               bodyWidget(context)
             ],
           ),
         ),
+        resizeToAvoidBottomInset: false,
       ),
     );
   }
@@ -240,6 +259,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 obscureText: _toggleVisibility,
               ),
             ),
+            _titleData(Strings.confirmPassword),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: passwordConfirmController,
+                validator: (String value) {
+                  if (value.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0, 
+                    horizontal: 10.0,
+                  ),
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
+                  ),
+                ),
+                obscureText: _toggleVisibility,
+              ),
+            ),
             SizedBox(height: Dimensions.heightSize),
           ],
         ));
@@ -287,27 +355,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
         height: Dimensions.buttonHeight,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: CustomColor.primaryColor,
-            borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius))),
+          color: CustomColor.primaryColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              Dimensions.radius,
+            ),
+          ),
+        ),
         child: Center(
           child: Text(
             Strings.signUp.toUpperCase(),
             style: TextStyle(
-                color: Colors.white,
-                fontSize: Dimensions.largeTextSize,
-                fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: Dimensions.largeTextSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
-      onTap: () async {
-        // Navigator.of(context).push(MaterialPageRoute(
-        //     builder: (context) => EmailVerificationScreen(
-        //           emailAddress: emailController.text,
-        //         )));
+      onTap: () {
         if (formKey.currentState.validate()) {
-          showLoadingDialog(context);
-
-          signupRequest(context);
+          _signupRequest(context);
         }
       },
     );

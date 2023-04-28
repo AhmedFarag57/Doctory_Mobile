@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
@@ -33,7 +32,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.changePassword,),
+              BackWidget(
+                name: Strings.changePassword,
+                active: true,  
+              ),
               bodyWidget(context)
             ],
           ),

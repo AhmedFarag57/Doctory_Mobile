@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/widgets/back_widget.dart';
-
 import 'add_new_card_screen.dart';
 
 class MyCardScreen extends StatefulWidget {
@@ -23,7 +21,10 @@ class _MyCardScreenState extends State<MyCardScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.myCard,),
+              BackWidget(
+                name: Strings.myCard,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),

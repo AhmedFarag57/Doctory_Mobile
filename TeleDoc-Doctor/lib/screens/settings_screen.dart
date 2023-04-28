@@ -1,7 +1,6 @@
 import 'package:doctor/screens/change_password_screen.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:flutter/material.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
@@ -12,7 +11,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -23,7 +21,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.settings,),
+              BackWidget(
+                name: Strings.settings,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -35,34 +36,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
       ),
       child: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(Dimensions.radius * 2),
-            topRight: Radius.circular(Dimensions.radius * 2),
-          )
-        ),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            )),
         child: SingleChildScrollView(
           child: Column(
             children: [
               GestureDetector(
                 child: Container(
-                  child: contactInfo(Icons.lock_outline, Strings.changePassword),
+                  child: contactInfo(
+                    Icons.lock_outline,
+                    Strings.changePassword,
+                  ),
                 ),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChangePasswordScreen()
-                  ));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ChangePasswordScreen(),
+                    ),
+                  );
                 },
               ),
               contactInfo(Icons.notifications_outlined, Strings.notification),
               contactInfo(Icons.timer, Strings.appointmentAlt),
               contactInfo(Icons.email_outlined, Strings.email),
-
             ],
           ),
         ),
@@ -82,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(Dimensions.radius)
+          borderRadius: BorderRadius.circular(Dimensions.radius),
         ),
         child: Padding(
           padding: const EdgeInsets.only(
@@ -97,12 +102,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icon(
                     icon,
                   ),
-                  SizedBox(width: Dimensions.widthSize * 0.5,),
+                  SizedBox(
+                    width: Dimensions.widthSize * 0.5,
+                  ),
                   Text(
                     name,
-                    style: TextStyle(
-                      color: Colors.black.withOpacity(0.7)
-                    ),
+                    style: TextStyle(color: Colors.black.withOpacity(0.7)),
                   )
                 ],
               ),
@@ -116,5 +121,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
 }

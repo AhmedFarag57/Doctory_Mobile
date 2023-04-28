@@ -23,7 +23,10 @@ class _MyCardScreenState extends State<MyCardScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.myCard,),
+              BackWidget(
+                name: Strings.myCard,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),

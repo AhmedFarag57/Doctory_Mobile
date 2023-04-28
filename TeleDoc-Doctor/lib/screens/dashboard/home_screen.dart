@@ -1,18 +1,15 @@
 import 'dart:convert';
-
-import 'package:doctor/data/recent.dart';
-import 'package:doctor/models/doctor.dart';
+import 'package:doctor/dialog/message_dialog.dart';
 import 'package:doctor/network_utils/api.dart';
+import 'package:doctor/screens/auth/sign_in_screen.dart';
 import 'package:doctor/screens/loading/loading_screen.dart';
-import 'package:doctor/dialog/model/session.dart';
-import 'package:doctor/network_utils/api.dart';
+import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../notification_screen.dart';
+import 'package:doctor/screens/notification_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,57 +20,66 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  bool isLoading = false;
+  bool _isLoading = true;
 
   var totalAppointed;
   var totalPatients = 0;
   var recentlyAppointed;
+  var notificationCount = 0;
 
   @override
   void initState() {
     super.initState();
-
     _loadData();
   }
 
-  _loadData() async {
-    setState(() => isLoading = true);
+  Future _loadData() async {
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var model = jsonDecode(localStorage.getString('model'));
+      var id = model['id'];
+      var response;
+      var body;
 
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var user = jsonDecode(localStorage.getString('user'));
-    var model = jsonDecode(localStorage.getString('model'));
-    var id = model['id'];
-    var response;
-    var body;
+      // get total appointed
+      response = await CallApi().getDataWithToken(
+        '/doctors/' + id.toString() + '/appointments/count',
+      );
 
-    // get total appointed
-    response = await CallApi()
-        .getDataWithToken('/doctors/' + id.toString() + '/appointments/count');
+      body = json.decode(response.body);
 
-    body = json.decode(response.body);
+      if (response.statusCode == 200) {
+        totalAppointed = body['data'];
+      } else {
+        throw Exception(response.reasonPhrase);
+      }
 
-    if (body['success']) {
-      totalAppointed = body['data']['count'];
+      // get total patients
+      // ..
+
+      // get recently appointed
+      response = await CallApi().getDataWithToken(
+        '/doctors/' + id.toString() + '/appointments',
+      );
+
+      body = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        recentlyAppointed = body['data'];
+      } else {
+        throw Exception(response.reasonPhrase);
+      }
+
+      // Pop the loading page
+      setState(() => _isLoading = false);
+    } catch (e) {
+      // handle the logout process
+      _handleTheLogout();
     }
-
-    // get total patients
-    // ..
-
-    // get recently appointed
-    response = await CallApi()
-        .getDataWithToken('/doctors/' + id.toString() + '/appointments');
-
-    body = json.decode(response.body);
-
-    if (body['success']) {
-      recentlyAppointed = body['data'];
-    }
-
-    setState(() => isLoading = false);
   }
 
   @override
-  Widget build(BuildContext context) => isLoading
+  Widget build(BuildContext context) => _isLoading
       ? const LoadingPage()
       : SafeArea(
           child: Scaffold(
@@ -142,40 +148,70 @@ class _HomeScreenState extends State<HomeScreen> {
                         clipBehavior: Clip.none,
                         children: [
                           Container(
-                              height: 40,
-                              width: 40.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0)),
-                              child: Icon(
-                                Icons.notifications_outlined,
-                                color: CustomColor.primaryColor,
-                              )),
-                          Positioned(
-                            right: -5,
-                            top: -5,
-                            child: Container(
-                              height: 20.0,
-                              width: 20.0,
-                              decoration: BoxDecoration(
+                            height: 40,
+                            width: 40.0,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Icon(
+                              Icons.notifications_outlined,
+                              color: CustomColor.primaryColor,
+                            ),
+                          ),
+                          if (notificationCount > 0)
+                            Positioned(
+                              right: -5,
+                              top: -5,
+                              child: Container(
+                                height: 20.0,
+                                width: 20.0,
+                                decoration: BoxDecoration(
                                   color: CustomColor.primaryColor,
-                                  borderRadius: BorderRadius.circular(10.0)),
-                              child: Center(
-                                child: Text(
-                                  '02',
-                                  style: TextStyle(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '00',
+                                    style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: Dimensions.smallTextSize),
+                                      fontSize: Dimensions.smallTextSize,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Positioned(
+                              right: -5,
+                              top: -5,
+                              child: Container(
+                                height: 20.0,
+                                width: 20.0,
+                                decoration: BoxDecoration(
+                                  color: CustomColor.primaryColor,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    notificationCount.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: Dimensions.smallTextSize,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          )
                         ],
                       ),
                     ),
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => NotificationScreen()));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => NotificationScreen(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -192,9 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     Strings.letsFindYourAppointedPatient,
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.extraLargeTextSize * 1.6,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: Dimensions.extraLargeTextSize * 1.6,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.start,
                   ),
                 ),
@@ -390,7 +427,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Row(
                                   children: [
                                     Text(
-                                      recentlyAppointed[index]['time'],
+                                      recentlyAppointed[index]['time_from'] +
+                                          ' to ' +
+                                          recentlyAppointed[index]['time_to'],
                                       style: TextStyle(
                                           color: Colors.black.withOpacity(0.6),
                                           fontSize: Dimensions.smallTextSize),
@@ -475,5 +514,55 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  Future _handleTheLogout() async {
+    try {
+      var response = await CallApi().getDataWithToken('/logout');
+      if (response.statusCode == 200) {
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        localStorage.remove('user');
+        localStorage.remove('token');
+        localStorage.remove('model');
+
+        LaravelEcho.instance.disconnect();
+
+        _goToSigninScreen(context);
+
+        showErrorDialog(
+            context, 'Error in loading data, please try login again');
+      } else {
+        // Try to logout again
+      }
+    } catch (e) {
+      // Show the error message
+      showErrorDialog(context, e.message);
+    }
+  }
+
+  _goToSigninScreen(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) {
+          return SignInScreen();
+        },
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  Future<bool> showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
+          ),
+        )) ??
+        false;
   }
 }

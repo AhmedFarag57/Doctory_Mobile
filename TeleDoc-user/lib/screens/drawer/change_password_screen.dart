@@ -13,7 +13,6 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   TextEditingController oldPasswordController = TextEditingController();
@@ -33,7 +32,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.changePassword,),
+              BackWidget(
+                name: Strings.changePassword,
+                active: true,
+              ),
               bodyWidget(context)
             ],
           ),
@@ -55,9 +57,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           height: height * 0.6,
           width: width,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(Dimensions.radius * 2)
-          ),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(Dimensions.radius * 2)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -78,8 +79,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           padding: const EdgeInsets.only(
               top: Dimensions.heightSize * 2,
               left: Dimensions.marginSize,
-              right: Dimensions.marginSize
-          ),
+              right: Dimensions.marginSize),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -91,16 +91,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: oldPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
                     hintText: Strings.typePassword,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                     labelStyle: CustomStyle.textStyle,
                     focusedBorder: CustomStyle.focusBorder,
                     enabledBorder: CustomStyle.focusErrorBorder,
@@ -117,13 +118,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       },
                       icon: _toggleVisibility
                           ? Icon(
-                        Icons.visibility_off,
-                        color: CustomColor.greyColor,
-                      )
+                              Icons.visibility_off,
+                              color: CustomColor.greyColor,
+                            )
                           : Icon(
-                        Icons.visibility,
-                        color: CustomColor.greyColor,
-                      ),
+                              Icons.visibility,
+                              color: CustomColor.greyColor,
+                            ),
                     ),
                   ),
                   obscureText: _toggleVisibility,
@@ -137,16 +138,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: newPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
                     hintText: Strings.typePassword,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                     labelStyle: CustomStyle.textStyle,
                     focusedBorder: CustomStyle.focusBorder,
                     enabledBorder: CustomStyle.focusErrorBorder,
@@ -163,13 +165,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       },
                       icon: _toggleVisibility
                           ? Icon(
-                        Icons.visibility_off,
-                        color: CustomColor.greyColor,
-                      )
+                              Icons.visibility_off,
+                              color: CustomColor.greyColor,
+                            )
                           : Icon(
-                        Icons.visibility,
-                        color: CustomColor.greyColor,
-                      ),
+                              Icons.visibility,
+                              color: CustomColor.greyColor,
+                            ),
                     ),
                   ),
                   obscureText: _toggleVisibility,
@@ -183,16 +185,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: confirmPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String value) {
+                    if (value.isEmpty) {
                       return Strings.pleaseFillOutTheField;
-                    }else{
+                    } else {
                       return null;
                     }
                   },
                   decoration: InputDecoration(
                     hintText: Strings.typePassword,
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                     labelStyle: CustomStyle.textStyle,
                     focusedBorder: CustomStyle.focusBorder,
                     enabledBorder: CustomStyle.focusErrorBorder,
@@ -209,13 +212,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       },
                       icon: _toggleVisibility
                           ? Icon(
-                        Icons.visibility_off,
-                        color: CustomColor.greyColor,
-                      )
+                              Icons.visibility_off,
+                              color: CustomColor.greyColor,
+                            )
                           : Icon(
-                        Icons.visibility,
-                        color: CustomColor.greyColor,
-                      ),
+                              Icons.visibility,
+                              color: CustomColor.greyColor,
+                            ),
                     ),
                   ),
                   obscureText: _toggleVisibility,
@@ -224,36 +227,39 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               SizedBox(height: Dimensions.heightSize),
             ],
           ),
-        )
-    );
+        ));
   }
-
 
   buttonWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: Dimensions.marginSize, right: Dimensions.marginSize),
+      padding: const EdgeInsets.only(
+          left: Dimensions.marginSize, right: Dimensions.marginSize),
       child: GestureDetector(
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
               color: CustomColor.primaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius))
-          ),
+              borderRadius:
+                  BorderRadius.all(Radius.circular(Dimensions.radius))),
           child: Center(
             child: Text(
               Strings.changePassword.toUpperCase(),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-              DashboardScreen()));
+          if (formKey.currentState.validate()) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => DashboardScreen(),
+              ),
+            );
+          }
         },
       ),
     );
@@ -267,11 +273,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
       child: Text(
         title,
-        style: TextStyle(
-            color: Colors.black
-        ),
+        style: TextStyle(color: Colors.black),
       ),
     );
   }
-
 }

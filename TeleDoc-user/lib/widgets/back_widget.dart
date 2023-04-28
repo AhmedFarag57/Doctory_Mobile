@@ -4,8 +4,10 @@ import 'package:teledoc/utils/strings.dart';
 
 class BackWidget extends StatefulWidget {
   final String name;
+  final bool active;
+  final onTap;
 
-  const BackWidget({Key key, this.name}) : super(key: key);
+  const BackWidget({Key key, this.name, this.onTap, this.active = false}) : super(key: key);
 
   @override
   _BackWidgetState createState() => _BackWidgetState();
@@ -30,28 +32,7 @@ class _BackWidgetState extends State<BackWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                GestureDetector(
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        Text(
-                          Strings.back,
-                          style: TextStyle(
-                            color: Colors.white
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
+                _buildBackIcon(context),
               ],
             ),
           ),
@@ -64,13 +45,42 @@ class _BackWidgetState extends State<BackWidget> {
               style: TextStyle(
                   fontSize: Dimensions.extraLargeTextSize,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white
-              ),
+                  color: Colors.white),
               textAlign: TextAlign.center,
             ),
           ),
         ),
       ],
     );
+  }
+
+  Widget _buildBackIcon(context) {
+    if (widget.active) {
+      return GestureDetector(
+        child: Container(
+          child: Row(
+            children: [
+              Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20,
+              ),
+              Text(
+                Strings.back,
+                style: TextStyle(color: Colors.white),
+              )
+            ],
+          ),
+        ),
+        onTap: () {
+          if (widget.onTap != null) {
+            widget.onTap();
+          }
+          Navigator.of(context).pop();
+        },
+      );
+    } else {
+      return SizedBox(height: 1.0,);
+    }
   }
 }

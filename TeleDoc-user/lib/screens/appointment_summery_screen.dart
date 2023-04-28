@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/dashboard_screen.dart';
@@ -10,18 +9,21 @@ import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/custom_style.dart';
+import 'package:teledoc/dialog/loading_dialog.dart';
+import 'package:teledoc/dialog/message_dialog.dart';
 
 class AppointmentSummeryScreen extends StatefulWidget {
-  final String docName, date, time;
-  //final int id;
+  final String id, docName, sessionPrice, date, timeId, timeFrom, timeTo;
 
   const AppointmentSummeryScreen({
     Key key,
     this.docName,
-    //this.session_price,
-    //this.id,
+    this.sessionPrice,
+    this.id,
     this.date,
-    this.time,
+    this.timeId,
+    this.timeFrom,
+    this.timeTo,
   }) : super(key: key);
 
   @override
@@ -34,11 +36,8 @@ enum SingingCharacter { point }
 class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   SingingCharacter _character = SingingCharacter.point;
 
-  TextEditingController docNameController = TextEditingController();
-  TextEditingController dateController = TextEditingController();
-  TextEditingController timeController = TextEditingController();
-/*
-  var user;
+  bool _isSelected = true;
+  var model;
 
   @override
   void initState() {
@@ -46,32 +45,43 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
     super.initState();
   }
 
-  _getUserData() async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    user = jsonDecode(localStorage.get('user'));
-  }
-  */
-
-  void _dispaly() async {
-    var data = {
-      'name': docNameController.text,
-      'date': dateController.text,
-      'time': timeController.text,
-    };
-
-    var response = await CallApi().postData(data, '/appointments');
-
-    var body = json.decode(response.body);
-
-    if (body['success']) {
+  Future _getUserData() async {
+    try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('token', json.encode(body['data']['token']));
-      localStorage.setString('user', json.encode(body['data']['user']));
+      model = jsonDecode(localStorage.get('model'));
+    } catch (e) {
+      // ..
+    }
+  }
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => DashboardScreen()));
-    } else {
-      //....
+  Future _createAppointment(BuildContext context) async {
+    // Show the loading Dialog
+    _showLoadingDialog(context);
+    var response;
+    try {
+      var data = {
+        'doc_id': widget.id.toString(),
+        'patient_id': model['id'].toString(),
+        'session_price': widget.sessionPrice.toString(),
+        'date': widget.date.toString(),
+        'time_id': widget.timeId.toString(),
+        'time_from': widget.timeFrom.toString(),
+        'time_to': widget.timeTo.toString(),
+      };
+      response = await CallApi().postDataWithToken(data, '/appointments');
+      if (response.statusCode == 200) {
+        // pop the Loading Diaolg
+        Navigator.of(context).pop();
+        // Show success message
+        _showPaymentSuccessDialog();
+      } else {
+        throw Exception();
+      }
+    } catch (e) {
+      // pop the Loading Diaolg
+      Navigator.of(context).pop();
+      // Show error message
+      _showErrorDialog(context, 'Error in create appointment');
     }
   }
 
@@ -87,9 +97,10 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
             children: [
               BackWidget(
                 name: Strings.appointmentSummery,
+                active: true,
               ),
               bodyWidget(context),
-              nextButtonWidget(context)
+              nextButtonWidget(context),
             ],
           ),
         ),
@@ -108,13 +119,13 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radius * 2),
+            topRight: Radius.circular(Dimensions.radius * 2),
+          ),
+        ),
         child: ListView(
-          //physics: NeverScrollableScrollPhysics(),
           children: [
             detailsWidget(context),
             SizedBox(height: Dimensions.heightSize),
@@ -129,24 +140,36 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   detailsWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          left: Dimensions.marginSize,
-          right: Dimensions.marginSize,
-          top: Dimensions.heightSize),
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+        top: Dimensions.heightSize,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             Strings.appointmentDetails,
             style: TextStyle(
-                color: Colors.black,
-                fontSize: Dimensions.largeTextSize,
-                fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: Dimensions.largeTextSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(height: Dimensions.heightSize),
-          _titleData('Doctor Name', Strings.fee, widget.docName),
-          // widget.session_price + ' L.E'),
-          _titleData(Strings.date, widget.date, widget.time),
-          //Strings.time
+          _titleData(
+            'Doctor Name',
+            Strings.fee,
+            widget.docName,
+            widget.sessionPrice + ' L.E',
+          ),
+          _titleData(
+            Strings.date,
+            Strings.time,
+            widget.date,
+            _getTimeFormated(widget.timeFrom) +
+                " - " +
+                _getTimeFormated(widget.timeTo),
+          ),
         ],
       ),
     );
@@ -155,17 +178,22 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   paymentWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: Dimensions.heightSize * 3,
-          left: Dimensions.marginSize,
-          right: Dimensions.marginSize),
+        top: Dimensions.heightSize * 3,
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+      ),
       child: Column(
         children: [
           Container(
             height: 60.0,
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withOpacity(0.1)),
-                borderRadius:
-                    BorderRadius.all(Radius.circular(Dimensions.radius))),
+              border: Border.all(
+                color: Colors.black.withOpacity(0.1),
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(Dimensions.radius),
+              ),
+            ),
             child: ListTile(
               title: Text(
                 "My Point".toUpperCase(),
@@ -179,6 +207,7 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                 onChanged: (SingingCharacter value) {
                   setState(() {
                     _character = value;
+                    _isSelected = !_isSelected;
                   });
                 },
               ),
@@ -202,27 +231,34 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
           height: Dimensions.buttonHeight,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius:
-                  BorderRadius.all(Radius.circular(Dimensions.radius * 0.5))),
+            color: CustomColor.primaryColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(Dimensions.radius * 0.5),
+            ),
+          ),
           child: Center(
             child: Text(
               Strings.sendAppointmentRequest.toUpperCase(),
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: Dimensions.largeTextSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
         onTap: () async {
-          await _createAppointment();
+          if (_isSelected) {
+            _createAppointment(context);
+          } else {
+            _showInSnackBar('You must select payment method');
+          }
         },
       ),
     );
   }
 
-  _titleData(String title1, String title2, String value1) {
+  _titleData(String title1, String title2, String value1, String value2) {
     return Padding(
       padding: const EdgeInsets.only(
         top: Dimensions.heightSize,
@@ -242,16 +278,20 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(value1,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: Dimensions.defaultTextSize)),
-              /*
-              Text(value2,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: Dimensions.defaultTextSize)),
-                      */
+              Text(
+                value1,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: Dimensions.defaultTextSize,
+                ),
+              ),
+              Text(
+                value2,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: Dimensions.defaultTextSize,
+                ),
+              ),
             ],
           ),
         ],
@@ -273,9 +313,10 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                   Text(
                     Strings.successfullySendYourRequest,
                     style: TextStyle(
-                        fontSize: Dimensions.extraLargeTextSize,
-                        color: CustomColor.primaryColor,
-                        fontWeight: FontWeight.bold),
+                      fontSize: Dimensions.extraLargeTextSize,
+                      color: CustomColor.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   GestureDetector(
@@ -283,26 +324,28 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                       height: 60.0,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.all(
-                              Radius.circular(Dimensions.radius))),
+                        color: Colors.black,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(Dimensions.radius),
+                        ),
+                      ),
                       child: Center(
                         child: Text(
                           Strings.ok.toUpperCase(),
                           style: TextStyle(
-                              fontSize: Dimensions.extraLargeTextSize,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                            fontSize: Dimensions.extraLargeTextSize,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     onTap: () {
-                      _dispaly();
-
-                      /*
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => DashboardScreen()));
-                          */
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => DashboardScreen(),
+                        ),
+                      );
                     },
                   )
                 ],
@@ -313,22 +356,40 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
         false;
   }
 
-  _createAppointment() async {
-    var data = {
-      'doc_id': 158, //widget.id,
-      'patient_id': 3, //user['id'],
-      'status': 'pending',
-      'date': widget.date,
-      'time': widget.time,
-      //'session_price': widget.session_price,
-    };
+  Future<bool> _showLoadingDialog(BuildContext context) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => LoadingDialog(),
+        )) ??
+        false;
+  }
 
-    var response = await CallApi().postDataWithToken(data, '/appointments');
+  Future<bool> _showErrorDialog(BuildContext context, message) async {
+    return (await showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) => MessageDialog(
+            title: "Error",
+            subTitle: message,
+            action: false,
+            img: 'error.png',
+            buttonName: Strings.ok,
+          ),
+        )) ??
+        false;
+  }
 
-    var body = jsonDecode(response.body);
+  void _showInSnackBar(String value) {
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
+      content: new Text(value),
+      duration: Duration(seconds: 3),
+    ));
+  }
 
-    if (body['success']) {
-      _showPaymentSuccessDialog();
-    } else {}
+  _getTimeFormated(time) {
+    DateTime tmp = DateTime.parse('2023-04-26 ' + time);
+    String formattedDate = DateFormat('hh:mm a').format(tmp);
+    return formattedDate;
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:doctor/utils/custom_style.dart';
-
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
@@ -22,7 +21,10 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: Strings.helpSupport,),
+              BackWidget(
+                name: Strings.helpSupport,
+                active: true,
+              ),
               bodyWidget(context),
             ],
           ),
