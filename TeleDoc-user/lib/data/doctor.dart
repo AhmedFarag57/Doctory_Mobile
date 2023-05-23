@@ -7,13 +7,19 @@ class Doctor {
   final String address;
   final String rating;
 
-  const Doctor({this.id, this.name, this.image, this.specialist, this.available, this.address,
-  this.rating});
+  const Doctor(
+      {required this.id,
+      required this.name,
+      required this.image,
+      required this.specialist,
+      required this.available,
+      required this.address,
+      required this.rating});
 }
 
 class DoctorList {
   static List<Doctor> list() {
-    const data = <Doctor> [
+    const data = <Doctor>[
       Doctor(
           id: 1,
           name: 'Dr. Tomas Khushiya',
@@ -21,8 +27,7 @@ class DoctorList {
           specialist: 'Liver Specialist',
           available: '12:00pm - 03:00pm',
           address: 'Regent Hospital',
-          rating: '5'
-      ),
+          rating: '5'),
       Doctor(
           id: 2,
           name: 'Dr. Zecop Winner',
@@ -30,8 +35,7 @@ class DoctorList {
           specialist: 'Gynecologists',
           available: '05:00pm - 08:00pm',
           address: 'Modern Hospital',
-          rating: '5'
-      ),
+          rating: '5'),
       Doctor(
           id: 3,
           name: 'Dr. Jabed Patowari',
@@ -39,8 +43,7 @@ class DoctorList {
           specialist: 'Medicine Specialist',
           available: '12:00pm - 03:00pm',
           address: 'Regent Hospital',
-          rating: '5'
-      ),
+          rating: '5'),
       Doctor(
           id: 4,
           name: 'Dr. Toma Mirza',
@@ -48,8 +51,7 @@ class DoctorList {
           specialist: 'Gynecologists',
           available: '05:00pm - 08:00pm',
           address: 'Modern Hospital',
-          rating: '5'
-      ),
+          rating: '5'),
     ];
     return data;
   }

@@ -2,32 +2,30 @@ import 'package:laravel_echo/laravel_echo.dart';
 import 'package:pusher_client/pusher_client.dart';
 
 class LaravelEcho {
-  static LaravelEcho _singleton;
-  static Echo _echo;
+  static LaravelEcho? _singleton;
+  static Echo? _echo;
   final String token;
 
   LaravelEcho._({
-    this.token,
-  }){
+    required this.token,
+  }) {
     _echo = createLaravelEcho(token);
   }
 
   factory LaravelEcho.init({
-    String token,
-  }){
-    if(_singleton == null || token != _singleton?.token){
+    required String token,
+  }) {
+    if (_singleton == null || token != _singleton?.token) {
       _singleton = LaravelEcho._(token: token);
     }
 
-    return _singleton;
+    return _singleton!;
   }
 
-  static Echo get instance => _echo;
+  static Echo get instance => _echo!;
 
-  static String get socketId => _echo.socketId() ?? "11111.11111111";
-
+  static String get socketId => _echo!.socketId() ?? "11111.11111111";
 }
-
 
 class PusherConfig {
   static const appId = "1506178";
@@ -64,6 +62,7 @@ PusherClient createPusherClient(String token) {
 
 Echo createLaravelEcho(String token) {
   return Echo(
-      client: createPusherClient(token),
-      broadcaster: EchoBroadcasterType.Pusher);
+    client: createPusherClient(token),
+    broadcaster: EchoBroadcasterType.Pusher,
+  );
 }

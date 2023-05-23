@@ -47,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.get('user'));
-      model = jsonDecode(localStorage.get('model'));
+      user = jsonDecode(localStorage.get('user').toString());
+      model = jsonDecode(localStorage.get('model').toString());
 
       var response = await CallApi().getDataWithToken('/doctors');
 
@@ -140,11 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Strings.helpSupport,
                       HelpSupportScreen(),
                     ),
-                    logoutListData(
-                      'assets/images/icon/signout.png',
-                      Strings.signOut,
-                      context
-                    ),
+                    logoutListData('assets/images/icon/signout.png',
+                        Strings.signOut, context),
                   ],
                 ),
               ),
@@ -240,10 +237,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                     ),
                     onPressed: () {
-                      if (scaffoldKey.currentState.isDrawerOpen) {
-                        scaffoldKey.currentState.openEndDrawer();
+                      if (scaffoldKey.currentState!.isDrawerOpen) {
+                        scaffoldKey.currentState!.openEndDrawer();
                       } else {
-                        scaffoldKey.currentState.openDrawer();
+                        scaffoldKey.currentState!.openDrawer();
                       }
                     },
                   ),
@@ -355,8 +352,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: CustomStyle.textStyle,
                       controller: searchController,
                       keyboardType: TextInputType.text,
-                      validator: (String value) {
-                        if (value.isEmpty) {
+                      validator: (String? value) {
+                        if (value!.isEmpty) {
                           return Strings.pleaseFillOutTheField;
                         } else {
                           return null;
@@ -365,7 +362,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(
                         hintText: Strings.searchDoctor,
                         contentPadding: EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 5.0),
+                          vertical: 5.0,
+                          horizontal: 5.0,
+                        ),
                         labelStyle: CustomStyle.textStyle,
                         filled: true,
                         fillColor: Colors.white,
@@ -392,9 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            SizedBox(
-              height: Dimensions.heightSize * 2,
-            ),
+            SizedBox(height: Dimensions.heightSize * 2),
             detailsWidget(context),
           ],
         ),
@@ -633,7 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       // Show the error message
-      _showErrorDialog(context, e.message);
+      _showErrorDialog(context, 'Error in logout. please try again');
     }
   }
 
@@ -645,6 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: "Error",
             subTitle: message,
             action: false,
+            moved: SignInScreen(),
             img: 'error.png',
             buttonName: Strings.ok,
           ),

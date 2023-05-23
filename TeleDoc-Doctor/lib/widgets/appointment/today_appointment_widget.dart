@@ -1,5 +1,7 @@
 import 'package:doctor/data/recent.dart';
+import 'package:doctor/screens/audio_call_screen.dart';
 import 'package:doctor/screens/messaging_screen.dart';
+import 'package:doctor/screens/video_call_screen.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/custom_style.dart';
 import 'package:doctor/utils/dimensions.dart';
@@ -171,16 +173,14 @@ class TodayAppointmentWidget extends StatelessWidget {
                                       ),
                                     ),
                                     onTap: () {
-                                      /*
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (context) => MessagingScreen(
-                                            todayAppointments[index]['id'],
-                                            todayAppointments[index]['chat_id'],
+                                          builder: (context) => AudioCallScreen(
+                                            callId: todayAppointments[index]
+                                                ['chat_id'],
                                           ),
                                         ),
                                       );
-                                      */
                                     },
                                   ),
                                   SizedBox(
@@ -201,16 +201,14 @@ class TodayAppointmentWidget extends StatelessWidget {
                                       ),
                                     ),
                                     onTap: () {
-                                      /*
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (context) => MessagingScreen(
-                                            todayAppointments[index]['id'],
-                                            todayAppointments[index]['chat_id'],
+                                          builder: (context) => VideoCallTestScreen(
+                                            callId: todayAppointments[index]
+                                                ['chat_id'],
                                           ),
                                         ),
                                       );
-                                      */
                                     },
                                   ),
                                 ],

@@ -7,7 +7,12 @@ class BackWidget extends StatefulWidget {
   final bool active;
   final onTap;
 
-  const BackWidget({Key key, this.name, this.onTap, this.active = false}) : super(key: key);
+  const BackWidget({
+    Key? key,
+    required this.name,
+    this.onTap,
+    this.active = false,
+  }) : super(key: key);
 
   @override
   _BackWidgetState createState() => _BackWidgetState();
@@ -43,9 +48,10 @@ class _BackWidgetState extends State<BackWidget> {
             child: Text(
               widget.name,
               style: TextStyle(
-                  fontSize: Dimensions.extraLargeTextSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                fontSize: Dimensions.extraLargeTextSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -68,7 +74,7 @@ class _BackWidgetState extends State<BackWidget> {
               Text(
                 Strings.back,
                 style: TextStyle(color: Colors.white),
-              )
+              ),
             ],
           ),
         ),
@@ -80,7 +86,9 @@ class _BackWidgetState extends State<BackWidget> {
         },
       );
     } else {
-      return SizedBox(height: 1.0,);
+      return SizedBox(
+        height: 1.0,
+      );
     }
   }
 }

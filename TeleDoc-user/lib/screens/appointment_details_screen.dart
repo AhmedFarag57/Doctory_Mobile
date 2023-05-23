@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teledoc/dialog/message_dialog.dart';
 import 'package:teledoc/network_utils/api.dart';
 import 'package:teledoc/screens/dashboard_screen.dart';
 import 'package:teledoc/screens/submit_review_screen.dart';
+import 'package:teledoc/screens/videocall_screen.dart';
 import 'package:teledoc/widgets/back_widget.dart';
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
@@ -16,7 +18,7 @@ class AppointmentDetailsScreen extends StatefulWidget {
   final myAppointment;
 
   const AppointmentDetailsScreen({
-    Key key,
+    Key? key,
     this.myAppointment,
   }) : super(key: key);
 
@@ -29,6 +31,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   bool _isLoading = true;
 
   var chatId;
+  var user;
 
   @override
   void initState() {
@@ -50,6 +53,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
         chatId = body['data'].toString();
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        user = jsonDecode(localStorage.get('user').toString());
         setState(() {
           _isLoading = false;
         });
@@ -61,7 +66,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       _showErrorDialog(context, 'Error in Appointment detail. Try again');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -484,11 +489,18 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                             ),
                           ),
                           onTap: () {
-                            // ...
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => VideocallScreen(
+                                  callId: chatId,
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

@@ -69,7 +69,7 @@ class _SignInScreenState extends State<SignInScreen> {
       // Pop the loading dialog
       Navigator.of(context).pop();
       // Show the error in Error dialog
-      showErrorDialog(context, e.message);
+      showErrorDialog(context, 'Error in signup. please try again');
     }
   }
 
@@ -85,6 +85,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               BackWidget(
                 name: Strings.signInAccount,
+                onTap: null,
               ),
               bodyWidget(context)
             ],
@@ -147,97 +148,98 @@ class _SignInScreenState extends State<SignInScreen> {
 
   inputFiledWidget(BuildContext context) {
     return Form(
-        key: formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: Dimensions.heightSize * 2,
-              left: Dimensions.marginSize,
-              right: Dimensions.marginSize),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _titleData(Strings.email),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.demoEmail,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                  ),
+      key: formKey,
+      child: Padding(
+        padding: const EdgeInsets.only(
+            top: Dimensions.heightSize * 2,
+            left: Dimensions.marginSize,
+            right: Dimensions.marginSize),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _titleData(Strings.email),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.demoEmail,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                  labelStyle: CustomStyle.textStyle,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
                 ),
               ),
-              _titleData(Strings.password),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: passwordController,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.typePassword,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _toggleVisibility = !_toggleVisibility;
-                        });
-                      },
-                      icon: _toggleVisibility
-                          ? Icon(
-                              Icons.visibility_off,
-                              color: CustomColor.greyColor,
-                            )
-                          : Icon(
-                              Icons.visibility,
-                              color: CustomColor.greyColor,
-                            ),
-                    ),
+            ),
+            _titleData(Strings.password),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: passwordController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
                   ),
-                  obscureText: _toggleVisibility,
                 ),
+                obscureText: _toggleVisibility,
               ),
-              SizedBox(height: Dimensions.heightSize),
-            ],
-          ),
-        ));
+            ),
+            SizedBox(height: Dimensions.heightSize),
+          ],
+        ),
+      ),
+    );
   }
 
   rememberForgotWidget(BuildContext context) {
@@ -247,12 +249,18 @@ class _SignInScreenState extends State<SignInScreen> {
         children: [
           Text(
             Strings.rememberMe,
-            style: CustomStyle.textStyle,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12.0,
+            ),
           ),
           GestureDetector(
             child: Text(
               Strings.forgotPassword,
-              style: CustomStyle.textStyle,
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 12.0,
+              ),
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -264,7 +272,7 @@ class _SignInScreenState extends State<SignInScreen> {
       value: checkedValue,
       onChanged: (newValue) {
         setState(() {
-          checkedValue = newValue;
+          checkedValue = newValue!;
         });
       },
       controlAffinity: ListTileControlAffinity.leading, //  <-- leading Checkbox
@@ -301,7 +309,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         onTap: () {
-          if (formKey.currentState.validate()) {
+          if (formKey.currentState!.validate()) {
             _loginRequest(context);
           }
         },
@@ -366,6 +374,7 @@ class _SignInScreenState extends State<SignInScreen> {
           context: context,
           builder: (context) => MessageDialog(
             title: "Error",
+            moved: DashboardScreen(),
             subTitle: message,
             action: false,
             img: 'error.png',

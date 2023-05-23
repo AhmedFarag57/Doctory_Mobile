@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CallApi {
   // final String _url = 'https://doctory-test.000webhostapp.com/api';
   // Ahmed Farag Backend URL -> Change it when use it
-  final String _url = 'http://10.0.2.2:8080/Projects/Graduation_Project/Doctory/public/api';
+  final String _url = 'http://192.168.1.168:8080/Projects/Graduation_Project/Doctory/public/api';
+  // final String _url = 'http://10.0.2.2:8080/Projects/Graduation_Project/Doctory/public/api';
   
   
   //final String _url = 'http://10.0.2.2:8080/Doctory_Web/public/api';
@@ -14,7 +15,7 @@ class CallApi {
 
   _getToken() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    token = jsonDecode(localStorage.getString('token'));
+    token = jsonDecode(localStorage.getString('token')!);
   }
 
   postDataWithToken(data, apiUrl) async {

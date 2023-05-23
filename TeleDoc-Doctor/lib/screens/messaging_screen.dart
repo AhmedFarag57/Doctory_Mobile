@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:doctor/screens/videocall_screen.dart';
+import 'package:doctor/screens/video_call_screen.dart';
 import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor/widgets/back_widget.dart';
@@ -55,7 +57,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.getString('user'));
+      user = jsonDecode(localStorage.getString('user')!);
       userId = user['id'];
 
       /**
@@ -109,10 +111,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
   }
 
   void listenChatChannel() {
-    LaravelEcho.instance.private('chat.${chatId}').listen('.message.sent', (e) {
+    LaravelEcho.instance.private('chat.$chatId').listen('.message.sent', (e) {
       if (e is PusherEvent) {
         if (e.data != null) {
-          _handleNewMessage(jsonDecode(e.data));
+          _handleNewMessage(jsonDecode(e.data!));
         }
       }
     }).error((err) {
@@ -122,7 +124,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
   void leaveChatChannel() {
     try {
-      LaravelEcho.instance.leave('chat.${chatId}');
+      LaravelEcho.instance.leave('chat.$chatId');
     } catch (err) {
       print(err);
     }
@@ -171,11 +173,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radius * 2),
+            topRight: Radius.circular(Dimensions.radius * 2),
+          ),
+        ),
         child: ListView(
           //physics: NeverScrollableScrollPhysics(),
           children: [
@@ -189,9 +192,11 @@ class _MessagingScreenState extends State<MessagingScreen> {
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                      color: CustomColor.primaryColor,
-                      borderRadius:
-                          BorderRadius.circular(Dimensions.radius * 0.5)),
+                    color: CustomColor.primaryColor,
+                    borderRadius: BorderRadius.circular(
+                      Dimensions.radius * 0.5,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Image.asset('assets/images/call.png'),
@@ -200,16 +205,38 @@ class _MessagingScreenState extends State<MessagingScreen> {
                 SizedBox(
                   width: Dimensions.widthSize,
                 ),
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
+                GestureDetector(
+                  onTap: () {
+                    /*
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => VideocallScreen(
+                          callId: chatId,
+                        ),
+                      ),
+                    );
+                    */
+                    Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => VideoCallTestScreen(
+                            callId: chatId,
+                          ),
+                        ),
+                      );
+                  },
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
                       color: Colors.red,
-                      borderRadius:
-                          BorderRadius.circular(Dimensions.radius * 0.5)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.asset('assets/images/video.png'),
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.radius * 0.5,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset('assets/images/video.png'),
+                    ),
                   ),
                 ),
               ],
@@ -442,8 +469,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           style: CustomStyle.textStyle,
                           controller: messageController,
                           keyboardType: TextInputType.name,
-                          validator: (String value) {
-                            if (value.isEmpty) {
+                          validator: (String? value) {
+                            if (value!.isEmpty) {
                               return Strings.typeSomething;
                             } else {
                               return null;
@@ -483,7 +510,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                         size: 18,
                       ),
                 onPressed: () {
-                  if (formKey.currentState.validate()) {
+                  if (formKey.currentState!.validate()) {
                     if (!_isSending) {
                       _sendMessageRequest();
                     }

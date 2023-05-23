@@ -86,6 +86,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               BackWidget(
                 name: Strings.createAnAccount,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context)
             ],
@@ -159,8 +160,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 style: CustomStyle.textStyle,
                 controller: nameController,
                 keyboardType: TextInputType.emailAddress,
-                validator: (String value) {
-                  if (value.isEmpty) {
+                validator: (String? value) {
+                  if (value!.isEmpty) {
                     return Strings.pleaseFillOutTheField;
                   } else {
                     return null;
@@ -190,8 +191,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 style: CustomStyle.textStyle,
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                validator: (String value) {
-                  if (value.isEmpty) {
+                validator: (String? value) {
+                  if (value!.isEmpty) {
                     return Strings.pleaseFillOutTheField;
                   } else {
                     return null;
@@ -220,8 +221,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: TextFormField(
                 style: CustomStyle.textStyle,
                 controller: passwordController,
-                validator: (String value) {
-                  if (value.isEmpty) {
+                validator: (String? value) {
+                  if (value!.isEmpty) {
                     return Strings.pleaseFillOutTheField;
                   } else {
                     return null;
@@ -267,8 +268,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: TextFormField(
                 style: CustomStyle.textStyle,
                 controller: passwordConfirmController,
-                validator: (String value) {
-                  if (value.isEmpty) {
+                validator: (String? value) {
+                  if (value!.isEmpty) {
                     return Strings.pleaseFillOutTheField;
                   } else {
                     return null;
@@ -317,20 +318,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return CheckboxListTile(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "I accept the ",
-            style: CustomStyle.textStyle,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12.0,
+            ),
           ),
           GestureDetector(
             child: Text(
               "Terms and Conditions",
               style: TextStyle(
-                  fontSize: Dimensions.defaultTextSize,
+                  fontSize: 12.0,
                   fontWeight: FontWeight.bold,
                   color: CustomColor.blueColor,
-                  decoration: TextDecoration.underline),
+                  decoration: TextDecoration.underline,
+              ),
             ),
             onTap: () {
               print('go to privacy url');
@@ -342,10 +347,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       value: checkedValue,
       onChanged: (newValue) {
         setState(() {
-          checkedValue = newValue;
+          checkedValue = newValue!;
         });
       },
-      controlAffinity: ListTileControlAffinity.leading, //  <-- leading Checkbox
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 
@@ -374,7 +379,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       onTap: () {
-        if (formKey.currentState.validate()) {
+        if (formKey.currentState!.validate()) {
           _signupRequest(context);
         }
       },
@@ -659,6 +664,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             action: false,
             img: 'error.png',
             buttonName: Strings.ok,
+            moved: SignUpScreen(),
           ),
         )) ??
         false;

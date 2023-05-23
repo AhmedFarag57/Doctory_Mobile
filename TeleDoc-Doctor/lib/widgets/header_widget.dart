@@ -4,7 +4,7 @@ import 'package:doctor/utils/dimensions.dart';
 class HeaderWidget extends StatefulWidget {
   final String name;
 
-  const HeaderWidget({Key key, this.name}) : super(key: key);
+  const HeaderWidget({Key? key, required this.name}) : super(key: key);
 
   @override
   _HeaderWidgetState createState() => _HeaderWidgetState();
@@ -27,9 +27,9 @@ class _HeaderWidgetState extends State<HeaderWidget> {
             child: Text(
               widget.name,
               style: TextStyle(
-                  fontSize: Dimensions.extraLargeTextSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white
+                fontSize: Dimensions.extraLargeTextSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
             ),

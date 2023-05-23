@@ -8,7 +8,8 @@ import 'package:doctor/screens/dashboard_screen.dart';
 class EmailVerificationScreen extends StatefulWidget {
   final String emailAddress;
 
-  const EmailVerificationScreen({Key key, this.emailAddress}) : super(key: key);
+  const EmailVerificationScreen({Key? key, required this.emailAddress})
+      : super(key: key);
 
   @override
   _EmailVerificationScreenState createState() =>
@@ -17,7 +18,8 @@ class EmailVerificationScreen extends StatefulWidget {
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   TextEditingController emailController = TextEditingController();
-  String _emailAddress;
+  String? _emailAddress;
+
   @override
   void initState() {
     super.initState();
@@ -30,12 +32,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       child: Scaffold(
         backgroundColor: CustomColor.secondaryColor,
         body: OtpConfirmation(
-          emailAddress: _emailAddress,
+          emailAddress: _emailAddress.toString(),
           otpLength: 4,
           validateOtp: validateOtp,
           routeCallback: moveToNextScreen,
           titleColor: Colors.black,
           themeColor: Colors.black,
+          bottomColor: Colors.transparent,
+          topColor: Colors.transparent,
+          image: '',
+          keyboardBackgroundColor: Colors.transparent,
+          isGradientApplied: false,
         ),
       ),
     );
@@ -51,12 +58,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     }
   }
 
-  // action to be performed after OTP validation is success
   void moveToNextScreen(context) {
     showSuccessDialog(context);
-
-    /*Navigator.of(context).push(MaterialPageRoute(builder: (context) =>
-        DashboardScreen()));*/
+    print('open dialog');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DashboardScreen(),
+      ),
+    );
   }
 
   Future<bool> showSuccessDialog(BuildContext context) async {

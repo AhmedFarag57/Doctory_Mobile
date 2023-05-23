@@ -31,8 +31,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.getString('user'));
-      model = jsonDecode(localStorage.getString('model'));
+      user = jsonDecode(localStorage.getString('user')!);
+      model = jsonDecode(localStorage.getString('model')!);
       Timer(
         Duration(seconds: 1),
         (() {

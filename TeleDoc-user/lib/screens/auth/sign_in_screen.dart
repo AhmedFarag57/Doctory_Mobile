@@ -69,7 +69,7 @@ class _SignInScreenState extends State<SignInScreen> {
       // Pop the loading dialog
       Navigator.of(context).pop();
       // Show the error in Error dialog
-      _showErrorDialog(context, e.message);
+      _showErrorDialog(context, 'Error in signin. please try again');
     }
   }
 
@@ -144,97 +144,103 @@ class _SignInScreenState extends State<SignInScreen> {
 
   inputFiledWidget(BuildContext context) {
     return Form(
-        key: formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: Dimensions.heightSize * 2,
-              left: Dimensions.marginSize,
-              right: Dimensions.marginSize),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _titleData(Strings.email),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.demoEmail,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
+      key: formKey,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: Dimensions.heightSize * 2,
+          left: Dimensions.marginSize,
+          right: Dimensions.marginSize,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _titleData(Strings.email),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.demoEmail,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 10.0,
                   ),
+                  labelStyle: CustomStyle.textStyle,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
                 ),
               ),
-              _titleData(Strings.password),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: passwordController,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.typePassword,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _toggleVisibility = !_toggleVisibility;
-                        });
-                      },
-                      icon: _toggleVisibility
-                          ? Icon(
-                              Icons.visibility_off,
-                              color: CustomColor.greyColor,
-                            )
-                          : Icon(
-                              Icons.visibility,
-                              color: CustomColor.greyColor,
-                            ),
-                    ),
+            ),
+            _titleData(Strings.password),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: passwordController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 10.0,
                   ),
-                  obscureText: _toggleVisibility,
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
+                  ),
                 ),
+                obscureText: _toggleVisibility,
               ),
-              SizedBox(height: Dimensions.heightSize),
-            ],
-          ),
-        ));
+            ),
+            SizedBox(height: Dimensions.heightSize),
+          ],
+        ),
+      ),
+    );
   }
 
   rememberForgotWidget(BuildContext context) {
@@ -252,8 +258,11 @@ class _SignInScreenState extends State<SignInScreen> {
               style: CustomStyle.textStyle,
             ),
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ForgotPasswordScreen()));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ForgotPasswordScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -261,7 +270,7 @@ class _SignInScreenState extends State<SignInScreen> {
       value: checkedValue,
       onChanged: (newValue) {
         setState(() {
-          checkedValue = newValue;
+          checkedValue = newValue!;
         });
       },
       controlAffinity: ListTileControlAffinity.leading, //  <-- leading Checkbox
@@ -271,15 +280,19 @@ class _SignInScreenState extends State<SignInScreen> {
   signInButtonWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          left: Dimensions.marginSize, right: Dimensions.marginSize),
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+      ),
       child: GestureDetector(
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius:
-                  BorderRadius.all(Radius.circular(Dimensions.radius))),
+            color: CustomColor.primaryColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(Dimensions.radius),
+            ),
+          ),
           child: Center(
             child: Text(
               Strings.signIn.toUpperCase(),
@@ -291,7 +304,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         onTap: () {
-          if (formKey.currentState.validate()) {
+          if (formKey.currentState!.validate()) {
             _loginRequest(context);
           }
         },
@@ -354,6 +367,7 @@ class _SignInScreenState extends State<SignInScreen> {
             title: "Error",
             subTitle: message,
             action: false,
+            moved: SignInScreen(),
             img: 'error.png',
             buttonName: Strings.ok,
           ),

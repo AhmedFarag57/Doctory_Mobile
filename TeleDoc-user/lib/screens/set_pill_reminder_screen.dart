@@ -55,11 +55,12 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radius * 2),
+            topRight: Radius.circular(Dimensions.radius * 2),
+          ),
+        ),
         child: inputFiledWidget(context),
       ),
     );
@@ -67,56 +68,57 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
 
   inputFiledWidget(BuildContext context) {
     return Form(
-        key: formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: Dimensions.heightSize * 2,
-              left: Dimensions.marginSize,
-              right: Dimensions.marginSize),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _titleData(Strings.nameOfPill),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: nameController,
-                  keyboardType: TextInputType.text,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.name,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                  ),
+      key: formKey,
+      child: Padding(
+        padding: const EdgeInsets.only(
+            top: Dimensions.heightSize * 2,
+            left: Dimensions.marginSize,
+            right: Dimensions.marginSize),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _titleData(Strings.nameOfPill),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: nameController,
+                keyboardType: TextInputType.text,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.name,
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                  labelStyle: CustomStyle.textStyle,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
                 ),
               ),
-              _titleData(Strings.selectDay),
-              selectWeekday(context),
-              SizedBox(
-                height: Dimensions.heightSize,
-              ),
-              selectTimeWidget(context),
-              setEatingTimeWidget(context)
-            ],
-          ),
-        ));
+            ),
+            _titleData(Strings.selectDay),
+            selectWeekday(context),
+            SizedBox(
+              height: Dimensions.heightSize,
+            ),
+            selectTimeWidget(context),
+            setEatingTimeWidget(context),
+          ],
+        ),
+      ),
+    );
   }
 
   _titleData(String title) {
@@ -226,14 +228,16 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
                             ),
                           ),
                           onTap: () {
-                            setState(() {
-                              if (timeCount > 1) {
-                                timeCount--;
-                              }
-                            });
+                            setState(
+                              () {
+                                if (timeCount > 1) {
+                                  timeCount--;
+                                }
+                              },
+                            );
                           },
                         ),
-                      )
+                      ),
               ],
             ),
           );
@@ -249,9 +253,9 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
           title: const Text('After Eat'),
           value: SingingCharacter.after,
           groupValue: _character,
-          onChanged: (SingingCharacter value) {
+          onChanged: (value) {
             setState(() {
-              _character = value;
+              _character = value!;
             });
           },
         ),
@@ -259,9 +263,9 @@ class _SetPillReminderScreenState extends State<SetPillReminderScreen> {
           title: const Text('Before Eat'),
           value: SingingCharacter.before,
           groupValue: _character,
-          onChanged: (SingingCharacter value) {
+          onChanged: (value) {
             setState(() {
-              _character = value;
+              _character = value!;
             });
           },
         ),

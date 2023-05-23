@@ -5,15 +5,19 @@ import 'package:doctor/utils/dimensions.dart';
 class SuccessDialog extends StatefulWidget {
   final String title, subTitle, buttonName;
   final Widget moved;
-  const SuccessDialog({Key key, this.title, this.subTitle, this.buttonName, this.moved}) : super(key:
-key);
+  const SuccessDialog({
+    Key? key,
+    required this.title,
+    required this.subTitle,
+    required this.buttonName,
+    required this.moved,
+  }) : super(key: key);
 
   @override
   _SuccessDialogState createState() => _SuccessDialogState();
 }
 
 class _SuccessDialogState extends State<SuccessDialog> {
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -23,24 +27,24 @@ class _SuccessDialogState extends State<SuccessDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Image.asset(
-                'assets/images/tik.png',
+              'assets/images/tik.png',
               height: 80,
               width: 80,
             ),
             Text(
               '${widget.title}!!',
               style: TextStyle(
-                  fontSize: Dimensions.extraLargeTextSize,
-                  color: CustomColor.primaryColor,
-                  fontWeight: FontWeight.bold
+                fontSize: Dimensions.extraLargeTextSize,
+                color: CustomColor.primaryColor,
+                fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             Text(
               widget.subTitle,
               style: TextStyle(
-                  fontSize: Dimensions.largeTextSize,
-                  color: CustomColor.primaryColor,
+                fontSize: Dimensions.largeTextSize,
+                color: CustomColor.primaryColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -49,16 +53,18 @@ class _SuccessDialogState extends State<SuccessDialog> {
                 height: 60.0,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius))
+                  color: Colors.black,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(Dimensions.radius),
+                  ),
                 ),
                 child: Center(
                   child: Text(
                     widget.buttonName.toUpperCase(),
                     style: TextStyle(
-                        fontSize: Dimensions.extraLargeTextSize,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
+                      fontSize: Dimensions.extraLargeTextSize,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -74,8 +80,6 @@ class _SuccessDialogState extends State<SuccessDialog> {
           ],
         ),
       ),
-
     );
   }
-
 }

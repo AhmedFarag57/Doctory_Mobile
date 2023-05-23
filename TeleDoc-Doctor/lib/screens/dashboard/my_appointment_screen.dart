@@ -34,8 +34,8 @@ class _MyAppointmentScreenState extends State<MyAppointmentScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.getString('user'));
-      model = jsonDecode(localStorage.getString('model'));
+      user = jsonDecode(localStorage.getString('user')!);
+      model = jsonDecode(localStorage.getString('model')!);
       var id = model['id'];
       var response;
       var body;

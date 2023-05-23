@@ -24,6 +24,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
               BackWidget(
                 name: Strings.myCard,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
             ],
@@ -36,7 +37,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
   bodyWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: 80,
+        top: 80,
       ),
       child: Container(
         height: MediaQuery.of(context).size.height,
@@ -46,7 +47,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(Dimensions.radius * 2),
             topRight: Radius.circular(Dimensions.radius * 2),
-          )
+          ),
         ),
         child: cardWidget(context),
       ),
@@ -55,8 +56,11 @@ class _MyCardScreenState extends State<MyCardScreen> {
 
   cardWidget(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: Dimensions.marginSize, right: Dimensions.marginSize,
-          top: Dimensions.heightSize * 3),
+      padding: const EdgeInsets.only(
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+        top: Dimensions.heightSize * 3,
+      ),
       child: SingleChildScrollView(
         child: Column(
           children: [
@@ -65,26 +69,34 @@ class _MyCardScreenState extends State<MyCardScreen> {
                 height: Dimensions.buttonHeight,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                    color: CustomColor.primaryColor,
-                    borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius * 0.5))
+                  color: CustomColor.primaryColor,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(Dimensions.radius * 0.5),
+                  ),
                 ),
                 child: Center(
                   child: Text(
                     Strings.addNewCard.toUpperCase() + ' +',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: Dimensions.largeTextSize,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: Dimensions.largeTextSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => AddNewCardScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddNewCardScreen(),
+                  ),
+                );
               },
             ),
-            SizedBox(height: Dimensions.heightSize * 3,),
+            SizedBox(
+              height: Dimensions.heightSize * 3,
+            ),
             Container(
               height: 250,
               width: MediaQuery.of(context).size.width,
@@ -105,18 +117,20 @@ class _MyCardScreenState extends State<MyCardScreen> {
                         Text(
                           Strings.demoCardNumber,
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimensions.largeTextSize
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimensions.largeTextSize,
                           ),
                         ),
-                        SizedBox(height: Dimensions.heightSize,),
+                        SizedBox(
+                          height: Dimensions.heightSize,
+                        ),
                         Text(
                           Strings.demoHolderName.toUpperCase(),
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimensions.largeTextSize
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimensions.largeTextSize,
                           ),
                         ),
                       ],
@@ -133,50 +147,54 @@ class _MyCardScreenState extends State<MyCardScreen> {
                             Text(
                               Strings.validForm.toUpperCase(),
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                             Text(
                               '12/20',
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(width: Dimensions.heightSize,),
+                        SizedBox(
+                          width: Dimensions.heightSize,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               Strings.validThru.toUpperCase(),
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                             Text(
                               '11/25',
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: Dimensions.heightSize,),
+            SizedBox(
+              height: Dimensions.heightSize,
+            ),
             Container(
               height: 250,
               width: MediaQuery.of(context).size.width,
@@ -197,18 +215,20 @@ class _MyCardScreenState extends State<MyCardScreen> {
                         Text(
                           Strings.demoCardNumber,
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimensions.largeTextSize
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimensions.largeTextSize,
                           ),
                         ),
-                        SizedBox(height: Dimensions.heightSize,),
+                        SizedBox(
+                          height: Dimensions.heightSize,
+                        ),
                         Text(
                           Strings.demoHolderName.toUpperCase(),
                           style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimensions.largeTextSize
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimensions.largeTextSize,
                           ),
                         ),
                       ],
@@ -225,46 +245,48 @@ class _MyCardScreenState extends State<MyCardScreen> {
                             Text(
                               Strings.validForm.toUpperCase(),
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                             Text(
                               '12/20',
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(width: Dimensions.heightSize,),
+                        SizedBox(
+                          width: Dimensions.heightSize,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               Strings.validThru.toUpperCase(),
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                             Text(
                               '11/25',
                               style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimensions.defaultTextSize
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimensions.defaultTextSize,
                               ),
                             ),
                           ],
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

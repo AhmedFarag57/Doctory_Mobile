@@ -16,14 +16,14 @@ class AppointmentSummeryScreen extends StatefulWidget {
   final String id, docName, sessionPrice, date, timeId, timeFrom, timeTo;
 
   const AppointmentSummeryScreen({
-    Key key,
-    this.docName,
-    this.sessionPrice,
-    this.id,
-    this.date,
-    this.timeId,
-    this.timeFrom,
-    this.timeTo,
+    Key? key,
+    required this.docName,
+    required this.sessionPrice,
+    required this.id,
+    required this.date,
+    required this.timeId,
+    required this.timeFrom,
+    required this.timeTo,
   }) : super(key: key);
 
   @override
@@ -48,7 +48,7 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
   Future _getUserData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      model = jsonDecode(localStorage.get('model'));
+      model = jsonDecode(localStorage.get('model').toString());
     } catch (e) {
       // ..
     }
@@ -204,9 +204,9 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
                 toggleable: true,
                 autofocus: true,
                 groupValue: _character,
-                onChanged: (SingingCharacter value) {
+                onChanged: (SingingCharacter? value) {
                   setState(() {
-                    _character = value;
+                    _character = value!;
                     _isSelected = !_isSelected;
                   });
                 },
@@ -233,7 +233,9 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
           decoration: BoxDecoration(
             color: CustomColor.primaryColor,
             borderRadius: BorderRadius.all(
-              Radius.circular(Dimensions.radius * 0.5),
+              Radius.circular(
+                Dimensions.radius * 0.5,
+              ),
             ),
           ),
           child: Center(
@@ -373,6 +375,7 @@ class _AppointmentSummeryScreenState extends State<AppointmentSummeryScreen> {
             title: "Error",
             subTitle: message,
             action: false,
+            moved: DashboardScreen(),
             img: 'error.png',
             buttonName: Strings.ok,
           ),

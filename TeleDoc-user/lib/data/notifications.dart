@@ -4,19 +4,22 @@ class Notifications {
   final String subTitle;
   final String time;
 
-
-  const Notifications({this.id, this.title, this.subTitle, this.time});
+  const Notifications({
+    required this.id,
+    required this.title,
+    required this.subTitle,
+    required this.time,
+  });
 }
 
 class NotificationList {
   static List<Notifications> list() {
-    const data = <Notifications> [
+    const data = <Notifications>[
       Notifications(
-        id: 1,
-        title: 'Approved Your Request',
-        subTitle: 'Dr. Youssef Hany approved your request',
-        time: '10:45 AM'
-      ),
+          id: 1,
+          title: 'Approved Your Request',
+          subTitle: 'Dr. Youssef Hany approved your request',
+          time: '10:45 AM'),
       // Notifications(
       //     id: 2,
       //     title: 'Confirm your Appoinment',

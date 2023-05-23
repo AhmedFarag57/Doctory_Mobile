@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
@@ -74,186 +73,198 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   inputFiledWidget(BuildContext context) {
     return Form(
-        key: formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: Dimensions.heightSize * 2,
-              left: Dimensions.marginSize,
-              right: Dimensions.marginSize),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _titleData(Strings.oldPassword),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: oldPasswordController,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.typePassword,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _toggleVisibility = !_toggleVisibility;
-                        });
-                      },
-                      icon: _toggleVisibility
-                          ? Icon(
-                              Icons.visibility_off,
-                              color: CustomColor.greyColor,
-                            )
-                          : Icon(
-                              Icons.visibility,
-                              color: CustomColor.greyColor,
-                            ),
-                    ),
+      key: formKey,
+      child: Padding(
+        padding: const EdgeInsets.only(
+            top: Dimensions.heightSize * 2,
+            left: Dimensions.marginSize,
+            right: Dimensions.marginSize),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _titleData(Strings.oldPassword),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: oldPasswordController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 10.0,
                   ),
-                  obscureText: _toggleVisibility,
-                ),
-              ),
-              _titleData(Strings.newPassword),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: newPasswordController,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.typePassword,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _toggleVisibility = !_toggleVisibility;
-                        });
-                      },
-                      icon: _toggleVisibility
-                          ? Icon(
-                              Icons.visibility_off,
-                              color: CustomColor.greyColor,
-                            )
-                          : Icon(
-                              Icons.visibility,
-                              color: CustomColor.greyColor,
-                            ),
-                    ),
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
                   ),
-                  obscureText: _toggleVisibility,
                 ),
+                obscureText: _toggleVisibility,
               ),
-              _titleData(Strings.confirmNewPassword),
-              Material(
-                elevation: 10.0,
-                shadowColor: CustomColor.secondaryColor,
-                borderRadius: BorderRadius.circular(Dimensions.radius),
-                child: TextFormField(
-                  style: CustomStyle.textStyle,
-                  controller: confirmPasswordController,
-                  validator: (String value) {
-                    if (value.isEmpty) {
-                      return Strings.pleaseFillOutTheField;
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(
-                    hintText: Strings.typePassword,
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                    labelStyle: CustomStyle.textStyle,
-                    focusedBorder: CustomStyle.focusBorder,
-                    enabledBorder: CustomStyle.focusErrorBorder,
-                    focusedErrorBorder: CustomStyle.focusErrorBorder,
-                    errorBorder: CustomStyle.focusErrorBorder,
-                    filled: true,
-                    fillColor: Colors.white,
-                    hintStyle: CustomStyle.textStyle,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _toggleVisibility = !_toggleVisibility;
-                        });
-                      },
-                      icon: _toggleVisibility
-                          ? Icon(
-                              Icons.visibility_off,
-                              color: CustomColor.greyColor,
-                            )
-                          : Icon(
-                              Icons.visibility,
-                              color: CustomColor.greyColor,
-                            ),
-                    ),
+            ),
+            _titleData(Strings.newPassword),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: newPasswordController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 10.0,
                   ),
-                  obscureText: _toggleVisibility,
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
+                  ),
                 ),
+                obscureText: _toggleVisibility,
               ),
-              SizedBox(height: Dimensions.heightSize),
-            ],
-          ),
-        ));
+            ),
+            _titleData(Strings.confirmNewPassword),
+            Material(
+              elevation: 10.0,
+              shadowColor: CustomColor.secondaryColor,
+              borderRadius: BorderRadius.circular(Dimensions.radius),
+              child: TextFormField(
+                style: CustomStyle.textStyle,
+                controller: confirmPasswordController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return Strings.pleaseFillOutTheField;
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: Strings.typePassword,
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 10.0,
+                  ),
+                  labelStyle: CustomStyle.textStyle,
+                  focusedBorder: CustomStyle.focusBorder,
+                  enabledBorder: CustomStyle.focusErrorBorder,
+                  focusedErrorBorder: CustomStyle.focusErrorBorder,
+                  errorBorder: CustomStyle.focusErrorBorder,
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintStyle: CustomStyle.textStyle,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _toggleVisibility = !_toggleVisibility;
+                      });
+                    },
+                    icon: _toggleVisibility
+                        ? Icon(
+                            Icons.visibility_off,
+                            color: CustomColor.greyColor,
+                          )
+                        : Icon(
+                            Icons.visibility,
+                            color: CustomColor.greyColor,
+                          ),
+                  ),
+                ),
+                obscureText: _toggleVisibility,
+              ),
+            ),
+            SizedBox(height: Dimensions.heightSize),
+          ],
+        ),
+      ),
+    );
   }
 
   buttonWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(
-          left: Dimensions.marginSize, right: Dimensions.marginSize),
+        left: Dimensions.marginSize,
+        right: Dimensions.marginSize,
+      ),
       child: GestureDetector(
         child: Container(
           height: 50.0,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: CustomColor.primaryColor,
-              borderRadius:
-                  BorderRadius.all(Radius.circular(Dimensions.radius))),
+            color: CustomColor.primaryColor,
+            borderRadius: BorderRadius.all(
+              Radius.circular(Dimensions.radius),
+            ),
+          ),
           child: Center(
             child: Text(
               Strings.changePassword.toUpperCase(),
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Dimensions.largeTextSize,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: Dimensions.largeTextSize,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
         onTap: () {
-          if (formKey.currentState.validate()) {
+          if (formKey.currentState!.validate()) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => DashboardScreen(),

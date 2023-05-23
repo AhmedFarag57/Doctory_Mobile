@@ -35,6 +35,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               BackWidget(
                 name: Strings.changePassword,
                 active: true,  
+                onTap: null,
               ),
               bodyWidget(context)
             ],
@@ -93,8 +94,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: oldPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String? value){
+                    if(value!.isEmpty){
                       return Strings.pleaseFillOutTheField;
                     }else{
                       return null;
@@ -139,8 +140,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: newPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String? value){
+                    if(value!.isEmpty){
                       return Strings.pleaseFillOutTheField;
                     }else{
                       return null;
@@ -185,8 +186,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: TextFormField(
                   style: CustomStyle.textStyle,
                   controller: confirmPasswordController,
-                  validator: (String value){
-                    if(value.isEmpty){
+                  validator: (String? value){
+                    if(value!.isEmpty){
                       return Strings.pleaseFillOutTheField;
                     }else{
                       return null;

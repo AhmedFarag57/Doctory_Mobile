@@ -24,7 +24,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
   TextEditingController nameController = TextEditingController();
 
   List<String> dayList = [];
-  String selectedDay;
+  String? selectedDay;
 
   List<String> startTimeList = [
     '01:00 AM',
@@ -52,7 +52,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
     '11:00 PM',
     '12:00 PM',
   ];
-  String selectedStartTime;
+  String? selectedStartTime;
 
   List<String> endTimeList = [
     '01:00 AM',
@@ -80,7 +80,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
     '11:00 PM',
     '12:00 PM',
   ];
-  String selectedEndTime;
+  String? selectedEndTime;
 
   List<String> selectedStartTimes = [];
   List<String> selectedEndTimes = [];
@@ -110,7 +110,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      model = jsonDecode(localStorage.getString('model'));
+      model = jsonDecode(localStorage.getString('model')!);
       setState(() {
         _isLoading = false;
       });
@@ -170,6 +170,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
               BackWidget(
                 name: Strings.setSessionTime,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
               buttonWidget(context)
@@ -303,7 +304,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
       child: DropdownButton(
         underline: Container(),
         hint: Text(
-          selectedDay,
+          selectedDay!,
           style: CustomStyle.textStyle,
         ),
         value: selectedDay,
@@ -332,7 +333,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
         menuMaxHeight: 256.0,
         underline: Container(),
         hint: Text(
-          selectedStartTime,
+          selectedStartTime!,
           style: CustomStyle.textStyle,
         ),
         value: selectedStartTime,
@@ -363,7 +364,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
           menuMaxHeight: 256.0,
           underline: Container(),
           hint: Text(
-            selectedEndTime,
+            selectedEndTime!,
             style: CustomStyle.textStyle,
           ),
           value: selectedEndTime,
@@ -408,9 +409,9 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
         onTap: () {
           setState(() {
             if (numberOfDayCount < 3) {
-              selectedStartTimes.add(selectedStartTime);
-              selectedEndTimes.add(selectedEndTime);
-              selectedDate.add(selectedDay);
+              selectedStartTimes.add(selectedStartTime!);
+              selectedEndTimes.add(selectedEndTime!);
+              selectedDate.add(selectedDay!);
               numberOfTimes++;
               numberOfDayCount++;
             }
@@ -707,6 +708,7 @@ class _SetVisitingTimeScreenState extends State<SetVisitingTimeScreen> {
             title: "Error",
             subTitle: message,
             action: false,
+            moved: SetVisitingTimeScreen(),
             img: 'error.png',
             buttonName: Strings.ok,
           ),

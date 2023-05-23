@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/widgets/back_widget.dart';
-
 import '../add_new_card_screen.dart';
 
 class MyCardScreen extends StatefulWidget {

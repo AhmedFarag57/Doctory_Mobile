@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/category.dart';
 import 'package:teledoc/data/doctor.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/colors.dart';
 import 'package:teledoc/widgets/back_widget.dart';
@@ -10,10 +9,12 @@ import 'package:teledoc/widgets/my_rating.dart';
 class SpecialistDetailsScreen extends StatefulWidget {
   final Category specialist;
 
-  const SpecialistDetailsScreen({Key key, this.specialist}) : super(key: key);
+  const SpecialistDetailsScreen({Key? key, required this.specialist})
+      : super(key: key);
 
   @override
-  _SpecialistDetailsScreenState createState() => _SpecialistDetailsScreenState();
+  _SpecialistDetailsScreenState createState() =>
+      _SpecialistDetailsScreenState();
 }
 
 class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
@@ -27,7 +28,9 @@ class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              BackWidget(name: widget.specialist.name,),
+              BackWidget(
+                name: widget.specialist.name,
+              ),
               bodyWidget(context),
             ],
           ),
@@ -51,8 +54,7 @@ class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(Dimensions.radius * 2),
               topRight: Radius.circular(Dimensions.radius * 2),
-            )
-        ),
+            )),
         child: ListView.builder(
           itemCount: DoctorList.list().length,
           shrinkWrap: true,
@@ -63,8 +65,7 @@ class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
                   left: Dimensions.widthSize * 2,
                   right: Dimensions.widthSize,
                   top: 10,
-                  bottom: 10
-              ),
+                  bottom: 10),
               child: Container(
                 width: 150,
                 decoration: BoxDecoration(
@@ -85,10 +86,10 @@ class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Image.asset(
-                          doctor.image
+                      Image.asset(doctor.image),
+                      SizedBox(
+                        width: Dimensions.widthSize,
                       ),
-                      SizedBox(width: Dimensions.widthSize,),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -97,30 +98,35 @@ class _SpecialistDetailsScreenState extends State<SpecialistDetailsScreen> {
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: Dimensions.defaultTextSize,
-                                fontWeight: FontWeight.bold
-                            ),
+                                fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: Dimensions.heightSize * 0.5,),
+                          SizedBox(
+                            height: Dimensions.heightSize * 0.5,
+                          ),
                           Text(
                             doctor.specialist,
                             style: TextStyle(
                                 color: Colors.blueAccent,
-                                fontSize: Dimensions.smallTextSize
-                            ),
+                                fontSize: Dimensions.smallTextSize),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: Dimensions.heightSize * 0.5,),
+                          SizedBox(
+                            height: Dimensions.heightSize * 0.5,
+                          ),
                           Text(
                             doctor.available,
                             style: TextStyle(
                                 color: Colors.black.withOpacity(0.6),
-                                fontSize: Dimensions.smallTextSize
-                            ),
+                                fontSize: Dimensions.smallTextSize),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: Dimensions.heightSize * 0.5,),
-                          MyRating(rating: doctor.rating,),
+                          SizedBox(
+                            height: Dimensions.heightSize * 0.5,
+                          ),
+                          MyRating(
+                            rating: doctor.rating,
+                          ),
                         ],
                       )
                     ],

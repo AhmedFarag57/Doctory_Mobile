@@ -24,6 +24,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
               BackWidget(
                 name: Strings.helpSupport,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
             ],

@@ -188,4 +188,10 @@ class Strings {
   static String typeSomething = 'type something';
   static String typeMessage = 'type message';
 
+  // Video call screen
+  static String videoWithDoctor = 'Video With Doctor';
+
+  // Audio Call screen
+  static String audioWithDoctor = 'Audio With Doctor';
+
 }

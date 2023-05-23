@@ -12,7 +12,7 @@ import 'package:teledoc/widgets/back_widget.dart';
 class MyAppointmentScreen extends StatefulWidget {
   final int id;
 
-  const MyAppointmentScreen({Key key, this.id}) : super(key: key);
+  const MyAppointmentScreen({Key? key, required this.id}) : super(key: key);
 
   @override
   _MyAppointmentScreenState createState() => _MyAppointmentScreenState();

@@ -145,8 +145,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
                       style: CustomStyle.textStyle,
                       controller: searchController,
                       keyboardType: TextInputType.text,
-                      validator: (String value) {
-                        if (value.isEmpty) {
+                      validator: (String? value) {
+                        if (value!.isEmpty) {
                           return Strings.pleaseFillOutTheField;
                         } else {
                           return null;

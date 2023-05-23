@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:teledoc/screens/video_call_screen.dart';
+import 'package:teledoc/screens/videocall_screen.dart';
 import 'package:teledoc/widgets/back_widget.dart';
 import 'package:pusher_client/pusher_client.dart';
 import 'package:teledoc/utils/laravel_echo/laravel_echo.dart';
@@ -58,7 +60,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.getString('user'));
+      user = jsonDecode(localStorage.get('user').toString());
       userId = user['id'];
 
       /**
@@ -112,10 +114,10 @@ class _MessagingScreenState extends State<MessagingScreen> {
   }
 
   void _listenChatChannel() {
-    LaravelEcho.instance.private('chat.${chatId}').listen('.message.sent', (e) {
+    LaravelEcho.instance.private('chat.$chatId').listen('.message.sent', (e) {
       if (e is PusherEvent) {
         if (e.data != null) {
-          _handleNewMessage(jsonDecode(e.data));
+          _handleNewMessage(jsonDecode(e.data!));
         }
       }
     }).error((err) {
@@ -125,7 +127,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
 
   void _leaveChatChannel() {
     try {
-      LaravelEcho.instance.leave('chat.${chatId}');
+      LaravelEcho.instance.leave('chat.$chatId');
     } catch (err) {
       print(err);
     }
@@ -176,11 +178,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(Dimensions.radius * 2),
-              topRight: Radius.circular(Dimensions.radius * 2),
-            )),
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radius * 2),
+            topRight: Radius.circular(Dimensions.radius * 2),
+          ),
+        ),
         child: ListView(
           //physics: NeverScrollableScrollPhysics(),
           children: [
@@ -204,6 +207,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Icon(
                         Icons.call,
+                        color: Colors.white,
                       ),
                     ),
                     onTap: () {
@@ -228,10 +232,26 @@ class _MessagingScreenState extends State<MessagingScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Icon(
                         Icons.video_call,
+                        color: Colors.white,
                       ),
                     ),
                     onTap: () {
-                      print('Video');
+                      /*
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => VideocallScreen(
+                            callId: chatId,
+                          ),
+                        ),
+                      );
+                      */
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => VideoCallTestScreen(
+                            callId: chatId,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -463,8 +483,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           style: CustomStyle.textStyle,
                           controller: messageController,
                           keyboardType: TextInputType.name,
-                          validator: (String value) {
-                            if (value.isEmpty) {
+                          validator: (value) {
+                            if (value!.isEmpty) {
                               return Strings.typeSomething;
                             } else {
                               return null;
@@ -504,7 +524,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                         size: 18,
                       ),
                 onPressed: () async {
-                  if (formKey.currentState.validate()) {
+                  if (formKey.currentState!.validate()) {
                     if (!_isSending) {
                       _sendMessageRequest();
                     }

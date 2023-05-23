@@ -10,13 +10,13 @@ class DoctorDetailsScreen extends StatefulWidget {
   final String image, name, rating, id, sessionPrice, phone;
 
   const DoctorDetailsScreen({
-    Key key,
-    this.image,
-    this.name,
-    this.sessionPrice,
-    this.rating,
-    this.id,
-    this.phone,
+    Key? key,
+    required this.image,
+    required this.name,
+    required this.sessionPrice,
+    required this.rating,
+    required this.id,
+    required this.phone,
   }) : super(key: key);
 
   @override

@@ -6,7 +6,7 @@ import 'package:doctor/utils/dimensions.dart';
 class FilterChipWidget extends StatefulWidget {
   final String chipName;
 
-  FilterChipWidget({Key key, this.chipName}) : super(key: key);
+  FilterChipWidget({Key? key, required this.chipName}) : super(key: key);
 
   @override
   _FilterChipWidgetState createState() => _FilterChipWidgetState();

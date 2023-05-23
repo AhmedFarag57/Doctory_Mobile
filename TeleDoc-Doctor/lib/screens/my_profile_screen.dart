@@ -12,7 +12,7 @@ import 'package:doctor/utils/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:smart_select/smart_select.dart';
+//import 'package:smart_select/smart_select.dart';
 
 class MyProfileScreen extends StatefulWidget {
   @override
@@ -26,10 +26,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
   bool _isLoading = true;
 
-  File _image;
-  File file;
+  File? _image;
+  File? file;
 
   List<int> specialistValue = [1, 2];
+  /*
   List<S2Choice<int>> specialistItemList = [
     S2Choice<int>(value: 1, title: 'Medicine Specialist'),
     S2Choice<int>(value: 2, title: 'Liver Specialist'),
@@ -42,8 +43,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     S2Choice<int>(value: 9, title: 'Cardiologists'),
     S2Choice<int>(value: 10, title: 'Gynecologists'),
   ];
-
+  */
   List<int> hospitalValue = [4, 2];
+  /*
   List<S2Choice<int>> hospitalItemList = [
     S2Choice<int>(value: 1, title: 'Modern Hospital'),
     S2Choice<int>(value: 2, title: 'Family Support Hospital'),
@@ -56,7 +58,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     S2Choice<int>(value: 9, title: 'Green Life Hospital'),
     S2Choice<int>(value: 10, title: 'Premero Hospital'),
   ];
-
+  */
   @override
   void initState() {
     super.initState();
@@ -66,8 +68,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      user = jsonDecode(localStorage.getString('user'));
-      model = jsonDecode(localStorage.getString('model'));
+      user = jsonDecode(localStorage.getString('user')!);
+      model = jsonDecode(localStorage.getString('model')!);
 
       var response = await CallApi().getDataWithToken(
         '/doctors/' + model['id'].toString() + '/times',
@@ -100,6 +102,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               BackWidget(
                 name: Strings.myProfile,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
             ],
@@ -212,7 +215,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     _image == null
                         ? Image.asset('assets/images/profile.png')
                         : Image.file(
-                            _image,
+                            _image!,
                             fit: BoxFit.cover,
                           ),
                     Positioned(
@@ -304,7 +307,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       ),
     );
   }
-
+  /*
   specialistWidget(BuildContext context) {
     return SmartSelect<int>.multiple(
       title: Strings.specialist,
@@ -313,6 +316,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       onChange: (state) => setState(() => specialistValue = state.value),
     );
   }
+  */
 
   medicalDegreeWidget(BuildContext context) {
     return Padding(
@@ -351,7 +355,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       ),
     );
   }
-
+  /*
   hospitalWidget(BuildContext context) {
     return SmartSelect<int>.multiple(
       title: Strings.hospital,
@@ -360,6 +364,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       onChange: (state) => setState(() => specialistValue = state.value),
     );
   }
+ */
 
   visitingTimeWidget(BuildContext context) {
     return Padding(

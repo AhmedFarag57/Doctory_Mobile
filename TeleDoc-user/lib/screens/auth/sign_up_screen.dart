@@ -6,7 +6,7 @@ import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/custom_style.dart';
 import 'package:teledoc/widgets/back_widget.dart';
-import 'package:teledoc/screens/auth/otp/email_verification_screen.dart';
+// import 'package:teledoc/screens/auth/otp/email_verification_screen.dart';
 import 'package:teledoc/screens/auth/sign_in_screen.dart';
 import 'package:teledoc/dialog/loading_dialog.dart';
 import 'package:teledoc/dialog/message_dialog.dart';
@@ -140,169 +140,178 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   inputFieldWidget(BuildContext context) {
     return Form(
-        key: formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _titleData(Strings.name),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: nameController,
-                keyboardType: TextInputType.name,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: 'Enter your fake name',
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
+      key: formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _titleData(Strings.name),
+          Material(
+            elevation: 10.0,
+            shadowColor: CustomColor.secondaryColor,
+            borderRadius: BorderRadius.circular(Dimensions.radius),
+            child: TextFormField(
+              style: CustomStyle.textStyle,
+              controller: nameController,
+              keyboardType: TextInputType.name,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return Strings.pleaseFillOutTheField;
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: 'Enter your fake name',
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 10.0,
                 ),
+                labelStyle: CustomStyle.textStyle,
+                filled: true,
+                fillColor: Colors.white,
+                hintStyle: CustomStyle.textStyle,
+                focusedBorder: CustomStyle.focusBorder,
+                enabledBorder: CustomStyle.focusErrorBorder,
+                focusedErrorBorder: CustomStyle.focusErrorBorder,
+                errorBorder: CustomStyle.focusErrorBorder,
               ),
             ),
-            _titleData(Strings.email),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: Strings.demoEmail,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
+          ),
+          _titleData(Strings.email),
+          Material(
+            elevation: 10.0,
+            shadowColor: CustomColor.secondaryColor,
+            borderRadius: BorderRadius.circular(Dimensions.radius),
+            child: TextFormField(
+              style: CustomStyle.textStyle,
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return Strings.pleaseFillOutTheField;
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: Strings.demoEmail,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 10.0,
                 ),
+                labelStyle: CustomStyle.textStyle,
+                filled: true,
+                fillColor: Colors.white,
+                hintStyle: CustomStyle.textStyle,
+                focusedBorder: CustomStyle.focusBorder,
+                enabledBorder: CustomStyle.focusErrorBorder,
+                focusedErrorBorder: CustomStyle.focusErrorBorder,
+                errorBorder: CustomStyle.focusErrorBorder,
               ),
             ),
-            _titleData(Strings.password),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: passwordController,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: Strings.typePassword,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintStyle: CustomStyle.textStyle,
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _toggleVisibility = !_toggleVisibility;
-                      });
-                    },
-                    icon: _toggleVisibility
-                        ? Icon(
-                            Icons.visibility_off,
-                            color: CustomColor.greyColor,
-                          )
-                        : Icon(
-                            Icons.visibility,
-                            color: CustomColor.greyColor,
-                          ),
-                  ),
+          ),
+          _titleData(Strings.password),
+          Material(
+            elevation: 10.0,
+            shadowColor: CustomColor.secondaryColor,
+            borderRadius: BorderRadius.circular(Dimensions.radius),
+            child: TextFormField(
+              style: CustomStyle.textStyle,
+              controller: passwordController,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return Strings.pleaseFillOutTheField;
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: Strings.typePassword,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 10.0,
                 ),
-                obscureText: _toggleVisibility,
-              ),
-            ),
-            _titleData(Strings.confirmPassword),
-            Material(
-              elevation: 10.0,
-              shadowColor: CustomColor.secondaryColor,
-              borderRadius: BorderRadius.circular(Dimensions.radius),
-              child: TextFormField(
-                style: CustomStyle.textStyle,
-                controller: confirmPasswordController,
-                validator: (String value) {
-                  if (value.isEmpty) {
-                    return Strings.pleaseFillOutTheField;
-                  } else {
-                    return null;
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText: Strings.typePassword,
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                  labelStyle: CustomStyle.textStyle,
-                  focusedBorder: CustomStyle.focusBorder,
-                  enabledBorder: CustomStyle.focusErrorBorder,
-                  focusedErrorBorder: CustomStyle.focusErrorBorder,
-                  errorBorder: CustomStyle.focusErrorBorder,
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _toggleVisibility = !_toggleVisibility;
-                      });
-                    },
-                    icon: _toggleVisibility
-                        ? Icon(
-                            Icons.visibility_off,
-                            color: CustomColor.greyColor,
-                          )
-                        : Icon(
-                            Icons.visibility,
-                            color: CustomColor.greyColor,
-                          ),
-                  ),
-                  hintStyle: CustomStyle.textStyle,
+                labelStyle: CustomStyle.textStyle,
+                focusedBorder: CustomStyle.focusBorder,
+                enabledBorder: CustomStyle.focusErrorBorder,
+                focusedErrorBorder: CustomStyle.focusErrorBorder,
+                errorBorder: CustomStyle.focusErrorBorder,
+                filled: true,
+                fillColor: Colors.white,
+                hintStyle: CustomStyle.textStyle,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _toggleVisibility = !_toggleVisibility;
+                    });
+                  },
+                  icon: _toggleVisibility
+                      ? Icon(
+                          Icons.visibility_off,
+                          color: CustomColor.greyColor,
+                        )
+                      : Icon(
+                          Icons.visibility,
+                          color: CustomColor.greyColor,
+                        ),
                 ),
-                obscureText: _toggleVisibility,
               ),
+              obscureText: _toggleVisibility,
             ),
-            SizedBox(height: Dimensions.heightSize),
-          ],
-        ));
+          ),
+          _titleData(Strings.confirmPassword),
+          Material(
+            elevation: 10.0,
+            shadowColor: CustomColor.secondaryColor,
+            borderRadius: BorderRadius.circular(Dimensions.radius),
+            child: TextFormField(
+              style: CustomStyle.textStyle,
+              controller: confirmPasswordController,
+              validator: (String? value) {
+                if (value!.isEmpty) {
+                  return Strings.pleaseFillOutTheField;
+                } else {
+                  return null;
+                }
+              },
+              decoration: InputDecoration(
+                hintText: Strings.typePassword,
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 10.0,
+                ),
+                labelStyle: CustomStyle.textStyle,
+                focusedBorder: CustomStyle.focusBorder,
+                enabledBorder: CustomStyle.focusErrorBorder,
+                focusedErrorBorder: CustomStyle.focusErrorBorder,
+                errorBorder: CustomStyle.focusErrorBorder,
+                filled: true,
+                fillColor: Colors.white,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _toggleVisibility = !_toggleVisibility;
+                    });
+                  },
+                  icon: _toggleVisibility
+                      ? Icon(
+                          Icons.visibility_off,
+                          color: CustomColor.greyColor,
+                        )
+                      : Icon(
+                          Icons.visibility,
+                          color: CustomColor.greyColor,
+                        ),
+                ),
+                hintStyle: CustomStyle.textStyle,
+              ),
+              obscureText: _toggleVisibility,
+            ),
+          ),
+          SizedBox(height: Dimensions.heightSize),
+        ],
+      ),
+    );
   }
 
   termsCheckBoxWidget(BuildContext context) {
@@ -334,10 +343,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       value: checkedValue,
       onChanged: (newValue) {
         setState(() {
-          checkedValue = newValue;
+          checkedValue = newValue!;
         });
       },
-      controlAffinity: ListTileControlAffinity.leading, //  <-- leading Checkbox
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 
@@ -347,20 +356,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         height: Dimensions.buttonHeight,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-            color: CustomColor.primaryColor,
-            borderRadius: BorderRadius.all(Radius.circular(Dimensions.radius))),
+          color: CustomColor.primaryColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(Dimensions.radius),
+          ),
+        ),
         child: Center(
           child: Text(
             Strings.signUp.toUpperCase(),
             style: TextStyle(
-                color: Colors.white,
-                fontSize: Dimensions.largeTextSize,
-                fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: Dimensions.largeTextSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
       onTap: () {
-        if (formKey.currentState.validate()) {
+        if (formKey.currentState!.validate()) {
           _signupRequest(context);
         }
       },
@@ -629,6 +642,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             title: "Error",
             subTitle: message,
             action: false,
+            moved: SignUpScreen(),
             img: 'error.png',
             buttonName: Strings.ok,
           ),

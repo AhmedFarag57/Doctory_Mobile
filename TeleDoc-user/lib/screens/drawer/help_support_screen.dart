@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:teledoc/utils/custom_style.dart';
-
 import 'package:teledoc/utils/dimensions.dart';
 import 'package:teledoc/utils/strings.dart';
 import 'package:teledoc/utils/colors.dart';

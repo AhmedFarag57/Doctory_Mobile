@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/top_doctor.dart';
 import 'package:teledoc/models/Doctor.dart';
@@ -106,3 +107,4 @@ class DoctorWidget extends StatelessWidget {
     );
   }
 }
+*/

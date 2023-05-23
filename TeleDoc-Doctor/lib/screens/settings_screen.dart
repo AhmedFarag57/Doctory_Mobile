@@ -24,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               BackWidget(
                 name: Strings.settings,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
             ],

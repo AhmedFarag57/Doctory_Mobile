@@ -4,7 +4,7 @@ import 'package:teledoc/utils/dimensions.dart';
 class HeaderWidget extends StatefulWidget {
   final String name;
 
-  const HeaderWidget({Key key, this.name}) : super(key: key);
+  const HeaderWidget({required Key key, required this.name}) : super(key: key);
 
   @override
   _HeaderWidgetState createState() => _HeaderWidgetState();
@@ -19,8 +19,8 @@ class _HeaderWidgetState extends State<HeaderWidget> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(Dimensions.radius * 2),
-            bottomRight: Radius.circular(Dimensions.radius * 2)
+          bottomLeft: Radius.circular(Dimensions.radius * 2),
+          bottomRight: Radius.circular(Dimensions.radius * 2),
         ),
         boxShadow: [
           BoxShadow(
@@ -34,9 +34,9 @@ class _HeaderWidgetState extends State<HeaderWidget> {
         child: Text(
           widget.name,
           style: TextStyle(
-              fontSize: Dimensions.extraLargeTextSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.black
+            fontSize: Dimensions.extraLargeTextSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
       ),

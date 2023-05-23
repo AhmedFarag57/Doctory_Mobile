@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:teledoc/data/top_doctor.dart';
 import 'package:teledoc/utils/dimensions.dart';
@@ -277,3 +278,4 @@ class _NearbyScreenState extends State<NearbyScreen> {
     );
   }
 }
+*/

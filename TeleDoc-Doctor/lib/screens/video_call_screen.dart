@@ -1,0 +1,206 @@
+import 'dart:convert';
+import 'package:doctor/utils/colors.dart';
+import 'package:doctor/utils/dimensions.dart';
+import 'package:doctor/utils/strings.dart';
+import 'package:doctor/widgets/back_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+
+class VideoCallTestScreen extends StatefulWidget {
+  final callId;
+  const VideoCallTestScreen({super.key, this.callId});
+
+  @override
+  State<VideoCallTestScreen> createState() => _VideoCallTestScreenState();
+}
+
+class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
+  var user;
+  bool _isLoading = true;
+  bool _isLoaded = false;
+
+  @override
+  void initState() {
+    _loadUserDataFromDevice();
+    super.initState();
+  }
+
+  Future _loadUserDataFromDevice() async {
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      user = jsonDecode(localStorage.getString('user')!);
+      setState(() {
+        _isLoaded = true;
+      });
+    } catch (e) {
+      // ...
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: CustomColor.secondaryColor,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              BackWidget(
+                name: Strings.videoWithDoctor,
+                active: true,
+              ),
+              bodyWidget(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget bodyWidget(BuildContext context) {
+    if (_isLoading) {
+      return Padding(
+        padding: const EdgeInsets.only(
+          top: 80,
+          left: Dimensions.marginSize,
+          right: Dimensions.marginSize,
+        ),
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(Dimensions.radius * 2),
+              topRight: Radius.circular(Dimensions.radius * 2),
+            ),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      );
+    } else {
+      if (_isLoaded) {
+        return Padding(
+          padding: const EdgeInsets.only(
+            top: 80,
+            left: Dimensions.marginSize,
+            right: Dimensions.marginSize,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(Dimensions.radius * 2),
+                topRight: Radius.circular(Dimensions.radius * 2),
+              ),
+            ),
+            child: _buildVideoCallWidget(),
+          ),
+        );
+      } else {
+        return Padding(
+          padding: const EdgeInsets.only(
+            top: 80,
+            left: Dimensions.marginSize,
+            right: Dimensions.marginSize,
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(Dimensions.radius * 2),
+                topRight: Radius.circular(Dimensions.radius * 2),
+              ),
+            ),
+            child: _buildErrorInLoadWidget(),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildVideoCallWidget() {
+    return ZegoUIKitPrebuiltCall(
+      appID: 1460279720,
+      appSign:
+          "f20a8f018d56d319f2955b3a72fe1f4396be452043cde05c1d1ddabecde2bd67",
+      callID: widget.callId.toString(),
+      config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+        ..onOnlySelfInRoom = (context) => Navigator.pop(context),
+      userID: user['id'].toString(),
+      userName: user['name'].toString(),
+    );
+  }
+
+  Widget _buildErrorInLoadWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Image.asset(
+            'assets/images/error.png',
+            height: 80,
+            width: 80,
+          ),
+          Text(
+            'Error in setup the video call',
+            style: TextStyle(
+              fontSize: Dimensions.largeTextSize,
+              color: CustomColor.primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            'You can try again by click the button below and join again.',
+            style: TextStyle(
+              fontSize: Dimensions.largeTextSize,
+              color: CustomColor.primaryColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          GestureDetector(
+            child: Container(
+              height: 60.0,
+              width: MediaQuery.of(context).size.width,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(Dimensions.radius),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  'back'.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: Dimensions.extraLargeTextSize,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}

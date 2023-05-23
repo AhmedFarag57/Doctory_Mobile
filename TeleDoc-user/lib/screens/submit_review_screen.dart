@@ -202,8 +202,8 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                         color: Colors.black
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(height: Dimensions.heightSize * 0.5),
+                  MyRating(rating: '5'),
                 ],
               ),
             ),
@@ -219,14 +219,14 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                         color: Colors.black
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(height: Dimensions.heightSize * 0.5),
+                  MyRating(rating: '5')
                 ],
               ),
             ),
           ],
         ),
-        SizedBox(height: Dimensions.heightSize * 2,),
+        SizedBox(height: Dimensions.heightSize * 2),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -242,8 +242,8 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                         color: Colors.black
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(height: Dimensions.heightSize * 0.5),
+                  MyRating(rating: '5')
                 ],
               ),
             ),
@@ -259,14 +259,14 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                         color: Colors.black
                     ),
                   ),
-                  SizedBox(height: Dimensions.heightSize * 0.5,),
-                  MyRating(rating: '5',)
+                  SizedBox(height: Dimensions.heightSize * 0.5),
+                  MyRating(rating: '5')
                 ],
               ),
             ),
           ],
         ),
-        SizedBox(height: Dimensions.heightSize * 3,),
+        SizedBox(height: Dimensions.heightSize * 3),
         Text(
           Strings.yourComment,
           style: TextStyle(
@@ -280,10 +280,11 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
           style: CustomStyle.textStyle,
           controller: commentController,
           keyboardType: TextInputType.name,
-          validator: (String value){
-            if(value.isEmpty){
+          validator: (value) {
+            if(value!.isEmpty){
               return Strings.pleaseFillOutTheField;
-            }else{
+            }
+            else {
               return null;
             }
           },

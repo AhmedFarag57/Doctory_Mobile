@@ -8,23 +8,22 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-  final List<Color> colors = <Color>[Colors.red, Colors.blue,Colors.amber];
+  final List<Color> colors = <Color>[Colors.red, Colors.blue, Colors.amber];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     Timer(
-        Duration(
-            seconds: 3
+      Duration(seconds: 3),
+      () => Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => OnBoardScreen(),
         ),
-            () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>
-            OnBoardScreen()
-        ))
+      ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

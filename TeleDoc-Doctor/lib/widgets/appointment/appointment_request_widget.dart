@@ -18,13 +18,13 @@ class AppointmentRequestWidget extends StatelessWidget {
     this.appointmentsRequest = appointmentsRequest;
   }
 
-  Future _acceptRejectRequest(appointment_id, action, context) async {
+  Future _acceptRejectRequest(appointmentId, action, context) async {
     // Show the loading dialog
     showLoadingDialog(context);
     try {
       var response;
       var data = {
-        'appointment_id': appointment_id,
+        'appointment_id': appointmentId,
         'action': action,
       };
       response = await CallApi().postDataWithToken(
@@ -43,7 +43,7 @@ class AppointmentRequestWidget extends StatelessWidget {
       // Pop the loading dialog
       Navigator.of(context).pop();
       // Show error message
-      showErrorDialog(context, e.message);
+      showErrorDialog(context, 'Error in send the action. please try again');
     }
   }
 
@@ -302,6 +302,7 @@ class AppointmentRequestWidget extends StatelessWidget {
           context: context,
           builder: (context) => MessageDialog(
             title: "Error",
+            moved: DashboardScreen(),
             subTitle: message,
             action: false,
             img: 'error.png',

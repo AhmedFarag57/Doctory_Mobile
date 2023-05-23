@@ -3,17 +3,17 @@ class EmergencyCategory {
   final String name;
   final String image;
 
-  const EmergencyCategory({this.id, this.name, this.image});
+  const EmergencyCategory(
+      {required this.id, required this.name, required this.image});
 }
 
 class EmergencyCategoryList {
   static List<EmergencyCategory> list() {
-    const data = <EmergencyCategory> [
+    const data = <EmergencyCategory>[
       EmergencyCategory(
           id: 1,
           name: 'Doctor',
-          image: 'assets/images/emergency_category/3.png'
-      ),
+          image: 'assets/images/emergency_category/3.png'),
       /*
       EmergencyCategory(
           id: 2,

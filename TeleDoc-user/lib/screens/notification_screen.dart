@@ -30,7 +30,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Future _loadData() async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      model = jsonDecode(localStorage.getString('model'));
+      model = jsonDecode(localStorage.get('model').toString());
 
       var response = await CallApi().getDataWithToken(
         '/patients/' + model['id'].toString() + '/notification',

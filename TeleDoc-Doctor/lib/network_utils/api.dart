@@ -3,14 +3,13 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CallApi {
-  // final String _url = 'https://doctory-test.000webhostapp.com/api';
-  final String _url = 'http://10.0.2.2:8080/Projects/Graduation_Project/Doctory/public/api';
+  final String _url = 'https://serenity-dev.com/api';
   //if you are using android studio emulator, change localhost to 10.0.2.2
   var token;
 
   _getToken() async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    token = jsonDecode(localStorage.getString('token'));
+    token = jsonDecode(localStorage.getString('token')!);
   }
 
   postDataWithToken(data, apiUrl) async {

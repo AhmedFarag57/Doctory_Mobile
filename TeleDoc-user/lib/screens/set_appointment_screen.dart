@@ -12,15 +12,15 @@ import 'package:teledoc/widgets/my_rating.dart';
 class SetAppointmentScreen extends StatefulWidget {
   final String id, name, image, sessionPrice, phone, rating;
 
-  const SetAppointmentScreen(
-      {Key key,
-      this.id,
-      this.name,
-      this.image,
-      this.phone,
-      this.rating,
-      this.sessionPrice})
-      : super(key: key);
+  const SetAppointmentScreen({
+    Key? key,
+    required this.id,
+    required this.name,
+    required this.image,
+    required this.phone,
+    required this.rating,
+    required this.sessionPrice,
+  }) : super(key: key);
 
   @override
   _SetAppointmentScreenState createState() => _SetAppointmentScreenState();
@@ -35,7 +35,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   String _timeIdSelected = '';
   String _timeFromSelected = '';
   String _timeToSelected = '';
-  String _dateSelected;
+  String _dateSelected = '';
 
   DateTime selectedDate = DateTime.now();
   String date = 'Select date';
@@ -340,7 +340,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    int _value1 = 1;
+    int? _value1 = 1;
     List<Widget>.generate(
       3,
       (int index) {
@@ -356,7 +356,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
       },
     ).toList();
 
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(1950, 1),
@@ -419,9 +419,9 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   Widget _buildChipWidget(id, timeFrom, timeTo) {
     return FilterChip(
       label: Text(
-        _getTimeFormated(timeFrom.toString())
-        +' - '+
-        _getTimeFormated(timeTo.toString()),
+        _getTimeFormated(timeFrom.toString()) +
+            ' - ' +
+            _getTimeFormated(timeTo.toString()),
       ),
       labelStyle: TextStyle(
         color: CustomColor.greyColor,
@@ -466,7 +466,7 @@ class _SetAppointmentScreenState extends State<SetAppointmentScreen> {
   }
 
   _getTimeFormated(time) {
-    DateTime tmp = DateTime.parse('2023-04-26 '+ time);
+    DateTime tmp = DateTime.parse('2023-04-26 ' + time);
     String formattedDate = DateFormat('hh:mm a').format(tmp);
     return formattedDate;
   }

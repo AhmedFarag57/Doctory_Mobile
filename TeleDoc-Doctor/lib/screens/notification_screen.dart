@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/utils/colors.dart';
-import 'package:doctor/data/notifications.dart';
 import 'package:doctor/widgets/back_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class NotificationScreen extends StatefulWidget {
   @override
@@ -18,7 +17,6 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   bool _isLoading = true;
 
-  var model;
   var notifications;
 
   @override
@@ -29,12 +27,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future _loadData() async {
     try {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      model = jsonDecode(localStorage.getString('model'));
-
-      var response = await CallApi().getDataWithToken(
-        '/doctors/' + model['id'].toString() + '/notification',
-      );
+      var response = await CallApi().getDataWithToken('/notifications');
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
         notifications = body['data'];
@@ -63,6 +56,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               BackWidget(
                 name: Strings.notification,
                 active: true,
+                onTap: null,
               ),
               bodyWidget(context),
             ],
@@ -111,9 +105,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ),
           child: ListView.builder(
-            itemCount: NotificationList.list().length,
+            itemCount: notifications.length,
             itemBuilder: (context, index) {
-              Notifications notification = NotificationList.list()[index];
               return Padding(
                 padding: const EdgeInsets.only(
                   top: Dimensions.heightSize,
@@ -153,7 +146,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 children: [
                                   Text(
                                     notifications[index]['title'],
-                                    //notification.title,
                                     style: TextStyle(
                                       fontSize: Dimensions.largeTextSize,
                                       color: Colors.black,
@@ -165,8 +157,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 height: Dimensions.heightSize * 0.5,
                               ),
                               Text(
-                                notifications[index]['subTitle'],
-                                //notification.subTitle,
+                                notifications[index]['description'],
                                 style: TextStyle(
                                   fontSize: Dimensions.smallTextSize,
                                   color: Colors.grey,
@@ -181,8 +172,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         Expanded(
                           flex: 1,
                           child: Text(
-                            notifications[index]['time'],
-                            //notification.time,
+                            _getTimeFormated(
+                                notifications[index]['created_at']),
                             style: TextStyle(color: CustomColor.greyColor),
                             textAlign: TextAlign.end,
                           ),
@@ -213,5 +204,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         )) ??
         false;
+  }
+
+  _getTimeFormated(time) {
+    DateTime tmp = DateTime.parse(time);
+    String formattedDate = DateFormat('hh:mm a').format(tmp);
+    return formattedDate;
   }
 }

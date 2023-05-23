@@ -1,13 +1,18 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:doctor/dialog/message_dialog.dart';
 import 'package:doctor/network_utils/api.dart';
 import 'package:doctor/screens/auth/sign_in_screen.dart';
 import 'package:doctor/screens/loading/loading_screen.dart';
+import 'package:doctor/screens/specific_notification_screen.dart';
 import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
 import 'package:doctor/utils/strings.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:doctor/screens/notification_screen.dart';
 
@@ -19,6 +24,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   bool _isLoading = true;
 
@@ -26,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   var totalPatients = 0;
   var recentlyAppointed;
   var notificationCount = 0;
+  var user;
 
   @override
   void initState() {
@@ -33,10 +41,159 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadData();
   }
 
-  Future _loadData() async {
+  void _requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      if (kDebugMode) {
+        print('User granted permission');
+      }
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      if (kDebugMode) {
+        print('User granted provisional permission');
+      }
+    } else {
+      if (kDebugMode) {
+        print('User declined or has not accepted permisson');
+      }
+    }
+  }
+
+  Future<void> _getToken() async {
+    await FirebaseMessaging.instance.getToken().then(
+      (token) {
+        setState(() {
+          if (kDebugMode) {
+            print('The firebase token: $token');
+          }
+        });
+        _saveFirebaseToken(token!);
+        _updateFirebaseToken(token);
+      },
+    );
+  }
+
+  void _saveFirebaseToken(String token) async {
+    await FirebaseFirestore.instance
+        .collection("UserTokens")
+        .doc("User${user['id']}")
+        .set({
+      'token': token,
+    });
+  }
+
+  void _initInfo() {
+    var andriodInitialize =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    var iosInitialize = const IOSInitializationSettings();
+
+    var initializationSettings = InitializationSettings(
+      android: andriodInitialize,
+      iOS: iosInitialize,
+    );
+
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onSelectNotification: (String? payload) async {
+        try {
+          if (payload != null && payload.isNotEmpty) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: ((context) {
+                  return SpecificNotificationScreen(info: payload.toString());
+                }),
+              ),
+            );
+          }
+        } catch (e) {
+          // ..
+        }
+        return;
+      },
+    );
+
+    FirebaseMessaging.onMessage.listen(
+      (RemoteMessage message) async {
+        BigTextStyleInformation bigTextStyleInformation =
+            BigTextStyleInformation(
+          message.notification!.body.toString(),
+          htmlFormatBigText: true,
+          contentTitle: message.notification!.title.toString(),
+          htmlFormatContentTitle: true,
+        );
+
+        AndroidNotificationDetails androidNotificationDetails =
+            AndroidNotificationDetails(
+          'serenity',
+          'serenity',
+          importance: Importance.high,
+          styleInformation: bigTextStyleInformation,
+          priority: Priority.high,
+          playSound: true,
+          sound: const RawResourceAndroidNotificationSound('notification'),
+        );
+
+        NotificationDetails platformChannel = NotificationDetails(
+          android: androidNotificationDetails,
+          iOS: const IOSNotificationDetails(),
+        );
+
+        await flutterLocalNotificationsPlugin.show(
+          0,
+          message.notification!.title,
+          message.notification!.body,
+          platformChannel,
+          payload: message.data['body'],
+        );
+      },
+    );
+  }
+
+  void _updateFirebaseToken(String token) async {
     try {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      var model = jsonDecode(localStorage.getString('model'));
+
+      var data = {
+        'firebaseToken': token,
+      };
+
+      var response = await CallApi().postDataWithToken(
+        data,
+        '/firebase/token/update',
+      );
+
+      var body = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        localStorage.setString('user', json.encode(body['data']));
+      }
+    } catch (e) {}
+  }
+
+  Future<void> _loadData() async {
+    try {
+      _requestPermission();
+      await _getToken();
+      _initInfo();
+    } catch (e) {
+      // ..
+    }
+
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var model = jsonDecode(localStorage.getString('model')!);
+      user = jsonDecode(localStorage.getString('user')!);
       var id = model['id'];
       var response;
       var body;
@@ -536,7 +693,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       // Show the error message
-      showErrorDialog(context, e.message);
+      showErrorDialog(context, 'Error in logout. please try again');
     }
   }
 
@@ -561,6 +718,7 @@ class _HomeScreenState extends State<HomeScreen> {
             action: false,
             img: 'error.png',
             buttonName: Strings.ok,
+            moved: HomeScreen(),
           ),
         )) ??
         false;
