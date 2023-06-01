@@ -131,7 +131,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
   }
 
   void _handleNewMessage(var data) {
-    if (data['user_id'].toString() != userId.toString()) {
+    if (data['message']['user_id'].toString() != userId.toString()) {
       setState(() {
         messages.insert(0, data['message']);
       });
@@ -498,24 +498,24 @@ class _MessagingScreenState extends State<MessagingScreen> {
                   ],
                 ),
               ),
-              IconButton(
-                icon: _isSending
-                    ? const CircularProgressIndicator(
-                        color: Colors.blue,
-                        strokeWidth: 3,
-                      )
-                    : Icon(
-                        Icons.send,
-                        color: CustomColor.primaryColor,
-                        size: 18,
-                      ),
-                onPressed: () {
+              GestureDetector(
+                onTap: () async {
                   if (formKey.currentState!.validate()) {
                     if (!_isSending) {
                       _sendMessageRequest();
                     }
                   }
                 },
+                child: _isSending
+                    ? const CircularProgressIndicator(
+                        color: Colors.blue,
+                        strokeWidth: 3,
+                      )
+                    : const Icon(
+                        Icons.send,
+                        color: Colors.blue,
+                        size: 21.0,
+                      ),
               ),
             ],
           ),

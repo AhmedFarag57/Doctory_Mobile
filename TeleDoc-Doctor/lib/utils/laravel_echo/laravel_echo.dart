@@ -8,14 +8,14 @@ class LaravelEcho {
 
   LaravelEcho._({
     required this.token,
-  }){
+  }) {
     _echo = createLaravelEcho(token);
   }
 
   factory LaravelEcho.init({
     String? token,
-  }){
-    if(_singleton == null || token != _singleton?.token){
+  }) {
+    if (_singleton == null || token != _singleton?.token) {
       _singleton = LaravelEcho._(token: token!);
     }
 
@@ -25,16 +25,15 @@ class LaravelEcho {
   static Echo get instance => _echo!;
 
   static String get socketId => _echo!.socketId() ?? "11111.11111111";
-
 }
-
 
 class PusherConfig {
   static const appId = "1506178";
   static const key = "a70c1892eb4982269060";
   static const secret = "c6e260b35815cca97027";
   static const cluster = "eu";
-  static const hostEndPoint = "https://serenity-dev.com";
+  //static const hostEndPoint = "https://serenity-dev.com";
+  static const hostEndPoint = "https://049b-154-177-59-149.ngrok-free.app";
   static const hostAuthEndPoint = "$hostEndPoint/api/broadcasting/auth";
   static const port = 6001;
 }

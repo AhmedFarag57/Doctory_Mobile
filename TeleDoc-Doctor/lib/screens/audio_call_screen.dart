@@ -140,9 +140,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
 
   Widget _buildAudioCallWidget() {
     return ZegoUIKitPrebuiltCall(
-      appID: 1460279720,
+      appID: 678472265,
       appSign:
-          "f20a8f018d56d319f2955b3a72fe1f4396be452043cde05c1d1ddabecde2bd67",
+          "d4db5a2435abf583fae61036965aa2b9fe7b060ea065017cbd4d940a5d8fb28d",
       callID: widget.callId.toString(),
       config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall()
         ..onOnlySelfInRoom = (context) => Navigator.pop(context),

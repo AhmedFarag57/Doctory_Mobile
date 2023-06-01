@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:doctor/utils/colors.dart';
 import 'package:doctor/utils/dimensions.dart';
+import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 import 'package:doctor/utils/strings.dart';
 import 'package:doctor/widgets/back_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:pusher_client/pusher_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
@@ -17,13 +20,49 @@ class VideoCallTestScreen extends StatefulWidget {
 
 class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
   var user;
+
   bool _isLoading = true;
   bool _isLoaded = false;
+  bool _isBlurred = true;
 
   @override
   void initState() {
     _loadUserDataFromDevice();
+    _listenVideoChannel();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _listenVideoChannel() {
+    LaravelEcho.instance.private('video.${widget.callId}').listen('.video.blur',
+        (e) {
+      print(e);
+      if (e is PusherEvent) {
+        if (e.data != null) {
+          _handleNewEvent(jsonDecode(e.data!));
+        }
+      }
+    }).error((err) {
+      // ...
+    });
+  }
+
+  void _handleNewEvent(var data) {
+    setState(() {
+      _isBlurred = data['blurred'];
+    });
+  }
+
+  void _leaveVideoChannel() {
+    try {
+      LaravelEcho.instance.leave('video.${widget.callId}');
+    } catch (err) {
+      print(err);
+    }
   }
 
   Future _loadUserDataFromDevice() async {
@@ -55,6 +94,9 @@ class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
               BackWidget(
                 name: Strings.videoWithDoctor,
                 active: true,
+                onTap: () {
+                  _leaveVideoChannel();
+                },
               ),
               bodyWidget(context),
             ],
@@ -107,7 +149,12 @@ class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
                 topRight: Radius.circular(Dimensions.radius * 2),
               ),
             ),
-            child: _buildVideoCallWidget(),
+            child: Stack(
+              children: [
+                _buildVideoCallWidget(),
+                _isBlurred ? _buildBlurOverlay() : SizedBox()
+              ],
+            ),
           ),
         );
       } else {
@@ -136,9 +183,9 @@ class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
 
   Widget _buildVideoCallWidget() {
     return ZegoUIKitPrebuiltCall(
-      appID: 1460279720,
+      appID: 678472265,
       appSign:
-          "f20a8f018d56d319f2955b3a72fe1f4396be452043cde05c1d1ddabecde2bd67",
+          "d4db5a2435abf583fae61036965aa2b9fe7b060ea065017cbd4d940a5d8fb28d",
       callID: widget.callId.toString(),
       config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
         ..onOnlySelfInRoom = (context) => Navigator.pop(context),
@@ -200,6 +247,18 @@ class _VideoCallTestScreenState extends State<VideoCallTestScreen> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBlurOverlay() {
+    return Positioned.fill(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 25,
+          sigmaY: 25,
+        ),
+        child: Container(),
       ),
     );
   }

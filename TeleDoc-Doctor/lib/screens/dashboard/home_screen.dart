@@ -4,7 +4,10 @@ import 'package:doctor/dialog/message_dialog.dart';
 import 'package:doctor/network_utils/api.dart';
 import 'package:doctor/screens/auth/sign_in_screen.dart';
 import 'package:doctor/screens/loading/loading_screen.dart';
+import 'package:doctor/screens/messaging_screen.dart';
 import 'package:doctor/screens/specific_notification_screen.dart';
+import 'package:doctor/screens/video_call_screen.dart';
+import 'package:doctor/screens/videocall_screen.dart';
 import 'package:doctor/utils/laravel_echo/laravel_echo.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -525,7 +528,6 @@ class _HomeScreenState extends State<HomeScreen> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                //Recent recent = RecentList.list()[index];
                 return Padding(
                   padding: const EdgeInsets.only(
                       left: Dimensions.widthSize * 2,
@@ -609,49 +611,72 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Row(
                                   children: [
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/message.png'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // ..
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            color: CustomColor.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(15)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                              'assets/images/message.png'),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
                                       width: Dimensions.widthSize * 0.5,
                                     ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/call.png'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // ..
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            color: CustomColor.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(15)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                              'assets/images/call.png'),
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
                                       width: Dimensions.widthSize * 0.5,
                                     ),
-                                    Container(
-                                      height: 30,
-                                      width: 30,
-                                      decoration: BoxDecoration(
-                                          color: CustomColor.primaryColor,
-                                          borderRadius:
-                                              BorderRadius.circular(15)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Image.asset(
-                                            'assets/images/video.png'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return VideoCallTestScreen(
+                                                callId: recentlyAppointed[index]['id'],
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 30,
+                                        decoration: BoxDecoration(
+                                            color: CustomColor.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(15)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.asset(
+                                              'assets/images/video.png'),
+                                        ),
                                       ),
                                     ),
                                   ],
