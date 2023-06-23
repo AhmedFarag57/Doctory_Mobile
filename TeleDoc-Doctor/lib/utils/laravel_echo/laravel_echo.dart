@@ -32,8 +32,8 @@ class PusherConfig {
   static const key = "a70c1892eb4982269060";
   static const secret = "c6e260b35815cca97027";
   static const cluster = "eu";
-  //static const hostEndPoint = "https://serenity-dev.com";
-  static const hostEndPoint = "https://049b-154-177-59-149.ngrok-free.app";
+  static const hostEndPoint = "https://serenity-dev.com";
+  //static const hostEndPoint = "https://049b-154-177-59-149.ngrok-free.app";
   static const hostAuthEndPoint = "$hostEndPoint/api/broadcasting/auth";
   static const port = 6001;
 }

@@ -114,6 +114,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
     LaravelEcho.instance.private('chat.$chatId').listen('.message.sent', (e) {
       if (e is PusherEvent) {
         if (e.data != null) {
+          print(e.data);
           _handleNewMessage(jsonDecode(e.data!));
         }
       }
@@ -217,12 +218,12 @@ class _MessagingScreenState extends State<MessagingScreen> {
                     );
                     */
                     Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => VideoCallTestScreen(
-                            callId: chatId,
-                          ),
+                      MaterialPageRoute(
+                        builder: (context) => VideoCallTestScreen(
+                          callId: chatId,
                         ),
-                      );
+                      ),
+                    );
                   },
                   child: Container(
                     height: 40,
